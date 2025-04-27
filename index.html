@@ -578,8 +578,9 @@
 
     // ----- D3 TREE CODE -----
     const width = 4000;
-    const dx = 18;
-    const dy = 280;
+    const isMobile = window.innerWidth < 600;
+const dx = isMobile ? 12 : 18;
+const dy = isMobile ? 120 : 280;
     const margin = {top: 40, right: 120, bottom: 20, left: 120};
 
     const tree = d3.tree().nodeSize([dx, dy]);
