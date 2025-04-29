@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Partitioning Secondary Indexes by Term</title>
+</head>
+<body>
+<h1>Partitioning Secondary Indexes by Term</h1>
+
+<p>
+  Rather than each partition having its own secondary index (a <strong>local index</strong>), we can construct a <strong>global index</strong> that covers data in all partitions. However, we can’t just store that index on one node, since it would likely become a bottleneck and defeat the purpose of partitioning. A global index must also be partitioned, but it can be partitioned differently from the primary key index.
+</p>
+
+<p>
+  For example, red cars from all partitions appear under <code>color:red</code> in the index, but the index itself is partitioned so that colors starting with letters <em>a</em> to <em>r</em> appear in partition 0, and colors starting with <em>s</em> to <em>z</em> appear in partition 1. The index on the make of car can be partitioned similarly, with a boundary between certain letters.
+</p>
+
+<p>
+  This kind of index is called a <strong>term-partitioned</strong> index, because the <em>term</em> we are looking for determines the partition of the index. Here, a term would be something like <code>color:red</code>. The name "term" comes from full-text indexes, where terms are all the words occurring in a document.
+</p>
+
+<p>
+  We can partition the index by the term itself, or by using a hash of the term. Partitioning by the term itself is useful for range scans (e.g., numeric properties like the asking price of a car), whereas hashing the term results in a more even distribution of load.
+</p>
+
+<p>
+  The advantage of a global (term-partitioned) index over a document-partitioned index is that it can make reads more efficient: instead of doing a scatter/gather over all partitions, a client only needs to query the partition containing the desired term.
+</p>
+
+<p>
+  However, the downside of a global index is that writes are slower and more complex, because a single document write may affect multiple partitions of the index. Every term in the document might live on a different partition and possibly on a different node.
+</p>
+
+<p>
+  In an ideal world, the index would be updated immediately whenever a document is written. However, in a term-partitioned index, doing so would require a distributed transaction across all affected partitions, which many databases do not support.
+</p>
+
+<p>
+  In practice, updates to global secondary indexes are often <strong>asynchronous</strong>. That means if you query the index shortly after a write, your change may not yet be visible. For example, Amazon DynamoDB states that its global secondary indexes are typically updated within a fraction of a second under normal conditions, but may experience longer delays during infrastructure faults.
+</p>
+
+<p>
+  Other examples of global term-partitioned indexes include Riak's search feature and the Oracle data warehouse, which allows choosing between local and global indexing strategies.
+</p>
+
+<p>
+  We will revisit the topic of implementing term-partitioned secondary indexes in Chapter 12.
+</p>
+</body>
+</html>

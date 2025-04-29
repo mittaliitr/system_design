@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Rebalancing Partitions</title>
+</head>
+<body>
+<h1>Rebalancing Partitions</h1>
+
+<p>Over time, things change in a database:</p>
+<ul>
+  <li>The query throughput increases, so you want to add more CPUs to handle the load.</li>
+  <li>The dataset size increases, so you want to add more disks and RAM to store it.</li>
+  <li>A machine fails, and other machines need to take over the failed machine’s responsibilities.</li>
+</ul>
+
+<p>
+  All of these changes call for data and requests to be moved from one node to another.
+  The process of moving load from one node in the cluster to another is called <strong>rebalancing</strong>.
+</p>
+
+<p>No matter which partitioning scheme is used, rebalancing is usually expected to meet some minimum requirements:</p>
+<ul>
+  <li>After rebalancing, the load (data storage, read and write requests) should be shared fairly between the nodes in the cluster.</li>
+  <li>While rebalancing is happening, the database should continue accepting reads and writes.</li>
+  <li>No more data than necessary should be moved between nodes, to make rebalancing fast and to minimize the network and disk I/O load.</li>
+</ul>
+
+<h2>Strategies for Rebalancing</h2>
+
+<p>There are a few different ways of assigning partitions to nodes. Let’s briefly discuss each in turn.</p>
+
+<h3>How not to do it: hash mod N</h3>
+
+<p>
+  When partitioning by the hash of a key, it’s best to divide possible hashes into ranges and assign each range to a partition
+  (e.g., assign a key to partition 0 if <code>0 ≤ hash(key) &lt; b0</code>, to partition 1 if <code>b0 ≤ hash(key) &lt; b1</code>, and so on).
+</p>
+
+<p>
+  Perhaps you wondered why we don’t just use mod (the <code>%</code> operator in many programming languages).
+  For example, <code>hash(key) mod 10</code> would return a number between 0 and 9. If you have 10 nodes, numbered 0 to 9,
+  this seems like an easy way to assign each key to a node.
+</p>
+
+<p>
+  The problem with the mod N approach is that if the number of nodes <code>N</code> changes, most of the keys need to be moved.
+  For instance, if <code>hash(key) = 123456</code>:
+</p>
+<ul>
+  <li>With 10 nodes: 123456 mod 10 = 6 (key on node 6).</li>
+  <li>With 11 nodes: 123456 mod 11 = 3 (key moves to node 3).</li>
+  <li>With 12 nodes: 123456 mod 12 = 0 (key moves to node 0).</li>
+</ul>
+
+<p>Such frequent moves make rebalancing excessively expensive. We need a better approach that minimizes data movement.</p>
+
+<h3>Fixed number of partitions</h3>
+
+<p>
+  Fortunately, there’s a simple solution: create many more partitions than there are nodes,
+  and assign several partitions to each node. For example, a database cluster with 10 nodes
+  could be split into 1,000 partitions, with about 100 partitions per node.
+</p>
+
+<p>
+  When a node is added, it can "steal" a few partitions from every existing node until the partitions are evenly distributed again.
+  If a node is removed, the same redistribution happens in reverse.
+</p>
+
+<p>
+  Only entire partitions are moved between nodes. The number of partitions stays fixed, as does the assignment of keys to partitions.
+  The only change is which node is responsible for which partitions.
+</p>
+
+<p>
+  While data is transferred across nodes, reads and writes continue to use the old assignment until the transfer completes.
+</p>
+
+<p>
+  You can also accommodate hardware mismatches by assigning more partitions to stronger nodes,
+  letting them carry a larger share of the load.
+</p>
+
+<p>
+  This fixed-partition approach is used in databases like Riak, Elasticsearch, Couchbase, and Voldemort.
+</p>
+
+<p>
+  In such setups, the number of partitions is usually fixed during database setup and not changed afterward.
+  Although in principle you could split and merge partitions, a fixed number simplifies operations.
+</p>
+
+<p>
+  Choosing the right number of partitions is tricky if dataset size varies a lot over time:
+</p>
+
+<ul>
+  <li>Large partitions make rebalancing and recovery expensive.</li>
+  <li>Too many small partitions add management overhead.</li>
+</ul>
+
+<p>
+  The best performance is achieved when partitions are “just right” in size—neither too big nor too small—which is
+  difficult if partitions are fixed but the dataset size changes significantly.
+</p>
+</body>
+</html>

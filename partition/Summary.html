@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chapter 6 Summary - Partitioning</title>
+</head>
+<body>
+
+<h1>Chapter 6 Summary - Partitioning</h1>
+
+<p>In this chapter, we explored different ways of partitioning a large dataset into smaller subsets. Partitioning is necessary when you have so much data that storing and processing it on a single machine is no longer feasible.</p>
+
+<p>The goal of partitioning is to spread the data and query load evenly across multiple machines, avoiding hot spots (nodes with disproportionately high load). This requires choosing a partitioning scheme that is appropriate to your data, and rebalancing the partitions when nodes are added to or removed from the cluster.</p>
+
+<h2>Two Main Approaches to Partitioning</h2>
+<ul>
+    <li><strong>Key Range Partitioning</strong>:
+        <p>In this approach, keys are sorted, and a partition owns all the keys from some minimum up to some maximum. Sorting has the advantage that efficient range queries are possible, but there is a risk of hot spots if the application often accesses keys that are close together in the sorted order. Partitions are typically rebalanced dynamically by splitting the range into two subranges when a partition gets too big.</p>
+    </li>
+    <li><strong>Hash Partitioning</strong>:
+        <p>In this method, a hash function is applied to each key, and a partition owns a range of hashes. This method destroys the ordering of keys, making range queries inefficient, but may distribute load more evenly. It is common to create a fixed number of partitions in advance, assign several partitions to each node, and move entire partitions from one node to another when nodes are added or removed. Dynamic partitioning can also be used.</p>
+    </li>
+</ul>
+
+<h2>Hybrid Approaches</h2>
+<p>Hybrid approaches are also possible, for example with a compound key: using one part of the key to identify the partition and another part for the sort order.</p>
+
+<h2>Interaction Between Partitioning and Secondary Indexes</h2>
+<p>We also discussed the interaction between partitioning and secondary indexes. A secondary index also needs to be partitioned, and there are two methods:</p>
+<ul>
+    <li><strong>Document-partitioned indexes (local indexes)</strong>:
+        <p>Where the secondary indexes are stored in the same partition as the primary key and value. This means that only a single partition needs to be updated on write, but a read of the secondary index requires a scatter/gather across all partitions.</p>
+    </li>
+    <li><strong>Term-partitioned indexes (global indexes)</strong>:
+        <p>Where the secondary indexes are partitioned separately, using the indexed values. An entry in the secondary index may include records from all partitions of the primary key. When a document is written, several partitions of the secondary index need to be updated; however, a read can be served from a single partition.</p>
+    </li>
+</ul>
+
+<h2>Routing Queries to the Appropriate Partition</h2>
+<p>Finally, we discussed techniques for routing queries to the appropriate partition, which range from simple partition-aware load balancing to sophisticated parallel query execution engines.</p>
+
+<h2>Partitioned Database Operations</h2>
+<p>By design, every partition operates mostly independently—that’s what allows a partitioned database to scale to multiple machines. However, operations that need to write to several partitions can be difficult to reason about: for example, what happens if the write to one partition succeeds, but another fails? We will address that question in the following chapters.</p>
+
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Partitioning Secondary Indexes by Document</title>
+</head>
+<body>
+<h1>Partitioning Secondary Indexes by Document</h1>
+
+<p>
+  For example, imagine you are operating a website for selling used cars. Each listing has a unique ID—called the document ID—and you partition the database by the document ID (for example, IDs 0 to 499 in partition 0, IDs 500 to 999 in partition 1, etc.).
+</p>
+
+<p>
+  You want to let users search for cars, allowing them to filter by color and by make, so you need a secondary index on <strong>color</strong> and <strong>make</strong>. If you have declared the index, the database can perform the indexing automatically. For example, whenever a red car is added to the database, the database partition automatically adds it to the list of document IDs for the index entry <code>color:red</code>.
+</p>
+
+<p>
+  <strong>Note:</strong> If your database only supports a key-value model, you might be tempted to implement a secondary index yourself by creating a mapping from values to document IDs in application code. If you go down this route, you need to take great care to ensure your indexes remain consistent with the underlying data. Race conditions and intermittent write failures (where some changes were saved but others weren’t) can very easily cause the data to go out of sync.
+</p>
+
+<p>
+  In this indexing approach, each partition is completely separate: each partition maintains its own secondary indexes, covering only the documents in that partition. It doesn’t care what data is stored in other partitions. Whenever you write to the database—to add, remove, or update a document—you only deal with the partition that contains the document ID being written. For that reason, a document-partitioned index is also known as a <strong>local index</strong> (as opposed to a global index).
+</p>
+
+<p>
+  However, reading from a document-partitioned index requires care: unless you've specifically organized document IDs by value, there’s no reason why all cars with a particular color or make would be in the same partition. Red cars, for instance, may appear in both partition 0 and partition 1.
+</p>
+
+<p>
+  Thus, if you want to search for red cars, you need to send the query to <em>all</em> partitions and combine the results—a process known as <strong>scatter/gather</strong>. While this can be parallelized, it is prone to <em>tail latency amplification</em>, where the slowest partition delays the overall response.
+</p>
+
+<p>
+  Despite this downside, document-partitioned secondary indexes are widely used. Systems like MongoDB, Riak, Cassandra, Elasticsearch, SolrCloud, and VoltDB all follow this approach.
+</p>
+
+<p>
+  Most vendors recommend structuring your partitioning scheme to allow queries to be served from a single partition whenever possible. However, this isn’t always feasible, especially when multiple secondary index filters are used in a query (e.g., filtering cars by <strong>color</strong> <em>and</em> <strong>make</strong>).
+</p>
+</body>
+</html>
