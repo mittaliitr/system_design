@@ -28,692 +28,146 @@
           stroke-width: 3px;
         }
         #tree-scroll-container {
-  width: 100%;
-  overflow-x: auto;
-  border: 1px solid #fff; /* Optional: just for visibility */
-  background: #fff;       /* Optional: matches your theme */
-}
-
+          width: 100%;
+          overflow-x: auto;
+          border: 1px solid #fff;
+          background: #fff;
+        }
     </style>
 </head>
 <body>
-<h2> Designing Data-Intensive Applications</h2>
+<h2>Designing Data-Intensive Applications</h2>
 <div id="tree-scroll-container" style="width:100%; max-width:1900px; overflow-x:auto; border:1px solid #bbb; background:#eee;">
     <div id="tree-container"></div>
 </div>
 
 <script>
-    // ----- YOUR DATA HERE -----
-    const treeData ={
-  name: 'Designing Data-Intensive Applications',
-  url: 'https://example.com',
-  children: [
-    {
-      name: 'Part I: Foundations of Data Systems',
-      url: 'https://example.com/part1',
-      children: [
-        {
-          name: '1. Reliable, Scalable, and Maintainable Applications',
-          url: 'https://example.com/ch1',
-          children: [
-            {
-              name: 'Thinking About Data Systems',
-              url: 'https://example.com/ch1-1',
-              children: [
-                { name: 'Data-Intensive vs Compute-Intensive', url: 'https://example.com/ch1-1-1' },
-                { name: 'Complexity of Data Systems', url: 'https://example.com/ch1-1-2' },
-              ]
-            },
-            {
-              name: 'Reliability',
-              url: 'https://example.com/ch1-2',
-              children: [
-                { name: 'Hardware Faults', url: 'https://example.com/ch1-2-1' },
-                { name: 'Software Errors', url: 'https://example.com/ch1-2-2' },
-                { name: 'Human Errors', url: 'https://example.com/ch1-2-3' },
-                { name: 'How to Make Systems Reliable', url: 'https://example.com/ch1-2-4' },
-              ]
-            },
-            {
-              name: 'Scalability',
-              url: 'https://example.com/ch1-3',
-              children: [
-                { name: 'Describing Load', url: 'https://example.com/ch1-3-1' },
-                { name: 'Describing Performance', url: 'https://example.com/ch1-3-2' },
-                { name: 'Approaches for Coping with Load', url: 'https://example.com/ch1-3-3' },
-              ]
-            },
-            {
-              name: 'Maintainability',
-              url: 'https://example.com/ch1-4',
-              children: [
-                { name: 'Operability', url: 'https://example.com/ch1-4-1' },
-                { name: 'Simplicity', url: 'https://example.com/ch1-4-2' },
-                { name: 'Evolvability', url: 'https://example.com/ch1-4-3' },
-              ]
-            },
-          ]
-        },
-        {
-          name: '2. Data Models and Query Languages',
-          url: 'https://example.com/ch2',
-          children: [
-            {
-              name: 'Relational Model and Document Model',
-              url: 'https://example.com/ch2-1',
-              children: [
-                { name: 'Relational Model', url: 'https://example.com/ch2-1-1' },
-                { name: 'Document Model', url: 'https://example.com/ch2-1-2' },
-                { name: 'Comparing Document and Relational', url: 'https://example.com/ch2-1-3' },
-              ]
-            },
-            {
-              name: 'Schema Flexibility in Document Model',
-              url: 'https://example.com/ch2-2',
-              children: [
-                { name: 'Schema-on-Read and Schema-on-Write', url: 'https://example.com/ch2-2-1' },
-                { name: 'Normalization and Denormalization', url: 'https://example.com/ch2-2-2' },
-              ]
-            },
-            {
-              name: 'Query Languages for Data',
-              url: 'https://example.com/ch2-3',
-              children: [
-                { name: 'Declarative Queries', url: 'https://example.com/ch2-3-1' },
-                { name: 'MapReduce Querying', url: 'https://example.com/ch2-3-2' },
-              ]
-            },
-            {
-              name: 'Graph-Like Data Models',
-              url: 'https://example.com/ch2-4',
-              children: [
-                { name: 'Property Graphs', url: 'https://example.com/ch2-4-1' },
-                { name: 'Triple Stores', url: 'https://example.com/ch2-4-2' },
-                { name: 'Graph Query Languages', url: 'https://example.com/ch2-4-3' },
-              ]
-            },
-          ]
-        },
-        {
-          name: '3. Storage and Retrieval',
-          url: 'https://example.com/ch3',
-          children: [
-            {
-              name: 'Data Structures That Power Databases',
-              url: 'https://example.com/ch3-1',
-              children: [
-                { name: 'Log-Structured Storage', url: 'https://example.com/ch3-1-1' },
-                { name: 'Page-Oriented Storage', url: 'https://example.com/ch3-1-2' },
-              ]
-            },
-            {
-              name: 'Hash Indexes',
-              url: 'https://example.com/ch3-2',
-              children: [
-                { name: 'Hash Table Storage Engines', url: 'https://example.com/ch3-2-1' },
-                { name: 'Limitations of Hash Indexes', url: 'https://example.com/ch3-2-2' },
-              ]
-            },
-            {
-              name: 'SSTables and LSM-Trees',
-              url: 'https://example.com/ch3-3',
-              children: [
-                { name: 'Sorted String Table (SSTable)', url: 'https://example.com/ch3-3-1' },
-                { name: 'Log-Structured Merge-Tree (LSM)', url: 'https://example.com/ch3-3-2' },
-                { name: 'Performance Optimizations', url: 'https://example.com/ch3-3-3' },
-              ]
-            },
-            {
-              name: 'B-Trees',
-              url: 'https://example.com/ch3-4',
-              children: [
-                { name: 'How B-Trees Work', url: 'https://example.com/ch3-4-1' },
-                { name: 'B-Tree Variants', url: 'https://example.com/ch3-4-2' },
-                { name: 'Comparing B-Trees and LSM-Trees', url: 'https://example.com/ch3-4-3' },
-              ]
-            },
-            {
-              name: 'Other Indexing Structures',
-              url: 'https://example.com/ch3-5',
-              children: [
-                { name: 'Bitmap Indexes', url: 'https://example.com/ch3-5-1' },
-                { name: 'Full-Text Indexes', url: 'https://example.com/ch3-5-2' },
-                { name: 'Spatial Indexes', url: 'https://example.com/ch3-5-3' },
-              ]
-            },
-            {
-              name: 'Transaction Logs',
-              url: 'https://example.com/ch3-6',
-              children: [
-                { name: 'Write-Ahead Log', url: 'https://example.com/ch3-6-1' },
-                { name: 'Log Compaction', url: 'https://example.com/ch3-6-2' },
-              ]
-            },
-          ]
-        },
-        {
-          name: '4. Encoding and Evolution',
-          url: 'https://example.com/ch4',
-          children: [
-            {
-              name: 'Formats for Encoding Data',
-              url: 'https://example.com/ch4-1',
-              children: [
-                { name: 'Language-Specific Formats', url: 'https://example.com/ch4-1-1' },
-                { name: 'JSON, XML, and Binary Formats', url: 'https://example.com/ch4-1-2' },
-              ]
-            },
-            {
-              name: 'Modes of Dataflow',
-              url: 'https://example.com/ch4-2',
-              children: [
-                { name: 'Dataflow Through Databases', url: 'https://example.com/ch4-2-1' },
-                { name: 'Dataflow Through Services', url: 'https://example.com/ch4-2-2' },
-                { name: 'Message Brokers', url: 'https://example.com/ch4-2-3' },
-              ]
-            },
-            {
-              name: 'Schema Evolution',
-              url: 'https://example.com/ch4-3',
-              children: [
-                { name: 'Schema Changes', url: 'https://example.com/ch4-3-1' },
-                { name: 'Backwards and Forwards Compatibility', url: 'https://example.com/ch4-3-2' },
-              ]
-            },
-            {
-              name: 'Compatibility',
-              url: 'https://example.com/ch4-4',
-              children: [
-                { name: 'Strategies for Compatibility', url: 'https://example.com/ch4-4-1' },
-              ]
-            },
-          ]
-        },
-      ]
-    },
-    {
-      name: 'Part II: Distributed Data',
-      url: 'https://example.com/part2',
-      children: [
-        {
-          name: '5. Replication',
-          url: 'https://example.com/ch5',
-          children: [
-            {
-              name: 'Leaders and Followers',
-              url: 'https://example.com/ch5-1',
-              children: [
-                { name: 'Single-Leader Replication', url: 'https://docs.google.com/document/d/1V5CCmenG4vR560ip3agEru5ijpaGrfrkU7pilxE-ZIY/edit?usp=sharing' },
-                { name: 'Multi-Leader Replication', url: 'https://docs.google.com/document/d/1RR1NX3COsjuodLQFlVPJaUlN-G6BUJpcOtE2bFxktrw/edit?usp=sharing' },
-                { name: 'Leaderless Replication', url: 'https://docs.google.com/document/d/1nh1S76PZ1A1Y9wCtM_KRb3Tv1AhaVVUnBXE6vgoQq-8/edit?usp=sharing' },
-              ]
-            },
-            {
-              name: 'Synchronous vs Asynchronous Replication',
-              url: 'https://example.com/ch5-2',
-              children: [
-                { name: 'Sync Replication', url: 'https://example.com/ch5-2-1' },
-                { name: 'Async Replication', url: 'https://example.com/ch5-2-2' },
-              ]
-            },
-            {
-              name: 'Problems with Replication Lag',
-              url: 'https://example.com/ch5-3',
-              children: [
-                { name: 'Reading Your Own Writes', url: 'https://example.com/ch5-3-1' },
-                { name: 'Monotonic Reads', url: 'https://example.com/ch5-3-2' },
-                { name: 'Consistent Prefix Reads', url: 'https://example.com/ch5-3-3' },
-              ]
-            },
-            {
-              name: 'Multi-Leader Replication',
-              url: 'https://example.com/ch5-4',
-              children: [
-                { name: 'Use Cases', url: 'https://example.com/ch5-4-1' },
-                { name: 'Conflict Resolution', url: 'https://example.com/ch5-4-2' },
-                { name: 'Topology', url: 'https://example.com/ch5-4-3' },
-              ]
-            },
-            {
-              name: 'Leaderless Replication',
-              url: 'https://example.com/ch5-5',
-              children: [
-                { name: 'Quorum Reads and Writes', url: 'https://example.com/ch5-5-1' },
-                { name: 'Handling Node Failures', url: 'https://example.com/ch5-5-2' },
-                { name: 'Hinted Handoff', url: 'https://example.com/ch5-5-3' },
-                { name: 'Read Repair', url: 'https://example.com/ch5-5-4' },
-              ]
-            },
-          ]
-        },
-       {
-  "name": "6. Partitioning",
-  "url": "partition/6. Partitioning.html",
-  "children": [
-    {
-      "name": "Partitioning of Data",
-      "url": "partition/Partitioning of Data.html",
-      "children": [
-        { "name": "Strategies for Partitioning", "url": "partition/Strategies for Partitioning.html" },
-        { "name": "Partitioning by Key Range", "url": "partition/Partitioning by Key Range.html" },
-        { "name": "Partitioning by Hash", "url": "partition/Partitioning by Hash.html" }
-      ]
-    },
-    {
-      "name": "Partitioning and Secondary Indexes",
-      "url": "partition/Partitioning and Secondary Indexes.html",
-      "children": [
-        { "name": "Partitioning Secondary Indexes by Document", "url": "partition/Partitioning Secondary Indexes by Document.html" },
-        { "name": "Partitioning Secondary Indexes by Term", "url": "partition/Partitioning Secondary Indexes by Term.html" }
-      ]
-    },
-    {
-      "name": "Rebalancing Partitions",
-      "url": "partition/Rebalancing Partitions.html",
-      "children": [
-        { "name": "Dynamic Partition Rebalancing", "url": "partition/Dynamic Partition Rebalancing.html" },
-        { "name": "Operational Issues", "url": "partition/Operational Issues.html" }
-      ]
-    },
-    {
-      "name": "Request Routing",
-      "url": "partition/Request Routing.html",
-      "children": [
-        { "name": "Routing by Client", "url": "partition/Routing by Client.html" },
-        { "name": "Routing by Coordinator", "url": "partition/Routing by Coordinator.html" },
-      ]
-    },
-    {
-      "name": "Summary",
-      "url": "partition/Summary.html"
-    }
-  ]
-}
-,
-        {
-          name: '7. Transactions',
-          url: 'https://example.com/ch7',
-          children: [
-            {
-              name: 'The Slippery Concept of a Transaction',
-              url: 'https://example.com/ch7-1',
-              children: [
-                { name: 'ACID Properties', url: 'https://example.com/ch7-1-1' },
-                { name: 'Single-Object Transactions', url: 'https://example.com/ch7-1-2' },
-              ]
-            },
-            {
-              name: 'Weak Isolation Levels',
-              url: 'https://example.com/ch7-2',
-              children: [
-                { name: 'Read Committed', url: 'https://example.com/ch7-2-1' },
-                { name: 'Snapshot Isolation', url: 'https://example.com/ch7-2-2' },
-                { name: 'Repeatable Read and Serializable', url: 'https://example.com/ch7-2-3' },
-              ]
-            },
-            {
-              name: 'Serializability',
-              url: 'https://example.com/ch7-3',
-              children: [
-                { name: 'Serializable Isolation', url: 'https://example.com/ch7-3-1' },
-                { name: 'Serializable Snapshot Isolation', url: 'https://example.com/ch7-3-2' },
-                { name: 'Serializable with Two-Phase Locking', url: 'https://example.com/ch7-3-3' },
-              ]
-            },
-            {
-              name: 'Distributed Transactions',
-              url: 'https://example.com/ch7-4',
-              children: [
-                { name: 'Two-Phase Commit', url: 'https://example.com/ch7-4-1' },
-                { name: 'Three-Phase Commit', url: 'https://example.com/ch7-4-2' },
-                { name: 'Consensus Protocols', url: 'https://example.com/ch7-4-3' },
-              ]
-            },
-          ]
-        },
-        {
-          name: '8. The Trouble with Distributed Systems',
-          url: 'https://example.com/ch8',
-          children: [
-            {
-              name: 'Faults and Partial Failures',
-              url: 'https://example.com/ch8-1',
-              children: [
-                { name: 'Crash Faults', url: 'https://example.com/ch8-1-1' },
-                { name: 'Omission Faults', url: 'https://example.com/ch8-1-2' },
-              ]
-            },
-            {
-              name: 'Unreliable Networks',
-              url: 'https://example.com/ch8-2',
-              children: [
-                { name: 'Network Partitions', url: 'https://example.com/ch8-2-1' },
-                { name: 'Network Latency', url: 'https://example.com/ch8-2-2' },
-              ]
-            },
-            {
-              name: 'Unreliable Clocks',
-              url: 'https://example.com/ch8-3',
-              children: [
-                { name: 'Clock Synchronization', url: 'https://example.com/ch8-3-1' },
-                { name: 'Logical Clocks', url: 'https://example.com/ch8-3-2' },
-              ]
-            },
-            {
-              name: 'Process Pauses',
-              url: 'https://example.com/ch8-4',
-              children: [
-                { name: 'Stop-the-World Pauses', url: 'https://example.com/ch8-4-1' },
-                { name: 'GC Pauses', url: 'https://example.com/ch8-4-2' },
-              ]
-            },
-            {
-              name: 'Byzantine Faults',
-              url: 'https://example.com/ch8-5',
-              children: [
-                { name: 'Byzantine Generals Problem', url: 'https://example.com/ch8-5-1' },
-                { name: 'Practical Byzantine Fault Tolerance', url: 'https://example.com/ch8-5-2' },
-              ]
-            },
-          ]
-        },
-        {
-          name: '9. Consistency and Consensus',
-          url: 'https://example.com/ch9',
-          children: [
-            {
-              name: 'Consistency Guarantees',
-              url: 'https://example.com/ch9-1',
-              children: [
-                { name: 'Linearizability', url: 'https://example.com/ch9-1-1' },
-                { name: 'Causal Consistency', url: 'https://example.com/ch9-1-2' },
-                { name: 'Eventual Consistency', url: 'https://example.com/ch9-1-3' },
-              ]
-            },
-            {
-              name: 'Ordering Guarantees',
-              url: 'https://example.com/ch9-2',
-              children: [
-                { name: 'Total Order Broadcast', url: 'https://example.com/ch9-2-1' },
-                { name: 'Partial Ordering', url: 'https://example.com/ch9-2-2' },
-              ]
-            },
-            {
-              name: 'Distributed Transactions and Consensus',
-              url: 'https://example.com/ch9-3',
-              children: [
-                { name: 'Atomic Commit and Consensus', url: 'https://example.com/ch9-3-1' },
-                { name: 'Paxos and Raft', url: 'https://example.com/ch9-3-2' },
-              ]
-            },
-            {
-              name: 'Implementation of Consensus',
-              url: 'https://example.com/ch9-4',
-              children: [
-                { name: 'Consensus Algorithms', url: 'https://example.com/ch9-4-1' },
-                { name: 'ZooKeeper', url: 'https://example.com/ch9-4-2' },
-              ]
-            },
-          ]
-        },
-      ]
-    },
-    {
-      name: 'Part III: Derived Data',
-      url: 'https://example.com/part3',
-      children: [
-        {
-          name: '10. Batch Processing',
-          url: 'https://example.com/ch10',
-          children: [
-            {
-              name: 'Batch Processing with Unix Tools',
-              url: 'https://example.com/ch10-1',
-              children: [
-                { name: 'Pipelines', url: 'https://example.com/ch10-1-1' },
-                { name: 'Data Flow', url: 'https://example.com/ch10-1-2' },
-              ]
-            },
-            {
-              name: 'MapReduce and Distributed Filesystems',
-              url: 'https://example.com/ch10-2',
-              children: [
-                { name: 'MapReduce Basics', url: 'https://example.com/ch10-2-1' },
-                { name: 'Distributed Filesystems', url: 'https://example.com/ch10-2-2' },
-              ]
-            },
-            {
-              name: 'Workflow Orchestration',
-              url: 'https://example.com/ch10-3',
-              children: [
-                { name: 'Job Scheduling', url: 'https://example.com/ch10-3-1' },
-                { name: 'Data Dependencies', url: 'https://example.com/ch10-3-2' },
-              ]
-            },
-            {
-              name: 'Fault Tolerance',
-              url: 'https://example.com/ch10-4',
-              children: [
-                { name: 'Recovery from Failures', url: 'https://example.com/ch10-4-1' },
-                { name: 'Idempotency', url: 'https://example.com/ch10-4-2' },
-              ]
-            },
-          ]
-        },
-        {
-          name: '11. Stream Processing',
-          url: 'https://example.com/ch11',
-          children: [
-            {
-              name: 'Transmitting Event Streams',
-              url: 'https://example.com/ch11-1',
-              children: [
-                { name: 'Message Brokers', url: 'https://example.com/ch11-1-1' },
-                { name: 'Partitioned Logs', url: 'https://example.com/ch11-1-2' },
-              ]
-            },
-            {
-              name: 'Processing Streams',
-              url: 'https://example.com/ch11-2',
-              children: [
-                { name: 'Stateless vs Stateful Processing', url: 'https://example.com/ch11-2-1' },
-                { name: 'Event Time vs Processing Time', url: 'https://example.com/ch11-2-2' },
-              ]
-            },
-            {
-              name: 'Windowed Aggregations',
-              url: 'https://example.com/ch11-3',
-              children: [
-                { name: 'Tumbling and Sliding Windows', url: 'https://example.com/ch11-3-1' },
-                { name: 'Session Windows', url: 'https://example.com/ch11-3-2' },
-              ]
-            },
-            {
-              name: 'Joins in Stream Processing',
-              url: 'https://example.com/ch11-4',
-              children: [
-                { name: 'Stream-Stream Joins', url: 'https://example.com/ch11-4-1' },
-                { name: 'Stream-Table Joins', url: 'https://example.com/ch11-4-2' },
-              ]
-            },
-            {
-              name: 'Fault Tolerance',
-              url: 'https://example.com/ch11-5',
-              children: [
-                { name: 'Checkpointing', url: 'https://example.com/ch11-5-1' },
-                { name: 'Replay and Recovery', url: 'https://example.com/ch11-5-2' },
-              ]
-            },
-          ]
-        },
-        {
-          name: '12. The Future of Data Systems',
-          url: 'https://example.com/ch12',
-          children: [
-            {
-              name: 'The Big Picture',
-              url: 'https://example.com/ch12-1',
-              children: [
-                { name: 'Integration of Ideas', url: 'https://example.com/ch12-1-1' },
-                { name: 'Unified Data Platforms', url: 'https://example.com/ch12-1-2' },
-              ]
-            },
-            {
-              name: 'Trends in Data Systems',
-              url: 'https://example.com/ch12-2',
-              children: [
-                { name: 'Cloud-Native Data Systems', url: 'https://example.com/ch12-2-1' },
-                { name: 'Separation of Storage and Compute', url: 'https://example.com/ch12-2-2' },
-              ]
-            },
-            {
-              name: 'Research and Open Problems',
-              url: 'https://example.com/ch12-3',
-              children: [
-                { name: 'Open Research Questions', url: 'https://example.com/ch12-3-1' },
-                { name: 'Future Directions', url: 'https://example.com/ch12-3-2' },
-              ]
-            },
-          ]
-        },
-      ]
-    },
-  ]
-};
+    d3.json("DDIA.json").then(function(treeData) {
+        const width = 4000;
+        const isMobile = window.innerWidth < 600;
+        const dx = isMobile ? 12 : 18;
+        const dy = isMobile ? 120 : 280;
+        const margin = {top: 40, right: 120, bottom: 20, left: 120};
 
-    // ----- D3 TREE CODE -----
-    const width = 4000;
-    const isMobile = window.innerWidth < 600;
-const dx = isMobile ? 12 : 18;
-const dy = isMobile ? 120 : 280;
-    const margin = {top: 40, right: 120, bottom: 20, left: 120};
+        const tree = d3.tree().nodeSize([dx, dy]);
+        const diagonal = d3.linkHorizontal().x(d => d.y).y(d => d.x);
 
-    const tree = d3.tree().nodeSize([dx, dy]);
-    const diagonal = d3.linkHorizontal().x(d => d.y).y(d => d.x);
+        const root = d3.hierarchy(treeData);
+        root.x0 = dy / 2;
+        root.y0 = 0;
+        root.descendants().forEach((d, i) => {
+          d.id = i;
+          d._children = d.children;
+          if (d.depth && d.depth > 1) d.children = null; // Collapse after 1st level
+        });
 
-    const root = d3.hierarchy(treeData);
-    root.x0 = dy / 2;
-    root.y0 = 0;
-    root.descendants().forEach((d, i) => {
-      d.id = i;
-      d._children = d.children;
-      if (d.depth && d.depth > 1) d.children = null; // Collapse after 1st level
+        const svgWidth = 4000;
+        const svg = d3.select("#tree-container")
+          .append("svg")
+          .attr("width", svgWidth)
+          .attr("height", dx * 40)
+          .attr("viewBox", [-margin.left, -margin.top, svgWidth/2, dx * 40])
+          .style("font", "13px sans-serif")
+          .style("user-select", "none");
+
+        let duration = 400;
+
+        function update(source) {
+          const nodes = root.descendants().reverse();
+          const links = root.links();
+
+          tree(root);
+
+          let left = root;
+          let right = root;
+          root.eachBefore(node => {
+            if (node.x < left.x) left = node;
+            if (node.x > right.x) right = node;
+          });
+
+          const height = right.x - left.x + margin.top + margin.bottom;
+
+          const transition = svg.transition()
+            .duration(duration)
+            .attr("viewBox", [-margin.left, left.x - margin.top, width, height]);
+
+          const node = svg.selectAll("g.node")
+            .data(nodes, d => d.id);
+
+          const nodeEnter = node.enter().append("g")
+            .attr("class", "node")
+            .attr("transform", d => `translate(${source.y0},${source.x0})`)
+            .on("click", (event, d) => {
+              d.children = d.children ? null : d._children;
+              update(d);
+            });
+
+          nodeEnter.append("circle")
+            .attr("r", 6)
+            .attr("fill", d => d._children ? "#555" : "#fff");
+
+          const anchor = nodeEnter.append("a")
+            .attr("xlink:href", d => d.data.url)
+            .attr("target", "_blank")
+            .attr("rel", "noopener noreferrer");
+
+          anchor.append("text")
+            .attr("dy", "0.31em")
+            .attr("x", d => d._children ? -10 : 10)
+            .attr("text-anchor", d => d._children ? "end" : "start")
+            .text(d => d.data.name);
+
+          anchor.append("text")
+            .attr("dy", "0.31em")
+            .attr("x", d => d._children ? -10 : 10)
+            .attr("text-anchor", d => d._children ? "end" : "start")
+            .attr("stroke", "white")
+            .text(d => d.data.name)
+            .lower();
+
+          const nodeUpdate = node.merge(nodeEnter).transition(transition)
+            .attr("transform", d => `translate(${d.y},${d.x})`);
+
+          nodeUpdate.select("circle")
+            .attr("r", 6)
+            .attr("fill", d => d._children ? "#555" : "#fff");
+
+          nodeUpdate.select("text")
+            .style("fill-opacity", 1);
+
+          const nodeExit = node.exit().transition(transition).remove()
+            .attr("transform", d => `translate(${source.y},${source.x})`)
+            .style("opacity", 0);
+
+          const link = svg.selectAll("path.link")
+            .data(links, d => d.target.id);
+
+          const linkEnter = link.enter().insert("path", "g")
+            .attr("class", "link")
+            .attr("d", d => {
+              const o = {x: source.x0, y: source.y0};
+              return diagonal({source: o, target: o});
+            });
+
+          link.merge(linkEnter).transition(transition)
+            .attr("d", diagonal);
+
+          link.exit().transition(transition).remove()
+            .attr("d", d => {
+              const o = {x: source.x, y: source.y};
+              return diagonal({source: o, target: o});
+            });
+
+          root.eachBefore(d => {
+            d.x0 = d.x;
+            d.y0 = d.y;
+          });
+        }
+
+        update(root);
+    }).catch(function(error) {
+        console.error("Error loading DDIA.json:", error);
     });
-
-const svgWidth = 4000; // or larger, depending on your tree
-const svg = d3.select("#tree-container")
-  .append("svg")
-  .attr("width", svgWidth)
-  .attr("height", dx * 40) // adjust as needed
-  .attr("viewBox", [-margin.left, -margin.top, svgWidth/2, dx * 40])
-  .style("font", "13px sans-serif")
-  .style("user-select", "none");
-
-    let duration = 400;
-
-    function update(source) {
-      const nodes = root.descendants().reverse();
-      const links = root.links();
-
-      // Compute the new tree layout.
-      tree(root);
-
-      let left = root;
-      let right = root;
-      root.eachBefore(node => {
-        if (node.x < left.x) left = node;
-        if (node.x > right.x) right = node;
-      });
-
-      const height = right.x - left.x + margin.top + margin.bottom;
-
-      const transition = svg.transition()
-        .duration(duration)
-        .attr("viewBox", [-margin.left, left.x - margin.top, width, height]);
-
-      // Update the nodes…
-      const node = svg.selectAll("g.node")
-        .data(nodes, d => d.id);
-
-      // Enter new nodes at the parent's previous position.
-      const nodeEnter = node.enter().append("g")
-        .attr("class", "node")
-        .attr("transform", d => `translate(${source.y0},${source.x0})`)
-        .on("click", (event, d) => {
-          d.children = d.children ? null : d._children;
-          update(d);
-        });
-
-      nodeEnter.append("circle")
-        .attr("r", 6)
-        .attr("fill", d => d._children ? "#555" : "#fff");
-
-const anchor = nodeEnter.append("a")
-  .attr("xlink:href", d => d.data.url)
-  .attr("target", "_blank")
-  .attr("rel", "noopener noreferrer");
-
-anchor.append("text")
-  .attr("dy", "0.31em")
-  .attr("x", d => d._children ? -10 : 10)
-  .attr("text-anchor", d => d._children ? "end" : "start")
-  .text(d => d.data.name);
-
-anchor.append("text")
-  .attr("dy", "0.31em")
-  .attr("x", d => d._children ? -10 : 10)
-  .attr("text-anchor", d => d._children ? "end" : "start")
-  .attr("stroke", "white")
-  .text(d => d.data.name)
-  .lower();
-
-      // Transition nodes to their new position.
-      const nodeUpdate = node.merge(nodeEnter).transition(transition)
-        .attr("transform", d => `translate(${d.y},${d.x})`);
-
-      nodeUpdate.select("circle")
-        .attr("r", 6)
-        .attr("fill", d => d._children ? "#555" : "#fff");
-
-      nodeUpdate.select("text")
-        .style("fill-opacity", 1);
-
-      // Transition exiting nodes to the parent's new position.
-      const nodeExit = node.exit().transition(transition).remove()
-        .attr("transform", d => `translate(${source.y},${source.x})`)
-        .style("opacity", 0);
-
-      // Update the links…
-      const link = svg.selectAll("path.link")
-        .data(links, d => d.target.id);
-
-      // Enter any new links at the parent's previous position.
-      const linkEnter = link.enter().insert("path", "g")
-        .attr("class", "link")
-        .attr("d", d => {
-          const o = {x: source.x0, y: source.y0};
-          return diagonal({source: o, target: o});
-        });
-
-      // Transition links to their new position.
-      link.merge(linkEnter).transition(transition)
-        .attr("d", diagonal);
-
-      // Transition exiting nodes to the parent's new position.
-      link.exit().transition(transition).remove()
-        .attr("d", d => {
-          const o = {x: source.x, y: source.y};
-          return diagonal({source: o, target: o});
-        });
-
-      // Stash the old positions for transition.
-      root.eachBefore(d => {
-        d.x0 = d.x;
-        d.y0 = d.y;
-      });
-    }
-
-    update(root);
 </script>
 </body>
 </html>
