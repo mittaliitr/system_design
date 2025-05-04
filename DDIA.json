@@ -191,51 +191,202 @@
       "children": [
         {
           "name": "5. Replication",
-          "url": "https://example.com/ch5",
+          "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/",
           "children": [
             {
               "name": "Leaders and Followers",
-              "url": "https://example.com/ch5-1",
+              "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#leaders-and-followers",
               "children": [
-                { "name": "Single-Leader Replication", "url": "https://docs.google.com/document/d/1V5CCmenG4vR560ip3agEru5ijpaGrfrkU7pilxE-ZIY/edit?usp=sharing" },
-                { "name": "Multi-Leader Replication", "url": "https://docs.google.com/document/d/1RR1NX3COsjuodLQFlVPJaUlN-G6BUJpcOtE2bFxktrw/edit?usp=sharing" },
-                { "name": "Leaderless Replication", "url": "https://docs.google.com/document/d/1nh1S76PZ1A1Y9wCtM_KRb3Tv1AhaVVUnBXE6vgoQq-8/edit?usp=sharing" }
-              ]
-            },
-            {
-              "name": "Synchronous vs Asynchronous Replication",
-              "url": "https://example.com/ch5-2",
-              "children": [
-                { "name": "Sync Replication", "url": "https://example.com/ch5-2-1" },
-                { "name": "Async Replication", "url": "https://example.com/ch5-2-2" }
+                {
+                  "name": "Synchronous Versus Asynchronous Replication",
+                  "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#synchronous-versus-asynchronous-replication",
+                  "children": [
+                    {
+                      "name": "Synchronous Replication",
+                      "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#synchronous-replication",
+                      "children": []
+                    },
+                    {
+                      "name": "Asynchronous Replication",
+                      "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#asynchronous-replication",
+                      "children": []
+                    },
+                    {
+                      "name": "Setting Up New Followers",
+                      "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#setting-up-new-followers",
+                      "children": []
+                    },
+                    {
+                      "name": "Handling Node Outages",
+                      "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#handling-node-outages",
+                      "children": [
+                        {
+                          "name": "Scenario A - Follower Failure: Catch-up recovery",
+                          "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#scenario-a---follower-failure-catch-up-recovery",
+                          "children": []
+                        },
+                        {
+                          "name": "Scenario B - Leader failure: Failover",
+                          "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#scenario-b---leader-failure-failover",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Implementation of Replication Logs",
+                      "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#implementation-of-replication-logs",
+                      "children": []
+                    }
+                  ]
+                }
               ]
             },
             {
               "name": "Problems with Replication Lag",
-              "url": "https://example.com/ch5-3",
+              "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#problems-with-replication-lag",
               "children": [
-                { "name": "Reading Your Own Writes", "url": "https://example.com/ch5-3-1" },
-                { "name": "Monotonic Reads", "url": "https://example.com/ch5-3-2" },
-                { "name": "Consistent Prefix Reads", "url": "https://example.com/ch5-3-3" }
+                {
+                  "name": "Other Consistency Levels",
+                  "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#other-consistency-levels",
+                  "children": [
+                    {
+                      "name": "Reading Your Own Writes",
+                      "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#reading-your-own-writes",
+                      "children": []
+                    },
+                    {
+                      "name": "Monotonic Reads",
+                      "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#monotonic-reads",
+                      "children": []
+                    },
+                    {
+                      "name": "Consistent Prefix Reads",
+                      "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#consistent-prefix-reads",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Solutions for Replication Lag",
+                  "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#solutions-for-replication-lag",
+                  "children": []
+                }
               ]
             },
             {
               "name": "Multi-Leader Replication",
-              "url": "https://example.com/ch5-4",
+              "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#multi-leader-replication",
               "children": [
-                { "name": "Use Cases", "url": "https://example.com/ch5-4-1" },
-                { "name": "Conflict Resolution", "url": "https://example.com/ch5-4-2" },
-                { "name": "Topology", "url": "https://example.com/ch5-4-3" }
+                {
+                  "name": "Use Cases for Multi-Leader Replication",
+                  "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#use-cases-for-multi-leader-replication",
+                  "children": []
+                },
+                {
+                  "name": "Handling Write Conflicts",
+                  "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#handling-write-conflicts",
+                  "children": [
+                    {
+                      "name": "Synchronous versus asynchronous conflict detection",
+                      "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#synchronous-versus-asynchronous-conflict-detection",
+                      "children": []
+                    },
+                    {
+                      "name": "Conflict Avoidance",
+                      "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#conflict-avoidance",
+                      "children": []
+                    },
+                    {
+                      "name": "Converging toward a consistent state",
+                      "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#converging-toward-a-consistent-state",
+                      "children": []
+                    },
+                    {
+                      "name": "Custom Conflict Resolution Logic",
+                      "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#custom-conflict-resolution-logic",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Multi-Leader Replication Topologies",
+                  "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#multi-leader-replication-topologies",
+                  "children": []
+                }
               ]
             },
             {
               "name": "Leaderless Replication",
-              "url": "https://example.com/ch5-5",
+              "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#leaderless-replication",
               "children": [
-                { "name": "Quorum Reads and Writes", "url": "https://example.com/ch5-5-1" },
-                { "name": "Handling Node Failures", "url": "https://example.com/ch5-5-2" },
-                { "name": "Hinted Handoff", "url": "https://example.com/ch5-5-3" },
-                { "name": "Read Repair", "url": "https://example.com/ch5-5-4" }
+                {
+                  "name": "Preventing Stale Reads",
+                  "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#preventing-stale-reads",
+                  "children": []
+                },
+                {
+                  "name": "Read repair and anti-entropy",
+                  "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#read-repair-and-anti-entropy",
+                  "children": []
+                },
+                {
+                  "name": "Quorums for reading and writing",
+                  "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#quorums-for-reading-and-writing",
+                  "children": []
+                },
+                {
+                  "name": "Limitations of Quorum Consistency",
+                  "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#limitations-of-quorum-consistency",
+                  "children": [
+                    {
+                      "name": "Monitoring Staleness",
+                      "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#monitoring-staleness",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Sloppy Quorums and Hinted Handoff",
+                  "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#sloppy-quorums-and-hinted-handoff",
+                  "children": [
+                    {
+                      "name": "Multi-datacenter operation",
+                      "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#multi-datacenter-operation",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Detecting Concurrent Writes",
+                  "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#detecting-concurrent-writes",
+                  "children": [
+                    {
+                      "name": "Last write wins (discarding concurrent writes)",
+                      "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#last-write-wins-%28discarding-concurrent-writes%29",
+                      "children": []
+                    },
+                    {
+                      "name": "The \"happens-before\" relationship and concurrency",
+                      "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#the-%22happens-before%22-relationship-and-concurrency",
+                      "children": []
+                    },
+                    {
+                      "name": "Capturing the happens-before relationship",
+                      "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#capturing-the-happens-before-relationship",
+                      "children": []
+                    },
+                    {
+                      "name": "Merging Concurrently Written Values",
+                      "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#merging-concurrently-written-values",
+                      "children": []
+                    },
+                    {
+                      "name": "Version Vectors",
+                      "url": "https://timilearning.com/posts/ddia/part-two/chapter-5/#version-vectors",
+                      "children": []
+                    }
+                  ]
+                }
               ]
             }
           ]
@@ -285,41 +436,103 @@
         },
         {
           "name": "7. Transactions",
-          "url": "https://example.com/ch7",
+          "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%207%20-%20Transactions/README.md",
           "children": [
             {
+              "name": "Things that will go wrong with your application!",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%207%20-%20Transactions/README.md#things-that-will-go-wrong-with-your-application",
+              "children": []
+            },
+            {
               "name": "The Slippery Concept of a Transaction",
-              "url": "https://example.com/ch7-1",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%207%20-%20Transactions/README.md#the-slippery-concept-of-a-transaction",
+              "children": []
+            },
+            {
+              "name": "ACID",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%207%20-%20Transactions/README.md#acid",
               "children": [
-                { "name": "ACID Properties", "url": "https://example.com/ch7-1-1" },
-                { "name": "Single-Object Transactions", "url": "https://example.com/ch7-1-2" }
+                {
+                  "name": "Atomicity",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%207%20-%20Transactions/README.md#atomicity",
+                  "children": []
+                },
+                {
+                  "name": "Consistency",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%207%20-%20Transactions/README.md#consistency",
+                  "children": []
+                },
+                {
+                  "name": "Isolation",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%207%20-%20Transactions/README.md#isolation",
+                  "children": []
+                },
+                {
+                  "name": "Durability",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%207%20-%20Transactions/README.md#durability",
+                  "children": []
+                }
               ]
+            },
+            {
+              "name": "BASE",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%207%20-%20Transactions/README.md#base",
+              "children": []
             },
             {
               "name": "Weak Isolation Levels",
-              "url": "https://example.com/ch7-2",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%207%20-%20Transactions/README.md#weak-isolation-levels",
               "children": [
-                { "name": "Read Committed", "url": "https://example.com/ch7-2-1" },
-                { "name": "Snapshot Isolation", "url": "https://example.com/ch7-2-2" },
-                { "name": "Repeatable Read and Serializable", "url": "https://example.com/ch7-2-3" }
-              ]
-            },
-            {
-              "name": "Serializability",
-              "url": "https://example.com/ch7-3",
-              "children": [
-                { "name": "Serializable Isolation", "url": "https://example.com/ch7-3-1" },
-                { "name": "Serializable Snapshot Isolation", "url": "https://example.com/ch7-3-2" },
-                { "name": "Serializable with Two-Phase Locking", "url": "https://example.com/ch7-3-3" }
-              ]
-            },
-            {
-              "name": "Distributed Transactions",
-              "url": "https://example.com/ch7-4",
-              "children": [
-                { "name": "Two-Phase Commit", "url": "https://example.com/ch7-4-1" },
-                { "name": "Three-Phase Commit", "url": "https://example.com/ch7-4-2" },
-                { "name": "Consensus Protocols", "url": "https://example.com/ch7-4-3" }
+                {
+                  "name": "Read Committed",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%207%20-%20Transactions/README.md#read-committed",
+                  "children": []
+                },
+                {
+                  "name": "Snapshot Isolation (Repeatable Read)",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%207%20-%20Transactions/README.md#snapshot-isolation-repeatable-read",
+                  "children": []
+                },
+                {
+                  "name": "Implementing Snapshot Isolation",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%207%20-%20Transactions/README.md#implementing-snapshot-isolation",
+                  "children": []
+                },
+                {
+                  "name": "Preventing Lost Updates",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%207%20-%20Transactions/README.md#preventing-lost-updates",
+                  "children": []
+                },
+                {
+                  "name": "Write Skew",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%207%20-%20Transactions/README.md#write-skew",
+                  "children": []
+                },
+                {
+                  "name": "Phantoms",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%207%20-%20Transactions/README.md#phantoms",
+                  "children": []
+                },
+                {
+                  "name": "Serializability",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%207%20-%20Transactions/README.md#serializability",
+                  "children": []
+                },
+                {
+                  "name": "**Actual Serial Execution (one thread)**",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%207%20-%20Transactions/README.md#actual-serial-execution-one-thread",
+                  "children": []
+                },
+                {
+                  "name": "Two-Phase Locking (2PL)",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%207%20-%20Transactions/README.md#two-phase-locking-2pl",
+                  "children": []
+                },
+                {
+                  "name": "Serializable Snapshot Isolation (SSI)",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%207%20-%20Transactions/README.md#serializable-snapshot-isolation-ssi",
+                  "children": []
+                }
               ]
             }
           ]
