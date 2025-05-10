@@ -8,177 +8,228 @@
       "children": [
         {
           "name": "1. Reliable, Scalable, and Maintainable Applications",
-          "url": "https://example.com/ch1",
+          "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%201%20-%20Reliable%2C%20Scalable%2C%20and%20Maintainable%20Applications/README.md",
           "children": [
             {
               "name": "Thinking About Data Systems",
-              "url": "https://example.com/ch1-1",
-              "children": [
-                { "name": "Data-Intensive vs Compute-Intensive", "url": "https://example.com/ch1-1-1" },
-                { "name": "Complexity of Data Systems", "url": "https://example.com/ch1-1-2" }
-              ]
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%201%20-%20Reliable%2C%20Scalable%2C%20and%20Maintainable%20Applications/README.md#thinking-about-data-systems"
             },
             {
               "name": "Reliability",
-              "url": "https://example.com/ch1-2",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%201%20-%20Reliable%2C%20Scalable%2C%20and%20Maintainable%20Applications/README.md#reliability",
               "children": [
-                { "name": "Hardware Faults", "url": "https://example.com/ch1-2-1" },
-                { "name": "Software Errors", "url": "https://example.com/ch1-2-2" },
-                { "name": "Human Errors", "url": "https://example.com/ch1-2-3" },
-                { "name": "How to Make Systems Reliable", "url": "https://example.com/ch1-2-4" }
+                {
+                  "name": "Hardware Faults",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%201%20-%20Reliable%2C%20Scalable%2C%20and%20Maintainable%20Applications/README.md#hardware-faults"
+                },
+                {
+                  "name": "Software Errors",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%201%20-%20Reliable%2C%20Scalable%2C%20and%20Maintainable%20Applications/README.md#software-errors"
+                },
+                {
+                  "name": "Human Errors",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%201%20-%20Reliable%2C%20Scalable%2C%20and%20Maintainable%20Applications/README.md#human-errors"
+                }
               ]
             },
             {
               "name": "Scalability",
-              "url": "https://example.com/ch1-3",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%201%20-%20Reliable%2C%20Scalable%2C%20and%20Maintainable%20Applications/README.md#scalability",
               "children": [
-                { "name": "Describing Load", "url": "https://example.com/ch1-3-1" },
-                { "name": "Describing Performance", "url": "https://example.com/ch1-3-2" },
-                { "name": "Approaches for Coping with Load", "url": "https://example.com/ch1-3-3" }
+                {
+                  "name": "Describing Load",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%201%20-%20Reliable%2C%20Scalable%2C%20and%20Maintainable%20Applications/README.md#describing-load"
+                },
+                {
+                  "name": "Approaches for Coping with Load",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%201%20-%20Reliable%2C%20Scalable%2C%20and%20Maintainable%20Applications/README.md#approaches-for-coping-with-load"
+                },
+                {
+                  "name": "Latency and Response Time",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%201%20-%20Reliable%2C%20Scalable%2C%20and%20Maintainable%20Applications/README.md#latency-and-response-time"
+                }
               ]
             },
             {
               "name": "Maintainability",
-              "url": "https://example.com/ch1-4",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%201%20-%20Reliable%2C%20Scalable%2C%20and%20Maintainable%20Applications/README.md#maintainability",
               "children": [
-                { "name": "Operability", "url": "https://example.com/ch1-4-1" },
-                { "name": "Simplicity", "url": "https://example.com/ch1-4-2" },
-                { "name": "Evolvability", "url": "https://example.com/ch1-4-3" }
+                {
+                  "name": "Operability: Making Life Easy for Operations",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%201%20-%20Reliable%2C%20Scalable%2C%20and%20Maintainable%20Applications/README.md#operability-making-life-easy-for-operations"
+                },
+                {
+                  "name": "Simplicity: Managing Complexity",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%201%20-%20Reliable%2C%20Scalable%2C%20and%20Maintainable%20Applications/README.md#simplicity-managing-complexity"
+                },
+                {
+                  "name": "Evolvability: Making Change Easy",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%201%20-%20Reliable%2C%20Scalable%2C%20and%20Maintainable%20Applications/README.md#evolvability-making-change-easy"
+                }
               ]
             }
           ]
         },
         {
           "name": "2. Data Models and Query Languages",
-          "url": "https://example.com/ch2",
+          "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%202%20-%20Data%20Models%20and%20Query%20Languages/README.md",
           "children": [
             {
-              "name": "Relational Model and Document Model",
-              "url": "https://example.com/ch2-1",
+              "name": "Data Models",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%202%20-%20Data%20Models%20and%20Query%20Languages/README.md#data-models",
               "children": [
-                { "name": "Relational Model", "url": "https://example.com/ch2-1-1" },
-                { "name": "Document Model", "url": "https://example.com/ch2-1-2" },
-                { "name": "Comparing Document and Relational", "url": "https://example.com/ch2-1-3" }
+                {
+                  "name": "Relational Model",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%202%20-%20Data%20Models%20and%20Query%20Languages/README.md#relational-model"
+                },
+                {
+                  "name": "Document Model",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%202%20-%20Data%20Models%20and%20Query%20Languages/README.md#document-model"
+                },
+                {
+                  "name": "Graph Model",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%202%20-%20Data%20Models%20and%20Query%20Languages/README.md#graph-model"
+                }
               ]
             },
             {
-              "name": "Schema Flexibility in Document Model",
-              "url": "https://example.com/ch2-2",
+              "name": "Query Languages",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%202%20-%20Data%20Models%20and%20Query%20Languages/README.md#query-languages",
               "children": [
-                { "name": "Schema-on-Read and Schema-on-Write", "url": "https://example.com/ch2-2-1" },
-                { "name": "Normalization and Denormalization", "url": "https://example.com/ch2-2-2" }
+                {
+                  "name": "SQL",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%202%20-%20Data%20Models%20and%20Query%20Languages/README.md#sql"
+                },
+                {
+                  "name": "MapReduce",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%202%20-%20Data%20Models%20and%20Query%20Languages/README.md#mapreduce"
+                },
+                {
+                  "name": "MongoDB's Aggregation Pipeline",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%202%20-%20Data%20Models%20and%20Query%20Languages/README.md#mongodb-aggregation-pipeline"
+                },
+                {
+                  "name": "Cypher",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%202%20-%20Data%20Models%20and%20Query%20Languages/README.md#cypher"
+                },
+                {
+                  "name": "SPARQL",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%202%20-%20Data%20Models%20and%20Query%20Languages/README.md#sparql"
+                },
+                {
+                  "name": "Datalog",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%202%20-%20Data%20Models%20and%20Query%20Languages/README.md#datalog"
+                }
               ]
             },
             {
-              "name": "Query Languages for Data",
-              "url": "https://example.com/ch2-3",
-              "children": [
-                { "name": "Declarative Queries", "url": "https://example.com/ch2-3-1" },
-                { "name": "MapReduce Querying", "url": "https://example.com/ch2-3-2" }
-              ]
+              "name": "Imperative vs. Declarative Query Languages",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%202%20-%20Data%20Models%20and%20Query%20Languages/README.md#imperative-vs-declarative-query-languages"
             },
             {
-              "name": "Graph-Like Data Models",
-              "url": "https://example.com/ch2-4",
-              "children": [
-                { "name": "Property Graphs", "url": "https://example.com/ch2-4-1" },
-                { "name": "Triple Stores", "url": "https://example.com/ch2-4-2" },
-                { "name": "Graph Query Languages", "url": "https://example.com/ch2-4-3" }
-              ]
+              "name": "Schema Design Considerations",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%202%20-%20Data%20Models%20and%20Query%20Languages/README.md#schema-design-considerations"
             }
           ]
         },
         {
           "name": "3. Storage and Retrieval",
-          "url": "https://example.com/ch3",
+          "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%203%20-%20Storage%20and%20Retrieval/README.md",
           "children": [
             {
-              "name": "Data Structures That Power Databases",
-              "url": "https://example.com/ch3-1",
+              "name": "Storage Engines",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%203%20-%20Storage%20and%20Retrieval/README.md#storage-engines",
               "children": [
-                { "name": "Log-Structured Storage", "url": "https://example.com/ch3-1-1" },
-                { "name": "Page-Oriented Storage", "url": "https://example.com/ch3-1-2" }
+                {
+                  "name": "Log-Structured Storage Engines",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%203%20-%20Storage%20and%20Retrieval/README.md#log-structured-storage-engines",
+                  "children": [
+                    {
+                      "name": "Hash Indexes",
+                      "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%203%20-%20Storage%20and%20Retrieval/README.md#hash-indexes"
+                    },
+                    {
+                      "name": "SSTables and LSM-Trees",
+                      "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%203%20-%20Storage%20and%20Retrieval/README.md#sstables-and-lsm-trees"
+                    }
+                  ]
+                },
+                {
+                  "name": "B-Trees",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%203%20-%20Storage%20and%20Retrieval/README.md#b-trees"
+                }
               ]
             },
             {
-              "name": "Hash Indexes",
-              "url": "https://example.com/ch3-2",
-              "children": [
-                { "name": "Hash Table Storage Engines", "url": "https://example.com/ch3-2-1" },
-                { "name": "Limitations of Hash Indexes", "url": "https://example.com/ch3-2-2" }
-              ]
+              "name": "Comparing B-Trees and LSM-Trees",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%203%20-%20Storage%20and%20Retrieval/README.md#comparing-b-trees-and-lsm-trees"
             },
             {
-              "name": "SSTables and LSM-Trees",
-              "url": "https://example.com/ch3-3",
-              "children": [
-                { "name": "Sorted String Table (SSTable)", "url": "https://example.com/ch3-3-1" },
-                { "name": "Log-Structured Merge-Tree (LSM)", "url": "https://example.com/ch3-3-2" },
-                { "name": "Performance Optimizations", "url": "https://example.com/ch3-3-3" }
-              ]
-            },
-            {
-              "name": "B-Trees",
-              "url": "https://example.com/ch3-4",
-              "children": [
-                { "name": "How B-Trees Work", "url": "https://example.com/ch3-4-1" },
-                { "name": "B-Tree Variants", "url": "https://example.com/ch3-4-2" },
-                { "name": "Comparing B-Trees and LSM-Trees", "url": "https://example.com/ch3-4-3" }
-              ]
-            },
-            {
-              "name": "Other Indexing Structures",
-              "url": "https://example.com/ch3-5",
-              "children": [
-                { "name": "Bitmap Indexes", "url": "https://example.com/ch3-5-1" },
-                { "name": "Full-Text Indexes", "url": "https://example.com/ch3-5-2" },
-                { "name": "Spatial Indexes", "url": "https://example.com/ch3-5-3" }
-              ]
-            },
-            {
-              "name": "Transaction Logs",
-              "url": "https://example.com/ch3-6",
-              "children": [
-                { "name": "Write-Ahead Log", "url": "https://example.com/ch3-6-1" },
-                { "name": "Log Compaction", "url": "https://example.com/ch3-6-2" }
-              ]
+              "name": "Additional Index Structures",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%203%20-%20Storage%20and%20Retrieval/README.md#additional-index-structures"
             }
           ]
         },
         {
           "name": "4. Encoding and Evolution",
-          "url": "https://example.com/ch4",
+          "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%204%20-%20Encoding%20and%20Evolution/README.md",
           "children": [
             {
               "name": "Formats for Encoding Data",
-              "url": "https://example.com/ch4-1",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%204%20-%20Encoding%20and%20Evolution/README.md#formats-for-encoding-data",
               "children": [
-                { "name": "Language-Specific Formats", "url": "https://example.com/ch4-1-1" },
-                { "name": "JSON, XML, and Binary Formats", "url": "https://example.com/ch4-1-2" }
+                {
+                  "name": "Language-Specific Formats",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%204%20-%20Encoding%20and%20Evolution/README.md#language-specific-formats"
+                },
+                {
+                  "name": "JSON, XML, and Binary Variants",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%204%20-%20Encoding%20and%20Evolution/README.md#json-xml-and-binary-variants"
+                },
+                {
+                  "name": "Thrift and Protocol Buffers",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%204%20-%20Encoding%20and%20Evolution/README.md#thrift-and-protocol-buffers"
+                },
+                {
+                  "name": "Avro",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%204%20-%20Encoding%20and%20Evolution/README.md#avro"
+                }
               ]
             },
             {
               "name": "Modes of Dataflow",
-              "url": "https://example.com/ch4-2",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%204%20-%20Encoding%20and%20Evolution/README.md#modes-of-dataflow",
               "children": [
-                { "name": "Dataflow Through Databases", "url": "https://example.com/ch4-2-1" },
-                { "name": "Dataflow Through Services", "url": "https://example.com/ch4-2-2" },
-                { "name": "Message Brokers", "url": "https://example.com/ch4-2-3" }
+                {
+                  "name": "Dataflow Through Databases",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%204%20-%20Encoding%20and%20Evolution/README.md#dataflow-through-databases"
+                },
+                {
+                  "name": "Dataflow Through Services: REST and RPC",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%204%20-%20Encoding%20and%20Evolution/README.md#dataflow-through-services-rest-and-rpc"
+                },
+                {
+                  "name": "Message-Passing Dataflow",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%204%20-%20Encoding%20and%20Evolution/README.md#message-passing-dataflow"
+                }
               ]
             },
             {
               "name": "Schema Evolution",
-              "url": "https://example.com/ch4-3",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%204%20-%20Encoding%20and%20Evolution/README.md#schema-evolution",
               "children": [
-                { "name": "Schema Changes", "url": "https://example.com/ch4-3-1" },
-                { "name": "Backwards and Forwards Compatibility", "url": "https://example.com/ch4-3-2" }
-              ]
-            },
-            {
-              "name": "Compatibility",
-              "url": "https://example.com/ch4-4",
-              "children": [
-                { "name": "Strategies for Compatibility", "url": "https://example.com/ch4-4-1" }
+                {
+                  "name": "Backward and Forward Compatibility",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%204%20-%20Encoding%20and%20Evolution/README.md#backward-and-forward-compatibility"
+                },
+                {
+                  "name": "Compatibility Rules",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%204%20-%20Encoding%20and%20Evolution/README.md#compatibility-rules"
+                },
+                {
+                  "name": "Versioning and Schemas",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%204%20-%20Encoding%20and%20Evolution/README.md#versioning-and-schemas"
+                }
               ]
             }
           ]
@@ -399,33 +450,60 @@
               "name": "Partitioning of Data",
               "url": "partition/Partitioning of Data.html",
               "children": [
-                { "name": "Strategies for Partitioning", "url": "partition/Strategies for Partitioning.html" },
-                { "name": "Partitioning by Key Range", "url": "partition/Partitioning by Key Range.html" },
-                { "name": "Partitioning by Hash", "url": "partition/Partitioning by Hash.html" }
+                {
+                  "name": "Strategies for Partitioning",
+                  "url": "partition/Strategies for Partitioning.html"
+                },
+                {
+                  "name": "Partitioning by Key Range",
+                  "url": "partition/Partitioning by Key Range.html"
+                },
+                {
+                  "name": "Partitioning by Hash",
+                  "url": "partition/Partitioning by Hash.html"
+                }
               ]
             },
             {
               "name": "Partitioning and Secondary Indexes",
               "url": "partition/Partitioning and Secondary Indexes.html",
               "children": [
-                { "name": "Partitioning Secondary Indexes by Document", "url": "partition/Partitioning Secondary Indexes by Document.html" },
-                { "name": "Partitioning Secondary Indexes by Term", "url": "partition/Partitioning Secondary Indexes by Term.html" }
+                {
+                  "name": "Partitioning Secondary Indexes by Document",
+                  "url": "partition/Partitioning Secondary Indexes by Document.html"
+                },
+                {
+                  "name": "Partitioning Secondary Indexes by Term",
+                  "url": "partition/Partitioning Secondary Indexes by Term.html"
+                }
               ]
             },
             {
               "name": "Rebalancing Partitions",
               "url": "partition/Rebalancing Partitions.html",
               "children": [
-                { "name": "Dynamic Partition Rebalancing", "url": "partition/Dynamic Partition Rebalancing.html" },
-                { "name": "Operational Issues", "url": "partition/Operational Issues.html" }
+                {
+                  "name": "Dynamic Partition Rebalancing",
+                  "url": "partition/Dynamic Partition Rebalancing.html"
+                },
+                {
+                  "name": "Operational Issues",
+                  "url": "partition/Operational Issues.html"
+                }
               ]
             },
             {
               "name": "Request Routing",
               "url": "partition/Request Routing.html",
               "children": [
-                { "name": "Routing by Client", "url": "partition/Routing by Client.html" },
-                { "name": "Routing by Coordinator", "url": "partition/Routing by Coordinator.html" }
+                {
+                  "name": "Routing by Client",
+                  "url": "partition/Routing by Client.html"
+                },
+                {
+                  "name": "Routing by Coordinator",
+                  "url": "partition/Routing by Coordinator.html"
+                }
               ]
             },
             {
@@ -545,40 +623,70 @@
               "name": "Faults and Partial Failures",
               "url": "https://example.com/ch8-1",
               "children": [
-                { "name": "Crash Faults", "url": "https://example.com/ch8-1-1" },
-                { "name": "Omission Faults", "url": "https://example.com/ch8-1-2" }
+                {
+                  "name": "Crash Faults",
+                  "url": "https://example.com/ch8-1-1"
+                },
+                {
+                  "name": "Omission Faults",
+                  "url": "https://example.com/ch8-1-2"
+                }
               ]
             },
             {
               "name": "Unreliable Networks",
               "url": "https://example.com/ch8-2",
               "children": [
-                { "name": "Network Partitions", "url": "https://example.com/ch8-2-1" },
-                { "name": "Network Latency", "url": "https://example.com/ch8-2-2" }
+                {
+                  "name": "Network Partitions",
+                  "url": "https://example.com/ch8-2-1"
+                },
+                {
+                  "name": "Network Latency",
+                  "url": "https://example.com/ch8-2-2"
+                }
               ]
             },
             {
               "name": "Unreliable Clocks",
               "url": "https://example.com/ch8-3",
               "children": [
-                { "name": "Clock Synchronization", "url": "https://example.com/ch8-3-1" },
-                { "name": "Logical Clocks", "url": "https://example.com/ch8-3-2" }
+                {
+                  "name": "Clock Synchronization",
+                  "url": "https://example.com/ch8-3-1"
+                },
+                {
+                  "name": "Logical Clocks",
+                  "url": "https://example.com/ch8-3-2"
+                }
               ]
             },
             {
               "name": "Process Pauses",
               "url": "https://example.com/ch8-4",
               "children": [
-                { "name": "Stop-the-World Pauses", "url": "https://example.com/ch8-4-1" },
-                { "name": "GC Pauses", "url": "https://example.com/ch8-4-2" }
+                {
+                  "name": "Stop-the-World Pauses",
+                  "url": "https://example.com/ch8-4-1"
+                },
+                {
+                  "name": "GC Pauses",
+                  "url": "https://example.com/ch8-4-2"
+                }
               ]
             },
             {
               "name": "Byzantine Faults",
               "url": "https://example.com/ch8-5",
               "children": [
-                { "name": "Byzantine Generals Problem", "url": "https://example.com/ch8-5-1" },
-                { "name": "Practical Byzantine Fault Tolerance", "url": "https://example.com/ch8-5-2" }
+                {
+                  "name": "Byzantine Generals Problem",
+                  "url": "https://example.com/ch8-5-1"
+                },
+                {
+                  "name": "Practical Byzantine Fault Tolerance",
+                  "url": "https://example.com/ch8-5-2"
+                }
               ]
             }
           ]
@@ -670,115 +778,190 @@
       "children": [
         {
           "name": "10. Batch Processing",
-          "url": "https://example.com/ch10",
+          "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2010%20-%20Batch%20Processing/README.md",
           "children": [
             {
+              "name": "Introduction to Batch Processing",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2010%20-%20Batch%20Processing/README.md#introduction-to-batch-processing",
+              "children": []
+            },
+            {
               "name": "Batch Processing with Unix Tools",
-              "url": "https://example.com/ch10-1",
-              "children": [
-                { "name": "Pipelines", "url": "https://example.com/ch10-1-1" },
-                { "name": "Data Flow", "url": "https://example.com/ch10-1-2" }
-              ]
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2010%20-%20Batch%20Processing/README.md#batch-processing-with-unix-tools",
+              "children": []
             },
             {
               "name": "MapReduce and Distributed Filesystems",
-              "url": "https://example.com/ch10-2",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2010%20-%20Batch%20Processing/README.md#mapreduce-and-distributed-filesystems",
               "children": [
-                { "name": "MapReduce Basics", "url": "https://example.com/ch10-2-1" },
-                { "name": "Distributed Filesystems", "url": "https://example.com/ch10-2-2" }
+                {
+                  "name": "HDFS",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2010%20-%20Batch%20Processing/README.md#hdfs",
+                  "children": []
+                },
+                {
+                  "name": "How MapReduce Works",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2010%20-%20Batch%20Processing/README.md#how-mapreduce-works",
+                  "children": []
+                },
+                {
+                  "name": "MapReduce vs MPP Databases",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2010%20-%20Batch%20Processing/README.md#mapreduce-vs-mpp-databases",
+                  "children": []
+                },
+                {
+                  "name": "Materialization of Intermediate State in MapReduce",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2010%20-%20Batch%20Processing/README.md#materialization-of-intermediate-state-in-mapreduce",
+                  "children": []
+                }
               ]
             },
             {
-              "name": "Workflow Orchestration",
-              "url": "https://example.com/ch10-3",
+              "name": "Beyond MapReduce",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2010%20-%20Batch%20Processing/README.md#beyond-mapreduce",
               "children": [
-                { "name": "Job Scheduling", "url": "https://example.com/ch10-3-1" },
-                { "name": "Data Dependencies", "url": "https://example.com/ch10-3-2" }
-              ]
-            },
-            {
-              "name": "Fault Tolerance",
-              "url": "https://example.com/ch10-4",
-              "children": [
-                { "name": "Recovery from Failures", "url": "https://example.com/ch10-4-1" },
-                { "name": "Idempotency", "url": "https://example.com/ch10-4-2" }
+                {
+                  "name": "Graphs and Iterative Processing",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2010%20-%20Batch%20Processing/README.md#graphs-and-iterative-processing",
+                  "children": []
+                }
               ]
             }
           ]
         },
         {
           "name": "11. Stream Processing",
-          "url": "https://example.com/ch11",
+          "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2011%20-%20Stream%20Processing/README.md",
           "children": [
             {
               "name": "Transmitting Event Streams",
-              "url": "https://example.com/ch11-1",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2011%20-%20Stream%20Processing/README.md#transmitting-event-streams",
+              "children": []
+            },
+            {
+              "name": "Messaging Systems",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2011%20-%20Stream%20Processing/README.md#messaging-systems",
               "children": [
-                { "name": "Message Brokers", "url": "https://example.com/ch11-1-1" },
-                { "name": "Partitioned Logs", "url": "https://example.com/ch11-1-2" }
+                {
+                  "name": "Message Brokers",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2011%20-%20Stream%20Processing/README.md#message-brokers",
+                  "children": []
+                },
+                {
+                  "name": "Partitioned Logs",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2011%20-%20Stream%20Processing/README.md#partitioned-logs",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "Databases and Streams",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2011%20-%20Stream%20Processing/README.md#databases-and-streams",
+              "children": [
+                {
+                  "name": "Keeping Systems in Sync",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2011%20-%20Stream%20Processing/README.md#keeping-systems-in-sync",
+                  "children": []
+                },
+                {
+                  "name": "Change Data Capture (CDC)",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2011%20-%20Stream%20Processing/README.md#change-data-capture-cdc",
+                  "children": []
+                },
+                {
+                  "name": "Event Sourcing",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2011%20-%20Stream%20Processing/README.md#event-sourcing",
+                  "children": []
+                }
               ]
             },
             {
               "name": "Processing Streams",
-              "url": "https://example.com/ch11-2",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2011%20-%20Stream%20Processing/README.md#processing-streams",
               "children": [
-                { "name": "Stateless vs Stateful Processing", "url": "https://example.com/ch11-2-1" },
-                { "name": "Event Time vs Processing Time", "url": "https://example.com/ch11-2-2" }
-              ]
-            },
-            {
-              "name": "Windowed Aggregations",
-              "url": "https://example.com/ch11-3",
-              "children": [
-                { "name": "Tumbling and Sliding Windows", "url": "https://example.com/ch11-3-1" },
-                { "name": "Session Windows", "url": "https://example.com/ch11-3-2" }
-              ]
-            },
-            {
-              "name": "Joins in Stream Processing",
-              "url": "https://example.com/ch11-4",
-              "children": [
-                { "name": "Stream-Stream Joins", "url": "https://example.com/ch11-4-1" },
-                { "name": "Stream-Table Joins", "url": "https://example.com/ch11-4-2" }
-              ]
-            },
-            {
-              "name": "Fault Tolerance",
-              "url": "https://example.com/ch11-5",
-              "children": [
-                { "name": "Checkpointing", "url": "https://example.com/ch11-5-1" },
-                { "name": "Replay and Recovery", "url": "https://example.com/ch11-5-2" }
+                {
+                  "name": "Uses of Stream Processing",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2011%20-%20Stream%20Processing/README.md#uses-of-stream-processing",
+                  "children": []
+                },
+                {
+                  "name": "Stream Operations",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2011%20-%20Stream%20Processing/README.md#stream-operations",
+                  "children": [
+                    {
+                      "name": "Complex Event Processing (CEP)",
+                      "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2011%20-%20Stream%20Processing/README.md#complex-event-processing-cep",
+                      "children": []
+                    },
+                    {
+                      "name": "Stream Analytics",
+                      "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2011%20-%20Stream%20Processing/README.md#stream-analytics",
+                      "children": []
+                    },
+                    {
+                      "name": "Search Streams",
+                      "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2011%20-%20Stream%20Processing/README.md#search-streams",
+                      "children": []
+                    },
+                    {
+                      "name": "Join Streams",
+                      "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2011%20-%20Stream%20Processing/README.md#join-streams",
+                      "children": []
+                    },
+                    {
+                      "name": "Fault Tolerance",
+                      "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2011%20-%20Stream%20Processing/README.md#fault-tolerance",
+                      "children": []
+                    }
+                  ]
+                }
               ]
             }
           ]
         },
         {
           "name": "12. The Future of Data Systems",
-          "url": "https://example.com/ch12",
+          "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2012%20-%20The%20Future%20of%20Data%20Systems/README.md",
           "children": [
             {
-              "name": "The Big Picture",
-              "url": "https://example.com/ch12-1",
-              "children": [
-                { "name": "Integration of Ideas", "url": "https://example.com/ch12-1-1" },
-                { "name": "Unified Data Platforms", "url": "https://example.com/ch12-1-2" }
-              ]
+              "name": "Data Integration",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2012%20-%20The%20Future%20of%20Data%20Systems/README.md#data-integration",
+              "children": []
             },
             {
-              "name": "Trends in Data Systems",
-              "url": "https://example.com/ch12-2",
-              "children": [
-                { "name": "Cloud-Native Data Systems", "url": "https://example.com/ch12-2-1" },
-                { "name": "Separation of Storage and Compute", "url": "https://example.com/ch12-2-2" }
-              ]
+              "name": "Unbundling Databases",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2012%20-%20The%20Future%20of%20Data%20Systems/README.md#unbundling-databases",
+              "children": []
             },
             {
-              "name": "Research and Open Problems",
-              "url": "https://example.com/ch12-3",
-              "children": [
-                { "name": "Open Research Questions", "url": "https://example.com/ch12-3-1" },
-                { "name": "Future Directions", "url": "https://example.com/ch12-3-2" }
-              ]
+              "name": "Designing Applications Around Dataflow",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2012%20-%20The%20Future%20of%20Data%20Systems/README.md#designing-applications-around-dataflow",
+              "children": []
+            },
+            {
+              "name": "Aiming for Correctness",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2012%20-%20The%20Future%20of%20Data%20Systems/README.md#aiming-for-correctness",
+              "children": []
+            },
+            {
+              "name": "Enforcing Constraints",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2012%20-%20The%20Future%20of%20Data%20Systems/README.md#enforcing-constraints",
+              "children": []
+            },
+            {
+              "name": "Timeliness and Integrity",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2012%20-%20The%20Future%20of%20Data%20Systems/README.md#timeliness-and-integrity",
+              "children": []
+            },
+            {
+              "name": "Trust, but Verify",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2012%20-%20The%20Future%20of%20Data%20Systems/README.md#trust-but-verify",
+              "children": []
+            },
+            {
+              "name": "Doing the Right Thing",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%2012%20-%20The%20Future%20of%20Data%20Systems/README.md#doing-the-right-thing",
+              "children": []
             }
           ]
         }
