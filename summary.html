@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Replication Models Summary – DDIA</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 2rem;
+      background-color: #fdfdfd;
+      color: #333;
+    }
+    h1, h2, h3 {
+      color: #2c3e50;
+    }
+    code {
+      background-color: #eef;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+    table, th, td {
+      border: 1px solid #999;
+    }
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
+    .section {
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+
+<h1>📘 Replication Models & Total Order Broadcast – Summary from DDIA</h1>
+
+<div class="section">
+  <h2>🔁 Replication Models Overview</h2>
+
+<h3>1. Single-Leader Replication</h3>
+  <p><strong>How It Works:</strong> One designated <em>leader node</em> handles all client write requests. The leader records changes and propagates them to <em>follower replicas</em>.</p>
+  <p><strong>Problems:</strong></p>
+  <ul>
+    <li><strong>Replication Lag:</strong> Followers may fall behind.</li>
+    <li><strong>Read Inconsistency:</strong> Reads from lagging replicas may be stale.</li>
+    <li><strong>Leader Failure:</strong> Needs re-election; potential downtime.</li>
+  </ul>
+  <p><strong>Solutions:</strong></p>
+  <ul>
+    <li>Use write-ahead logs and replicate to followers.</li>
+    <li>Use consensus protocols like <code>Raft</code>, <code>Paxos</code>, or <code>Zab</code>.</li>
+    <li>Use quorum-based commit strategies.</li>
+  </ul>
+  <p><strong>Examples:</strong> etcd, ZooKeeper, Amazon RDS.</p>
+
+<h3>2. Multi-Leader Replication</h3>
+  <p><strong>How It Works:</strong> Multiple leaders accept concurrent writes and replicate to each other. Common in geo-distributed systems.</p>
+  <p><strong>Problems:</strong></p>
+  <ul>
+    <li><strong>Conflicting Writes:</strong> Same key may be updated in parallel.</li>
+    <li><strong>Ordering Ambiguity:</strong> No global clock.</li>
+  </ul>
+  <p><strong>Solutions:</strong></p>
+  <ul>
+    <li><code>Vector Clocks</code> for causal ordering.</li>
+    <li><code>CRDTs</code> for automatic conflict resolution.</li>
+    <li><code>Last Write Wins</code> using timestamps.</li>
+    <li><code>App Logic</code> for manual resolution.</li>
+  </ul>
+  <p><strong>Examples:</strong> CouchDB, Cassandra, Lotus Notes.</p>
+
+<h3>3. Leaderless Replication</h3>
+  <p><strong>How It Works:</strong> Any node can accept reads/writes. Changes spread via gossip or hinted handoff.</p>
+  <p><strong>Problems:</strong></p>
+  <ul>
+    <li><strong>Write Conflicts</strong> from parallel updates.</li>
+    <li><strong>Read Complexity</strong> due to merging data.</li>
+  </ul>
+  <p><strong>Solutions:</strong></p>
+  <ul>
+    <li>Quorum-based reads and writes (W+R > N).</li>
+    <li>Use <code>Vector Clocks</code> and <code>CRDTs</code>.</li>
+    <li>Read repair and anti-entropy mechanisms.</li>
+  </ul>
+  <p><strong>Examples:</strong> Amazon DynamoDB, Riak, Cassandra (in EC mode).</p>
+</div>
+
+<div class="section">
+  <h2>🔄 Total Order Broadcast (TOB)</h2>
+
+<h3>What Is It?</h3>
+  <p>All nodes receive and apply all writes in the same order. Ensures strong consistency and synchronization.</p>
+
+<h3>Why Important?</h3>
+  <ul>
+    <li>Prevents race conditions and divergence.</li>
+    <li>Keeps replicated state machines consistent.</li>
+  </ul>
+
+<h3>How Is TOB Achieved?</h3>
+  <p><strong>Using Consensus Protocols:</strong></p>
+  <ul>
+    <li><code>Raft</code>: Simpler and widely used (e.g. etcd, Consul).</li>
+    <li><code>Paxos</code>: More academic, harder to implement.</li>
+    <li><code>Zab</code>: Used in ZooKeeper.</li>
+  </ul>
+
+  <p><strong>Steps in Raft (etcd Example):</strong></p>
+  <ol>
+    <li>Leader elected.</li>
+    <li>Client sends write to leader.</li>
+    <li>Leader appends to its log.</li>
+    <li>Followers receive log entry.</li>
+    <li>Majority acknowledges → commit happens.</li>
+    <li>Log applied in same order on all replicas.</li>
+  </ol>
+
+  <p><strong>Real-Time Example:</strong> Kubernetes uses etcd. When you apply a pod config, it is written through Raft and applied consistently across etcd nodes.</p>
+</div>
+
+<div class="section">
+  <h2>❌ TOB in Multi-Leader Replication</h2>
+  <p>TOB is <strong>not feasible</strong> in multi-leader systems due to independent concurrent writes and lack of a global sequencer.</p>
+
+<h3>Why Not?</h3>
+  <ul>
+    <li>Different nodes receive updates in different orders.</li>
+    <li>Global ordering would reduce availability and increase coordination overhead.</li>
+  </ul>
+
+<h3>Alternative Conflict Resolution Techniques</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Technique</th>
+        <th>Description</th>
+        <th>Examples</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Vector Clocks</td>
+        <td>Track causal dependencies.</td>
+        <td>DynamoDB, Cassandra, Riak</td>
+      </tr>
+      <tr>
+        <td>CRDTs</td>
+        <td>Automatically merge concurrent changes.</td>
+        <td>Redis CRDT, Riak</td>
+      </tr>
+      <tr>
+        <td>Last Write Wins</td>
+        <td>Pick update with latest timestamp.</td>
+        <td>Cassandra, MongoDB</td>
+      </tr>
+      <tr>
+        <td>App Logic</td>
+        <td>Manually merge in the app layer.</td>
+        <td>CouchDB</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section">
+  <h2>🌍 Advanced System: Google Spanner</h2>
+  <p><strong>Goal:</strong> Multi-region replication with strong consistency.</p>
+  <ul>
+    <li>Uses <code>TrueTime API</code> with atomic clocks & GPS.</li>
+    <li>Ensures global ordering of transactions.</li>
+    <li>Uses Paxos internally for consensus.</li>
+  </ul>
+  <p><strong>Effect:</strong> Global total order and distributed serializability.</p>
+</div>
+
+<div class="section">
+  <h2>🧩 Final Takeaways</h2>
+  <ul>
+    <li><strong>Single-Leader:</strong> Simple, supports TOB.</li>
+    <li><strong>Multi-Leader:</strong> Good for availability, needs conflict resolution.</li>
+    <li><strong>Leaderless:</strong> Highly available, eventually consistent.</li>
+    <li>Choose model based on <strong>CAP theorem trade-offs</strong>.</li>
+  </ul>
+
+  <p>📚 Based on: <em>Designing Data-Intensive Applications</em> by Martin Kleppmann.</p>
+</div>
+
+</body>
+</html>

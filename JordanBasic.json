@@ -1,0 +1,209 @@
+{
+  "name": "Distributed Systems and Databases",
+  "children": [
+    {
+      "name": "Single Leader Replication",
+      "url": "https://drive.google.com/file/d/1h06qn9WXvkqn53cTihCvBbvRVcZVb00J9ZSgnhVRv0A/view"
+    },
+    {
+      "name": "Multi Leader Replication",
+      "url": "https://drive.google.com/file/d/1SkWX0GRcUHkV5l1i-LAOvNvIurYLqGx6GHPFehM57lw/view"
+    },
+    {
+      "name": "Partitioning",
+      "url": "https://drive.google.com/file/d/1ZNVDn4Uwcje1yYPz40C5mkJWBazkQ5W1XhSyhZTbRE0/view"
+    },
+    {
+      "name": "Transactions",
+      "url": "https://drive.google.com/file/d/1zg9_C1uOnlrRYX7_NX69vgBUcHjWu_dz2af9iXWnfQA/view"
+    },
+    {
+      "name": "Weak Isolation Levels",
+      "url": "https://drive.google.com/file/d/1lQtSQGQKWQgfutRnHOt7AL7TsqIXRVXq5iNtGgHjZz0/view"
+    },
+    {
+      "name": "Pitfalls of Relational Databases",
+      "url": "https://drive.google.com/file/d/1Xok8nBaLn-3USlK3nn4zCb2Ckb2THhP9iYTu5lPVJ3k/view"
+    },
+    {
+      "name": "Analytics Databases",
+      "url": "https://drive.google.com/file/d/1IkYDmtRq8Mo1JeVswRVSG5EoCYjUEhf7y3XCukQZSx4/view"
+    },
+    {
+      "name": "Clocks in Distributed Systems",
+      "url": "https://drive.google.com/file/d/1aWy8uNmY3fRYb79SsadzyIl52yW3IbspBrrr8iLYHLQ/view"
+    },
+    {
+      "name": "Fencing Tokens",
+      "url": "https://drive.google.com/file/d/1_JAO_ywxO__BSkkC3MQldO6qIW8E7UK6F919CEjrKBw/view"
+    },
+    {
+      "name": "Linearizability and Ordering",
+      "url": "https://drive.google.com/file/d/1Ucon3eLjLDM46dDQkQu4htdtyFhndXcLAacVH_eQK5g/view"
+    },
+    {
+      "name": "Two Phase Commit",
+      "url": "https://drive.google.com/file/d/1KSLogHQqE1EqcRPMuOE0uG6jCl6SCDnbmoO8EE4mo_0/view"
+    },
+    {
+      "name": "Raft",
+      "url": "https://drive.google.com/file/d/1dBfDjoraVs1XJpV8A0krtOaueBEAtlZ6HcEsdz8OWMg/view"
+    },
+    {
+      "name": "Batch Processing",
+      "url": "https://drive.google.com/file/d/1nhdcuUEOwodBM66SPxCwSzsH5nRMlonLOxDavX7QUcU/view"
+    },
+    {
+      "name": "Stream Processing",
+      "url": "https://drive.google.com/file/d/1ZRu4Z2NQ72RcYFyVBhTMFJaY7Q2ndgH66RWBwBJkjjk/view"
+    },
+    {
+      "name": "Consistent Hashing",
+      "url": "https://drive.google.com/file/d/1g_jlmugJ4ubRCTaH4kIUcoLXdq2phQmodSBHm9rogmk/view"
+    },
+    {
+      "name": "Gossip Protocol",
+      "url": "https://drive.google.com/file/d/15zn16VbJ-HRvshGb71AV4aYU7K-DDXTflnVJjiQ_flA/view"
+    },
+    {
+      "name": "Cassandra",
+      "url": "https://drive.google.com/file/d/1RoM3n6BWq9lZg9IubhKMoMwlkUEg2P-nTWTtessksgE/view"
+    },
+    {
+      "name": "Coordination Services",
+      "url": "https://drive.google.com/file/d/1mpbC8_3FYQYaU7CChULbBEoxwv6Gd1ny8jYsgZqMeBc/view"
+    },
+    {
+      "name": "Hadoop File System Design",
+      "url": "https://drive.google.com/file/d/1ztFyu-j3b4mRDLCl-VPOBiaaqkx13yzBtaLzIk4hBtQ/view"
+    },
+    {
+      "name": "Hbase",
+      "url": "https://drive.google.com/file/d/1edndSguoi2MR3aGE9ExuJ2IDZIBA9r4UrNIcXcSSKek/view"
+    },
+    {
+      "name": "CRDTs",
+      "url": "https://drive.google.com/file/d/1v0flWfQEmaXd8vOCW8uuCWd4ej1Z-bHnP3qmvCkBA-Y/view"
+    },
+    {
+      "name": "Riak",
+      "url": "https://drive.google.com/file/d/1ewbtjJRkbKuCBbVf2WVYiwS7E_W8Ew0gZXljxI6bnUM/view"
+    },
+    {
+      "name": "Caching",
+      "url": "https://drive.google.com/file/d/1wP-sBwASFTnrlA63VrdeHdBrTqaSyRupafpYHh_5TJY/view"
+    },
+    {
+      "name": "Memcached and Redis",
+      "url": "https://drive.google.com/file/d/1201lPTRD1WL_rqoakQGDl0Tzx6DUsrYpIwmFTot3etA/view"
+    },
+    {
+      "name": "Time Series Databases",
+      "url": "https://drive.google.com/file/d/1gS4dWJ1pCVSuckvht_SX3a5XFo2fi7wOmrL5MP9PqSo/view"
+    },
+    {
+      "name": "Geospatial Indexes",
+      "url": "https://drive.google.com/file/d/1GL6rGZAT6An9FYjXNqRmz1hyFqz0oQ08ScIP_VWgXes/view"
+    },
+    {
+      "name": "Chain Replication",
+      "url": "https://drive.google.com/file/d/1W_bM905lZW6wpIHb-5Rbr2slwdgB19nP11i1r3NZr4I/view"
+    },
+    {
+      "name": "Content Delivery Networks",
+      "url": "https://drive.google.com/file/d/1QDWdLz_iH8a2d1ecya7curg9KMe-7rB3Hr71k2sC1CA/view"
+    },
+    {
+      "name": "Spanner",
+      "url": "https://drive.google.com/file/d/1Gar5TknwleIWj6k8Lluk_yGtetXD0bOaxeWoTB6ncAw/view"
+    },
+    {
+      "name": "Load Balancing",
+      "url": "https://drive.google.com/file/d/1Q227M-Bnk5spHr8VUG5Atq7AROiMd6oVCnvk1fc1RfY/view"
+    },
+    {
+      "name": "Aurora",
+      "url": "https://drive.google.com/file/d/1tkz2iksFao7_yaUXuKAvcvgKNlh_xYTRQJmKwYT0GHI/view"
+    },
+    {
+      "name": "MongoDB",
+      "url": "https://drive.google.com/file/d/16IZVqYCBeOXNKa4trLO71B2Ws-aGc4nurjskWcLSmig/view"
+    },
+    {
+      "name": "VoltDB",
+      "url": "https://drive.google.com/file/d/1LrYd48VSbKBbLS-zJUj2C50Jwa8b2yshYqqzle6pze8/view"
+    },
+    {
+      "name": "Microservices Architecture",
+      "url": "https://drive.google.com/file/d/1r5JwywozYI3_mEvThEalBwMmvpxqGiX9HbIbdYPXC-8/view"
+    },
+    {
+      "name": "Long Polling, Websockets, Server Side Events",
+      "url": "https://drive.google.com/file/d/1_9oea2N7LNyd-cKjjwZafpaogsdlIwmzEC2k8rpsUQI/view"
+    },
+    {
+      "name": "Spark",
+      "url": "https://drive.google.com/file/d/1yaofWpTKUxkH864d6aT1yyLpoLgpnwrAJN2b5l_g1II/view"
+    },
+    {
+      "name": "Flink",
+      "url": "https://drive.google.com/file/d/12uAwv70QLRv1WRGi4LWxGYpLRGrRcnUSb-uAntKF0G8/view"
+    },
+    {
+      "name": "Bloom Filters",
+      "url": "https://drive.google.com/file/d/1NMlW9YMWd-T0vvW2AO95IlIksaey5kyMnTWa7VyQKHk/view"
+    },
+    {
+      "name": "Merkle Trees",
+      "url": "https://drive.google.com/file/d/1SHPzZKkdZeGz8YHvKVw4FXPVMHOddLQ6lL1eymcF3E0/view"
+    },
+    {
+      "name": "Data Serialization",
+      "url": "https://drive.google.com/file/d/14FSC9AYDf8eL3UZMgxT-r-9d53Salezbn8KKazoKP8E/view"
+    },
+    {
+      "name": "Parquet",
+      "url": "https://drive.google.com/file/d/13kKhgZ46D82EuHCY_h7oilu19Q4ORwssndL0IEVGW48/view"
+    },
+    {
+      "name": "TLS/SSL",
+      "url": "https://drive.google.com/file/d/1BdnV8F8wNqQgoMlNWDbocC9kU5vNkBBGUXlSIoM2ZZ4/view"
+    },
+    {
+      "name": "TCP and UDP",
+      "url": "https://drive.google.com/file/d/1KL7iiQAxQFqpJJmO0LmsDj3EXapx4Fp8tLimSkwaBxw/view"
+    },
+    {
+      "name": "Collaborative Text Editing",
+      "url": "https://drive.google.com/file/d/1P79GYJ-QwYYOUthOe03fijmwKeyJYhxKzegJt0_EYYE/view"
+    },
+    {
+      "name": "Bitcoin Design",
+      "url": "https://drive.google.com/file/d/1jGYCuU-7kkF8dMzDyM3kRFCPJwqrRK20BSBKFEjXITU/view"
+    },
+    {
+      "name": "Neo4j",
+      "url": "https://drive.google.com/file/d/1IGD6QO92ltzb8zQa3L9etQ1ErpBJVzBFJFP-TFYsr58/view"
+    },
+    {
+      "name": "Handling Interview Questions",
+      "url": "https://drive.google.com/file/d/1451ZZHKRPxpGg6FIKJXXP2a0jKzQFa0XhOaVz0cVNIc/view"
+    },
+    {
+      "name": "Choosing a Database",
+      "url": "https://drive.google.com/file/d/15ZshaGYUN8zIsP4PEXxRJyYJ4L1ljc2dRoKNOcy2F8A/view"
+    },
+    {
+      "name": "Leaderless Replication",
+      "url": "https://drive.google.com/file/d/1ZbX8DWA7OwHECRnPeWjwMJGeATQoxf7d32S6GVRVY7s/view"
+    },
+    {
+      "name": "Search Indexes",
+      "url": "https://drive.google.com/file/d/1NgMhN8GZQoMoN8AHMcp247hWA20M1JQDGsJf2KAqwHc/view"
+    },
+    {
+      "name": "Systems Design In an Hour",
+      "url": "https://drive.google.com/file/d/15HgYnnwnsfvdpOc88nr9O-VJY1T6Ho90maA5jJiyi5o/view"
+    }
+  ]
+}
