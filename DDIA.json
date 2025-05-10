@@ -585,39 +585,79 @@
         },
         {
           "name": "9. Consistency and Consensus",
-          "url": "https://example.com/ch9",
+          "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%209%20-%20Consistency%20and%20Consensus/README.md",
           "children": [
             {
               "name": "Consistency Guarantees",
-              "url": "https://example.com/ch9-1",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%209%20-%20Consistency%20and%20Consensus/README.md#consistency-guarantees",
               "children": [
-                { "name": "Linearizability", "url": "https://example.com/ch9-1-1" },
-                { "name": "Causal Consistency", "url": "https://example.com/ch9-1-2" },
-                { "name": "Eventual Consistency", "url": "https://example.com/ch9-1-3" }
+                {
+                  "name": "Linearizability",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%209%20-%20Consistency%20and%20Consensus/README.md#linearizability",
+                  "children": []
+                },
+                {
+                  "name": "Causal Consistency",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%209%20-%20Consistency%20and%20Consensus/README.md#causal-consistency",
+                  "children": []
+                },
+                {
+                  "name": "Consistency Models",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%209%20-%20Consistency%20and%20Consensus/README.md#consistency-models",
+                  "children": []
+                }
               ]
             },
             {
               "name": "Ordering Guarantees",
-              "url": "https://example.com/ch9-2",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%209%20-%20Consistency%20and%20Consensus/README.md#ordering-guarantees",
               "children": [
-                { "name": "Total Order Broadcast", "url": "https://example.com/ch9-2-1" },
-                { "name": "Partial Ordering", "url": "https://example.com/ch9-2-2" }
+                {
+                  "name": "Sequence Number Ordering",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%209%20-%20Consistency%20and%20Consensus/README.md#sequence-number-ordering",
+                  "children": []
+                },
+                {
+                  "name": "Total Order Broadcast",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%209%20-%20Consistency%20and%20Consensus/README.md#total-order-broadcast",
+                  "children": []
+                },
+                {
+                  "name": "Implementing Linearizable Storage Using Total Order Broadcast",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%209%20-%20Consistency%20and%20Consensus/README.md#implementing-linearizable-storage-using-total-order-broadcast",
+                  "children": []
+                },
+                {
+                  "name": "Implementing Total Order Broadcast Using Linearizable Storage",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%209%20-%20Consistency%20and%20Consensus/README.md#implementing-total-order-broadcast-using-linearizable-storage",
+                  "children": []
+                }
               ]
             },
             {
               "name": "Distributed Transactions and Consensus",
-              "url": "https://example.com/ch9-3",
+              "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%209%20-%20Consistency%20and%20Consensus/README.md#distributed-transactions-and-consensus",
               "children": [
-                { "name": "Atomic Commit and Consensus", "url": "https://example.com/ch9-3-1" },
-                { "name": "Paxos and Raft", "url": "https://example.com/ch9-3-2" }
-              ]
-            },
-            {
-              "name": "Implementation of Consensus",
-              "url": "https://example.com/ch9-4",
-              "children": [
-                { "name": "Consensus Algorithms", "url": "https://example.com/ch9-4-1" },
-                { "name": "ZooKeeper", "url": "https://example.com/ch9-4-2" }
+                {
+                  "name": "Atomic Commit and Two-Phase Commit (2PC)",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%209%20-%20Consistency%20and%20Consensus/README.md#atomic-commit-and-two-phase-commit-2pc",
+                  "children": []
+                },
+                {
+                  "name": "Distributed Transactions in Practice",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%209%20-%20Consistency%20and%20Consensus/README.md#distributed-transactions-in-practice",
+                  "children": []
+                },
+                {
+                  "name": "Fault-Tolerant Consensus",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%209%20-%20Consistency%20and%20Consensus/README.md#fault-tolerant-consensus",
+                  "children": []
+                },
+                {
+                  "name": "Membership and Coordination Services",
+                  "url": "https://github.com/mkassm/designing-data-intensive-applications-notes/blob/main/Chapters/Chapter%209%20-%20Consistency%20and%20Consensus/README.md#membership-and-coordination-services",
+                  "children": []
+                }
               ]
             }
           ]
