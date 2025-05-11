@@ -33,7 +33,7 @@
     },
     {
       "name": "Design Principles",
-      "url": "/system_design/SOLID.html",
+      "url": "/system_design/Solid.html",
       "children": [
         { "name": "SOLID Principles Explained", "url": "https://blog.algomaster.io/p/solid-principles-explained-with-code" }
       ]
