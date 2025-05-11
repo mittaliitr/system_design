@@ -8,16 +8,68 @@
           "name": "Two Pointers",
           "children": [
             {
-              "name": "11. Container With Most Water",
-              "url": "https://leetcode.com/problems/container-with-most-water/"
+              "name": "Two Sum II – Input Array Is Sorted",
+              "url": "https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/"
             },
             {
-              "name": "15. 3Sum",
+              "name": "3Sum",
               "url": "https://leetcode.com/problems/3sum/"
             },
             {
-              "name": "167. Two Sum II - Input Array Is Sorted",
-              "url": "https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/"
+              "name": "4Sum",
+              "url": "https://leetcode.com/problems/4sum/"
+            },
+            {
+              "name": "Remove Duplicates from Sorted Array",
+              "url": "https://leetcode.com/problems/remove-duplicates-from-sorted-array/"
+            },
+            {
+              "name": "Remove Element",
+              "url": "https://leetcode.com/problems/remove-element/"
+            },
+            {
+              "name": "Move Zeroes",
+              "url": "https://leetcode.com/problems/move-zeroes/"
+            },
+            {
+              "name": "Squares of a Sorted Array",
+              "url": "https://leetcode.com/problems/squares-of-a-sorted-array/"
+            },
+            {
+              "name": "Container With Most Water",
+              "url": "https://leetcode.com/problems/container-with-most-water/"
+            },
+            {
+              "name": "Valid Palindrome",
+              "url": "https://leetcode.com/problems/valid-palindrome/"
+            },
+            {
+              "name": "Reverse String",
+              "url": "https://leetcode.com/problems/reverse-string/"
+            },
+            {
+              "name": "Middle of the Linked List",
+              "url": "https://leetcode.com/problems/middle-of-the-linked-list/"
+            },
+            {
+              "name": "Linked List Cycle",
+              "url": "https://leetcode.com/problems/linked-list-cycle/"
+            },
+            {
+              "name": "Linked List Cycle II",
+              "url": "https://leetcode.com/problems/linked-list-cycle-ii/"
+            },
+            {
+              "name": "Remove Nth Node From End of List",
+              "url": "https://leetcode.com/problems/remove-nth-node-from-end-of-list/"
+            },
+            {
+              "name": "Rotate List",
+              "url": "https://leetcode.com/problems/rotate-list/"
+            },
+            {
+              "name": "Intersection of Two Linked Lists",
+              "url": "https://leetcode.com/problems/intersection-of-two-linked-lists/"
             }
           ]
         },
@@ -25,16 +77,80 @@
           "name": "Sliding Window",
           "children": [
             {
-              "name": "3. Longest Substring Without Repeating Characters",
+              "name": "Sliding Window Maximum",
+              "url": "https://leetcode.com/problems/sliding-window-maximum/"
+            },
+            {
+              "name": "Minimum Size Subarray Sum",
+              "url": "https://leetcode.com/problems/minimum-size-subarray-sum/"
+            },
+            {
+              "name": "Longest Substring Without Repeating Characters",
               "url": "https://leetcode.com/problems/longest-substring-without-repeating-characters/"
             },
             {
-              "name": "76. Minimum Window Substring",
+              "name": "Minimum Window Substring",
               "url": "https://leetcode.com/problems/minimum-window-substring/"
             },
             {
-              "name": "438. Find All Anagrams in a String",
+              "name": "Permutation in String",
+              "url": "https://leetcode.com/problems/permutation-in-string/"
+            },
+            {
+              "name": "Longest Repeating Character Replacement",
+              "url": "https://leetcode.com/problems/longest-repeating-character-replacement/"
+            },
+            {
+              "name": "Max Consecutive Ones III",
+              "url": "https://leetcode.com/problems/max-consecutive-ones-iii/"
+            },
+            {
+              "name": "Subarrays with K Different Integers",
+              "url": "https://leetcode.com/problems/subarrays-with-k-different-integers/"
+            },
+            {
+              "name": "Maximum Points You Can Obtain from Cards",
+              "url": "https://leetcode.com/problems/maximum-points-you-can-obtain-from-cards/"
+            },
+            {
+              "name": "Longest Substring with At Most Two Distinct Characters",
+              "url": "https://leetcode.com/problems/longest-substring-with-at-most-two-distinct-characters/"
+            },
+            {
+              "name": "Count Number of Nice Subarrays",
+              "url": "https://leetcode.com/problems/count-number-of-nice-subarrays/"
+            },
+            {
+              "name": "Maximum Average Subarray I",
+              "url": "https://leetcode.com/problems/maximum-average-subarray-i/"
+            },
+            {
+              "name": "Maximum Average Subarray II",
+              "url": "https://leetcode.com/problems/maximum-average-subarray-ii/"
+            },
+            {
+              "name": "Find All Anagrams in a String",
               "url": "https://leetcode.com/problems/find-all-anagrams-in-a-string/"
+            },
+            {
+              "name": "Longest Subarray of 1's After Deleting One Element",
+              "url": "https://leetcode.com/problems/longest-subarray-of-1s-after-deleting-one-element/"
+            },
+            {
+              "name": "Largest Sum of Averages",
+              "url": "https://leetcode.com/problems/largest-sum-of-averages/"
+            },
+            {
+              "name": "Longest Substring with At Most K Distinct Characters",
+              "url": "https://leetcode.com/problems/longest-substring-with-at-most-k-distinct-characters/"
+            },
+            {
+              "name": "Number of Subarrays with Bounded Maximum",
+              "url": "https://leetcode.com/problems/number-of-subarrays-with-bounded-maximum/"
+            },
+            {
+              "name": "Total Fruit",
+              "url": "https://leetcode.com/problems/total-fruit/"
             }
           ]
         },
@@ -42,12 +158,60 @@
           "name": "Prefix Sum",
           "children": [
             {
-              "name": "560. Subarray Sum Equals K",
+              "name": "Prefix Sum of Array",
+              "url": "https://leetcode.com/problems/prefix-sum-of-array/"
+            },
+            {
+              "name": "Subarray Sum Equals K",
               "url": "https://leetcode.com/problems/subarray-sum-equals-k/"
             },
             {
-              "name": "303. Range Sum Query - Immutable",
+              "name": "Range Sum Query - Immutable",
               "url": "https://leetcode.com/problems/range-sum-query-immutable/"
+            },
+            {
+              "name": "Range Sum Query 2D - Immutable",
+              "url": "https://leetcode.com/problems/range-sum-query-2d-immutable/"
+            },
+            {
+              "name": "Sum of Subarray Minimums",
+              "url": "https://leetcode.com/problems/sum-of-subarray-minimums/"
+            },
+            {
+              "name": "Maximum Sum of 3 Non-Overlapping Subarrays",
+              "url": "https://leetcode.com/problems/maximum-sum-of-3-non-overlapping-subarrays/"
+            },
+            {
+              "name": "Count of Range Sum",
+              "url": "https://leetcode.com/problems/count-of-range-sum/"
+            },
+            {
+              "name": "Find the Largest Divisible Subset",
+              "url": "https://leetcode.com/problems/find-the-largest-divisible-subset/"
+            },
+            {
+              "name": "Subarray Product Less Than K",
+              "url": "https://leetcode.com/problems/subarray-product-less-than-k/"
+            },
+            {
+              "name": "Kth Smallest Sum of a Matrix With Sorted Rows",
+              "url": "https://leetcode.com/problems/kth-smallest-sum-of-a-matrix-with-sorted-rows/"
+            },
+            {
+              "name": "Number of Subarrays with Sum 1",
+              "url": "https://leetcode.com/problems/number-of-subarrays-with-sum-1/"
+            },
+            {
+              "name": "Subarray Sum Divisible by K",
+              "url": "https://leetcode.com/problems/subarray-sum-divisible-by-k/"
+            },
+            {
+              "name": "Product of Array Except Self",
+              "url": "https://leetcode.com/problems/product-of-array-except-self/"
+            },
+            {
+              "name": "Maximum Subarray Sum with One Deletion",
+              "url": "https://leetcode.com/problems/maximum-subarray-sum-with-one-deletion/"
             }
           ]
         },
@@ -55,12 +219,68 @@
           "name": "Hash Maps / Sets",
           "children": [
             {
-              "name": "1. Two Sum",
+              "name": "Two Sum",
               "url": "https://leetcode.com/problems/two-sum/"
             },
             {
-              "name": "36. Valid Sudoku",
+              "name": "Valid Anagram",
+              "url": "https://leetcode.com/problems/valid-anagram/"
+            },
+            {
+              "name": "Group Anagrams",
+              "url": "https://leetcode.com/problems/group-anagrams/"
+            },
+            {
+              "name": "Intersection of Two Arrays II",
+              "url": "https://leetcode.com/problems/intersection-of-two-arrays-ii/"
+            },
+            {
+              "name": "Happy Number",
+              "url": "https://leetcode.com/problems/happy-number/"
+            },
+            {
+              "name": "Find the Duplicate Number",
+              "url": "https://leetcode.com/problems/find-the-duplicate-number/"
+            },
+            {
+              "name": "Contains Duplicate",
+              "url": "https://leetcode.com/problems/contains-duplicate/"
+            },
+            {
+              "name": "Longest Consecutive Sequence",
+              "url": "https://leetcode.com/problems/longest-consecutive-sequence/"
+            },
+            {
+              "name": "Subarray Sum Equals K",
+              "url": "https://leetcode.com/problems/subarray-sum-equals-k/"
+            },
+            {
+              "name": "Four Sum",
+              "url": "https://leetcode.com/problems/4sum/"
+            },
+            {
+              "name": "Top K Frequent Elements",
+              "url": "https://leetcode.com/problems/top-k-frequent-elements/"
+            },
+            {
+              "name": "Valid Sudoku",
               "url": "https://leetcode.com/problems/valid-sudoku/"
+            },
+            {
+              "name": "Encode and Decode Strings",
+              "url": "https://leetcode.com/problems/encode-and-decode-strings/"
+            },
+            {
+              "name": "Insert Delete GetRandom O(1)",
+              "url": "https://leetcode.com/problems/insert-delete-getrandom-o1/"
+            },
+            {
+              "name": "Count of Range Sum",
+              "url": "https://leetcode.com/problems/count-of-range-sum/"
+            },
+            {
+              "name": "Design HashMap",
+              "url": "https://leetcode.com/problems/design-hashmap/"
             }
           ]
         },
@@ -68,12 +288,68 @@
           "name": "Sorting",
           "children": [
             {
-              "name": "56. Merge Intervals",
+              "name": "Merge Intervals",
               "url": "https://leetcode.com/problems/merge-intervals/"
             },
             {
-              "name": "75. Sort Colors",
+              "name": "Kth Largest Element in an Array",
+              "url": "https://leetcode.com/problems/kth-largest-element-in-an-array/"
+            },
+            {
+              "name": "Sort Colors",
               "url": "https://leetcode.com/problems/sort-colors/"
+            },
+            {
+              "name": "Trapping Rain Water",
+              "url": "https://leetcode.com/problems/trapping-rain-water/"
+            },
+            {
+              "name": "Find the Majority Element",
+              "url": "https://leetcode.com/problems/majority-element/"
+            },
+            {
+              "name": "Largest Number",
+              "url": "https://leetcode.com/problems/largest-number/"
+            },
+            {
+              "name": "Wiggle Sort II",
+              "url": "https://leetcode.com/problems/wiggle-sort-ii/"
+            },
+            {
+              "name": "Sort an Array",
+              "url": "https://leetcode.com/problems/sort-an-array/"
+            },
+            {
+              "name": "Meeting Rooms II",
+              "url": "https://leetcode.com/problems/meeting-rooms-ii/"
+            },
+            {
+              "name": "Reorganize String",
+              "url": "https://leetcode.com/problems/reorganize-string/"
+            },
+            {
+              "name": "Count of Smaller Numbers After Self",
+              "url": "https://leetcode.com/problems/count-of-smaller-numbers-after-self/"
+            },
+            {
+              "name": "The Skyline Problem",
+              "url": "https://leetcode.com/problems/the-skyline-problem/"
+            },
+            {
+              "name": "Largest Rectangle in Histogram",
+              "url": "https://leetcode.com/problems/largest-rectangle-in-histogram/"
+            },
+            {
+              "name": "Merge Sorted Array",
+              "url": "https://leetcode.com/problems/merge-sorted-array/"
+            },
+            {
+              "name": "Sort List",
+              "url": "https://leetcode.com/problems/sort-list/"
+            },
+            {
+              "name": "Top K Frequent Words",
+              "url": "https://leetcode.com/problems/top-k-frequent-words/"
             }
           ]
         },
@@ -81,12 +357,64 @@
           "name": "Greedy",
           "children": [
             {
-              "name": "55. Jump Game",
+              "name": "Jump Game II",
+              "url": "https://leetcode.com/problems/jump-game-ii/"
+            },
+            {
+              "name": "Gas Station",
+              "url": "https://leetcode.com/problems/gas-station/"
+            },
+            {
+              "name": "Non-overlapping Intervals",
+              "url": "https://leetcode.com/problems/non-overlapping-intervals/"
+            },
+            {
+              "name": "Assign Cookies",
+              "url": "https://leetcode.com/problems/assign-cookies/"
+            },
+            {
+              "name": "Burst Balloons",
+              "url": "https://leetcode.com/problems/burst-balloons/"
+            },
+            {
+              "name": "Partition Labels",
+              "url": "https://leetcode.com/problems/partition-labels/"
+            },
+            {
+              "name": "Candy",
+              "url": "https://leetcode.com/problems/candy/"
+            },
+            {
+              "name": "Best Time to Buy and Sell Stock II",
+              "url": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/"
+            },
+            {
+              "name": "Minimum Number of Arrows to Burst Balloons",
+              "url": "https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons/"
+            },
+            {
+              "name": "Employee Free Time",
+              "url": "https://leetcode.com/problems/employee-free-time/"
+            },
+            {
+              "name": "Last Stone Weight II",
+              "url": "https://leetcode.com/problems/last-stone-weight-ii/"
+            },
+            {
+              "name": "Maximal Square",
+              "url": "https://leetcode.com/problems/maximal-square/"
+            },
+            {
+              "name": "Jump Game",
               "url": "https://leetcode.com/problems/jump-game/"
             },
             {
-              "name": "122. Best Time to Buy and Sell Stock II",
-              "url": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/"
+              "name": "Increasing Triplet Subsequence",
+              "url": "https://leetcode.com/problems/increasing-triplet-subsequence/"
+            },
+            {
+              "name": "Minimum Cost to Move Chips to the Same Position",
+              "url": "https://leetcode.com/problems/minimum-cost-to-move-chips-to-the-same-position/"
             }
           ]
         }
@@ -99,12 +427,60 @@
           "name": "Classic Binary Search",
           "children": [
             {
-              "name": "704. Binary Search",
+              "name": "Binary Search",
               "url": "https://leetcode.com/problems/binary-search/"
             },
             {
-              "name": "278. First Bad Version",
+              "name": "Search Insert Position",
+              "url": "https://leetcode.com/problems/search-insert-position/"
+            },
+            {
+              "name": "Find Peak Element",
+              "url": "https://leetcode.com/problems/find-peak-element/"
+            },
+            {
+              "name": "Find Minimum in Rotated Sorted Array",
+              "url": "https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/"
+            },
+            {
+              "name": "Search in Rotated Sorted Array",
+              "url": "https://leetcode.com/problems/search-in-rotated-sorted-array/"
+            },
+            {
+              "name": "Count of Smaller Numbers After Self",
+              "url": "https://leetcode.com/problems/count-of-smaller-numbers-after-self/"
+            },
+            {
+              "name": "Kth Largest Element in an Array",
+              "url": "https://leetcode.com/problems/kth-largest-element-in-an-array/"
+            },
+            {
+              "name": "First Bad Version",
               "url": "https://leetcode.com/problems/first-bad-version/"
+            },
+            {
+              "name": "Find Kth Largest Element in an Array",
+              "url": "https://leetcode.com/problems/kth-largest-element-in-an-array/"
+            },
+            {
+              "name": "Peak Index in a Mountain Array",
+              "url": "https://leetcode.com/problems/peak-index-in-a-mountain-array/"
+            },
+            {
+              "name": "Time Based Key-Value Store",
+              "url": "https://leetcode.com/problems/time-based-key-value-store/"
+            },
+            {
+              "name": "Median of Two Sorted Arrays",
+              "url": "https://leetcode.com/problems/median-of-two-sorted-arrays/"
+            },
+            {
+              "name": "Valid Perfect Square",
+              "url": "https://leetcode.com/problems/valid-perfect-square/"
+            },
+            {
+              "name": "Square Root of a Number",
+              "url": "https://leetcode.com/problems/sqrtx/"
             }
           ]
         },
@@ -125,11 +501,43 @@
           "name": "Binary Search on Answer",
           "children": [
             {
-              "name": "875. Koko Eating Bananas",
+              "name": "Aggressive Cows",
+              "url": "https://www.spoj.com/problems/AGGRCOW/"
+            },
+            {
+              "name": "Allocate Minimum Number of Pages",
+              "url": "https://practice.geeksforgeeks.org/problems/allocate-minimum-number-of-pages/0"
+            },
+            {
+              "name": "Koko Eating Bananas",
               "url": "https://leetcode.com/problems/koko-eating-bananas/"
             },
             {
-              "name": "410. Split Array Largest Sum",
+              "name": "Capacity To Ship Packages Within D Days",
+              "url": "https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/"
+            },
+            {
+              "name": "Minimum Time to Complete Trips",
+              "url": "https://leetcode.com/problems/minimum-time-to-complete-trips/"
+            },
+            {
+              "name": "Maximum Number of Events That Can Be Attended II",
+              "url": "https://leetcode.com/problems/maximum-number-of-events-that-can-be-attended-ii/"
+            },
+            {
+              "name": "Max Distance to Closest Person",
+              "url": "https://leetcode.com/problems/max-distance-to-closest-person/"
+            },
+            {
+              "name": "Find the Smallest Divisor Given a Threshold",
+              "url": "https://leetcode.com/problems/find-the-smallest-divisor-given-a-threshold/"
+            },
+            {
+              "name": "Minimum Cost to Hire K Workers",
+              "url": "https://leetcode.com/problems/minimum-cost-to-hire-k-workers/"
+            },
+            {
+              "name": "Split Array Largest Sum",
               "url": "https://leetcode.com/problems/split-array-largest-sum/"
             }
           ]
@@ -138,12 +546,44 @@
           "name": "Lower / Upper Bound",
           "children": [
             {
+              "name": "34. Find First and Last Position of Element in Sorted Array",
+              "url": "https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/"
+            },
+            {
               "name": "35. Search Insert Position",
               "url": "https://leetcode.com/problems/search-insert-position/"
             },
             {
-              "name": "34. Find First and Last Position of Element in Sorted Array",
-              "url": "https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/"
+              "name": "81. Search in Rotated Sorted Array II",
+              "url": "https://leetcode.com/problems/search-in-rotated-sorted-array-ii/"
+            },
+            {
+              "name": "153. Find Minimum in Rotated Sorted Array II",
+              "url": "https://leetcode.com/problems/find-minimum-in-rotated-sorted-array-ii/"
+            },
+            {
+              "name": "162. Find Peak Element",
+              "url": "https://leetcode.com/problems/find-peak-element/"
+            },
+            {
+              "name": "278. First Bad Version",
+              "url": "https://leetcode.com/problems/first-bad-version/"
+            },
+            {
+              "name": "367. Valid Perfect Square",
+              "url": "https://leetcode.com/problems/valid-perfect-square/"
+            },
+            {
+              "name": "704. Binary Search",
+              "url": "https://leetcode.com/problems/binary-search/"
+            },
+            {
+              "name": "1287. Element Appearing More Than 25% In Sorted Array",
+              "url": "https://leetcode.com/problems/element-appearing-more-than-25-in-sorted-array/"
+            },
+            {
+              "name": "2784. Array Upper Bound",
+              "url": "https://leetcode.ca/2023-10-28-2774-Array-Upper-Bound/"
             }
           ]
         }
