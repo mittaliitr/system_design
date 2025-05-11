@@ -3,6 +3,7 @@
   "children": [
     {
       "name": "Object-Oriented Programming (OOP)",
+      "url": "/system_design/Object-Oriented Programming (OOP).html",
       "children": [
         {
           "name": "Core Concepts",
@@ -32,12 +33,14 @@
     },
     {
       "name": "Design Principles",
+      "url": "/system_design/SOLID.html",
       "children": [
         { "name": "SOLID Principles Explained", "url": "https://blog.algomaster.io/p/solid-principles-explained-with-code" }
       ]
     },
     {
       "name": "UML Diagrams",
+      "url": "/system_design/UML Diagrams.html",
       "children": [
         {
           "name": "Class Diagrams",
@@ -54,48 +57,50 @@
     },
     {
       "name": "Design Patterns",
+      "url": "/system_design/Design Patterns.html",
       "children": [
         {
           "name": "Creational Patterns",
           "children": [
             { "name": "Singleton", "url": "https://blog.algomaster.io/p/singleton-design-pattern" },
-            { "name": "Factory Method", "url": "https://refactoring.guru/design-patterns/factory-method" },
-            { "name": "Abstract Factory", "url": "https://refactoring.guru/design-patterns/abstract-factory" },
-            { "name": "Builder", "url": "https://refactoring.guru/design-patterns/builder" },
-            { "name": "Prototype", "url": "https://refactoring.guru/design-patterns/prototype" }
+            { "name": "Factory Method", "url": "https://sourcemaking.com/design_patterns/factory_method" },
+            { "name": "Abstract Factory", "url": "https://sourcemaking.com/design_patterns/abstract_factory" },
+            { "name": "Builder", "url": "https://sourcemaking.com/design_patterns/builder" },
+            { "name": "Prototype", "url": "https://sourcemaking.com/design_patterns/prototype" }
           ]
         },
         {
           "name": "Structural Patterns",
           "children": [
-            { "name": "Adapter", "url": "https://refactoring.guru/design-patterns/adapter" },
-            { "name": "Facade", "url": "https://refactoring.guru/design-patterns/facade" },
-            { "name": "Decorator", "url": "https://refactoring.guru/design-patterns/decorator" },
-            { "name": "Composite", "url": "https://refactoring.guru/design-patterns/composite" },
-            { "name": "Proxy", "url": "https://refactoring.guru/design-patterns/proxy" },
-            { "name": "Bridge", "url": "https://refactoring.guru/design-patterns/bridge" },
-            { "name": "Flyweight", "url": "https://refactoring.guru/design-patterns/flyweight" }
+            { "name": "Adapter", "url": "https://sourcemaking.com/design_patterns/adapter" },
+            { "name": "Facade", "url": "https://sourcemaking.com/design_patterns/facade" },
+            { "name": "Decorator", "url": "https://sourcemaking.com/design_patterns/decorator" },
+            { "name": "Composite", "url": "https://sourcemaking.com/design_patterns/composite" },
+            { "name": "Proxy", "url": "https://sourcemaking.com/design_patterns/proxy" },
+            { "name": "Bridge", "url": "https://sourcemaking.com/design_patterns/bridge" },
+            { "name": "Flyweight", "url": "https://sourcemaking.com/design_patterns/flyweight" }
           ]
         },
         {
           "name": "Behavioral Patterns",
           "children": [
-            { "name": "Iterator", "url": "https://refactoring.guru/design-patterns/iterator" },
-            { "name": "Observer", "url": "https://refactoring.guru/design-patterns/observer" },
-            { "name": "Strategy", "url": "https://refactoring.guru/design-patterns/strategy" },
-            { "name": "Command", "url": "https://refactoring.guru/design-patterns/command" },
-            { "name": "State", "url": "https://refactoring.guru/design-patterns/state" },
-            { "name": "Template Method", "url": "https://refactoring.guru/design-patterns/template-method" },
-            { "name": "Visitor", "url": "https://refactoring.guru/design-patterns/visitor" },
-            { "name": "Mediator", "url": "https://refactoring.guru/design-patterns/mediator" },
-            { "name": "Memento", "url": "https://refactoring.guru/design-patterns/memento" },
-            { "name": "Chain of Responsibility", "url": "https://refactoring.guru/design-patterns/chain-of-responsibility" }
+            { "name": "Iterator", "url": "https://sourcemaking.com/design_patterns/iterator" },
+            { "name": "Observer", "url": "https://sourcemaking.com/design_patterns/observer" },
+            { "name": "Strategy", "url": "https://sourcemaking.com/design_patterns/strategy" },
+            { "name": "Command", "url": "https://sourcemaking.com/design_patterns/command" },
+            { "name": "State", "url": "https://sourcemaking.com/design_patterns/state" },
+            { "name": "Template Method", "url": "https://sourcemaking.com/design_patterns/template_method" },
+            { "name": "Visitor", "url": "https://sourcemaking.com/design_patterns/visitor" },
+            { "name": "Mediator", "url": "https://sourcemaking.com/design_patterns/mediator" },
+            { "name": "Memento", "url": "https://sourcemaking.com/design_patterns/memento" },
+            { "name": "Chain of Responsibility", "url": "https://sourcemaking.com/design_patterns/chain_of_responsibility" }
           ]
         }
       ]
     },
     {
       "name": "Interview Problems",
+      "url": "/system_design/Interview Problems.html",
       "children": [
         {
           "name": "Machine/Device Design",
@@ -184,6 +189,7 @@
     },
     {
       "name": "How to Answer LLD Problems",
+      "url": "/system_design/How to Answer LLD Problems.html",
       "children": [
         { "name": "Step-by-Step Approach", "url": "https://blog.algomaster.io/p/how-to-answer-a-lld-interview-problem" }
       ]
