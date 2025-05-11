@@ -1,0 +1,134 @@
+{
+  "name": "Low Level Design (LLD)",
+  "children": [
+    {
+      "name": "OOP Concepts",
+      "children": [
+        { "name": "Classes and Objects", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/classesandobjects" },
+        { "name": "Interfaces", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/interfaces" },
+        { "name": "Inheritance", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/inheritance" },
+        { "name": "Polymorphism", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/polymorphism" },
+        { "name": "Abstraction", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/abstraction" },
+        { "name": "Encapsulation", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/encapsulation" },
+        { "name": "Aggregation", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/aggregation" },
+        { "name": "Composition", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/composition" },
+        { "name": "Association", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/association" }
+      ]
+    },
+    {
+      "name": "SOLID Principles",
+      "children": [
+        { "name": "SOLID Principles Explained", "url": "https://blog.algomaster.io/p/solid-principles-explained-with-code" }
+      ]
+    },
+    {
+      "name": "UML Diagrams",
+      "children": [
+        { "name": "UML Class Diagram", "url": "https://blog.algomaster.io/p/uml-class-diagram-explained-with-examples" },
+        { "name": "Activity Diagram", "url": "https://www.visual-paradigm.com/guide/uml-unified-modeling-language/what-is-activity-diagram/" },
+        { "name": "State Machine Diagram", "url": "https://www.visual-paradigm.com/guide/uml-unified-modeling-language/what-is-state-machine-diagram/" }
+      ]
+    },
+    {
+      "name": "Design Patterns",
+      "children": [
+        {
+          "name": "Creational Patterns",
+          "children": [
+            { "name": "Singleton", "url": "https://blog.algomaster.io/p/singleton-design-pattern" },
+            { "name": "Factory Method", "url": "https://refactoring.guru/design-patterns/factory-method" },
+            { "name": "Abstract Factory", "url": "https://refactoring.guru/design-patterns/abstract-factory" },
+            { "name": "Builder", "url": "https://refactoring.guru/design-patterns/builder" },
+            { "name": "Prototype", "url": "https://refactoring.guru/design-patterns/prototype" }
+          ]
+        },
+        {
+          "name": "Structural Patterns",
+          "children": [
+            { "name": "Adapter", "url": "https://refactoring.guru/design-patterns/adapter" },
+            { "name": "Facade", "url": "https://refactoring.guru/design-patterns/facade" },
+            { "name": "Decorator", "url": "https://refactoring.guru/design-patterns/decorator" },
+            { "name": "Composite", "url": "https://refactoring.guru/design-patterns/composite" },
+            { "name": "Proxy", "url": "https://refactoring.guru/design-patterns/proxy" },
+            { "name": "Bridge", "url": "https://refactoring.guru/design-patterns/bridge" },
+            { "name": "Flyweight", "url": "https://refactoring.guru/design-patterns/flyweight" }
+          ]
+        },
+        {
+          "name": "Behavioral Patterns",
+          "children": [
+            { "name": "Iterator", "url": "https://refactoring.guru/design-patterns/iterator" },
+            { "name": "Observer", "url": "https://refactoring.guru/design-patterns/observer" },
+            { "name": "Strategy", "url": "https://refactoring.guru/design-patterns/strategy" },
+            { "name": "Command", "url": "https://refactoring.guru/design-patterns/command" },
+            { "name": "State", "url": "https://refactoring.guru/design-patterns/state" },
+            { "name": "Template Method", "url": "https://refactoring.guru/design-patterns/template-method" },
+            { "name": "Visitor", "url": "https://refactoring.guru/design-patterns/visitor" },
+            { "name": "Mediator", "url": "https://refactoring.guru/design-patterns/mediator" },
+            { "name": "Memento", "url": "https://refactoring.guru/design-patterns/memento" },
+            { "name": "Chain of Responsibility", "url": "https://refactoring.guru/design-patterns/chain-of-responsibility" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Interview Problems",
+      "children": [
+        {
+          "name": "Easy Problems",
+          "children": [
+            { "name": "Parking Lot", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/parkinglot" },
+            { "name": "Stack Overflow", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/stackoverflow" },
+            { "name": "Vending Machine", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/vendingmachine" },
+            { "name": "Logging Framework", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/loggingframework" },
+            { "name": "Coffee Vending Machine", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/coffeevendingmachine" },
+            { "name": "Task Management System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/taskmanagementsystem" },
+            { "name": "Traffic Signal Control System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/trafficsignalcontrolsystem" }
+          ]
+        },
+        {
+          "name": "Medium Problems",
+          "children": [
+            { "name": "ATM", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/atm" },
+            { "name": "LinkedIn", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/linkedin" },
+            { "name": "LRU Cache", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/lrucache" },
+            { "name": "Tic Tac Toe", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/tictactoe" },
+            { "name": "Pub-Sub System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/pubsubsystem" },
+            { "name": "Elevator System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/elevatorsystem" },
+            { "name": "Car Rental System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/carrentalsystem" },
+            { "name": "Online Auction System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/onlineauctionsystem" },
+            { "name": "Hotel Management System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/hotelmanagementsystem" },
+            { "name": "Digital Wallet Service", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/digitalwalletservice" },
+            { "name": "Airline Management System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/airlinemanagementsystem" },
+            { "name": "Library Management System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/librarymanagementsystem" },
+            { "name": "Restaurant Management System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/restaurantmanagementsystem" },
+            { "name": "Concert Ticket Booking System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/concertticketbookingsystem" }
+          ]
+        },
+        {
+          "name": "Hard Problems",
+          "children": [
+            { "name": "Social Networking Service", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/socialnetworkingservice" },
+            { "name": "CricInfo", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/cricinfo" },
+            { "name": "Splitwise", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/splitwise" },
+            { "name": "Chess Game", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/chessgame" },
+            { "name": "Snake and Ladder Game", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/snakeandladdergame" },
+            { "name": "Course Registration System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/courseregistrationsystem" },
+            { "name": "Movie Ticket Booking System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/movieticketbookingsystem" },
+            { "name": "Online Stock Brokerage System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/onlinestockbrokeragesystem" },
+            { "name": "Ride-Sharing Service", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/ridesharingservice" },
+            { "name": "Music Streaming Service", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/musicstreamingservice" },
+            { "name": "Online Shopping Service", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/onlineshoppingservice" },
+            { "name": "Food Delivery Service", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/fooddeliveryservice" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "How to Answer LLD Problems",
+      "children": [
+        { "name": "Step-by-Step Approach", "url": "https://blog.algomaster.io/p/how-to-answer-a-lld-interview-problem" }
+      ]
+    }
+  ]
+}
