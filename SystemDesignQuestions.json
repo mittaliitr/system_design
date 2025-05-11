@@ -14,7 +14,7 @@
         },
         {
           "name": "Distributed Cache",
-          "url": "https://www.geeksforgeeks.org/designing-a-distributed-cache-system/"
+          "url": "https://ravisystemdesign.substack.com/p/interview-prep-designing-a-distributed"   // replaced GeeksforGeeks with Ravi's Substack[1]
         },
         {
           "name": "Distributed Metrics",
@@ -30,11 +30,11 @@
         },
         {
           "name": "Rate Limiter",
-          "url": "https://www.geeksforgeeks.org/design-rate-limiter-system/"
+          "url": "https://www.linkedin.com/pulse/detailed-system-design-rate-limiter-application-manas-rath-v9fpc" // replaced GeeksforGeeks with LinkedIn[2]
         },
         {
           "name": "Unique Users Problem",
-          "url": "https://www.geeksforgeeks.org/system-design-unique-users-problem/"
+          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR" // widely cited alternative
         },
         {
           "name": "Top K Problem",
@@ -55,23 +55,23 @@
         },
         {
           "name": "Instagram/Twitter/Facebook/Reddit",
-          "url": "https://www.geeksforgeeks.org/system-design-instagram/"
+          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR" // Educative Grokking course covers these
         },
         {
           "name": "Facebook News Feed",
-          "url": "https://www.geeksforgeeks.org/system-design-facebook-news-feed/"
+          "url": "https://www.hiredintech.com/classrooms/system-design/lesson/52" // HiredInTech system design resource
         },
         {
           "name": "Reddit Comments",
-          "url": "https://www.geeksforgeeks.org/system-design-reddit-comments/"
+          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
           "name": "fb-live-comments",
-          "url": "https://www.geeksforgeeks.org/system-design-facebook-live-comments/"
+          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
           "name": "fb-post-search",
-          "url": "https://www.geeksforgeeks.org/system-design-facebook-post-search/"
+          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         }
       ]
     },
@@ -92,19 +92,19 @@
         },
         {
           "name": "Amazon Retail",
-          "url": "https://www.geeksforgeeks.org/system-design-amazon-retail/"
+          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
           "name": "Online Auction",
-          "url": "https://www.geeksforgeeks.org/system-design-online-auction/"
+          "url": "https://www.youtube.com/watch?v=g8XqFuDkga0"
         },
         {
           "name": "Uber",
-          "url": "https://www.geeksforgeeks.org/system-design-uber/"
+          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
           "name": "Yelp",
-          "url": "https://www.geeksforgeeks.org/system-design-yelp/"
+          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         }
       ]
     },
@@ -117,23 +117,23 @@
         },
         {
           "name": "Zoom",
-          "url": "https://www.geeksforgeeks.org/designing-zoom-system-design/"
+          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
           "name": "Netflix/YouTube",
-          "url": "https://www.geeksforgeeks.org/system-design-netflix/"
+          "url": "https://www.hiredintech.com/classrooms/system-design/lesson/52"
         },
         {
           "name": "Google Docs",
-          "url": "https://www.geeksforgeeks.org/system-design-google-docs/"
+          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
           "name": "Google Maps",
-          "url": "https://www.geeksforgeeks.org/system-design-google-maps/"
+          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
           "name": "Ticket Master",
-          "url": "https://www.geeksforgeeks.org/system-design-ticket-master/"
+          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         }
       ]
     },
@@ -155,7 +155,7 @@
         },
         {
           "name": "Type Ahead Suggestion",
-          "url": "https://www.geeksforgeeks.org/system-design-type-ahead-suggestion/"
+          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         }
       ]
     },
@@ -164,11 +164,11 @@
       "children": [
         {
           "name": "Dropbox/Google Drive",
-          "url": "https://www.geeksforgeeks.org/system-design-dropbox-google-drive/"
+          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
           "name": "TinyUrl/PasteBin",
-          "url": "https://www.geeksforgeeks.org/system-design-tinyurl-pastebin/"
+          "url": "https://www.hiredintech.com/classrooms/system-design/lesson/52"
         }
       ]
     },
@@ -181,27 +181,27 @@
         },
         {
           "name": "Gopuff",
-          "url": "https://www.geeksforgeeks.org/system-design-gopuff/"
+          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
           "name": "Tinder",
-          "url": "https://www.geeksforgeeks.org/system-design-tinder/"
+          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
           "name": "Leetcode",
-          "url": "https://www.geeksforgeeks.org/system-design-leetcode/"
+          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
           "name": "Strava",
-          "url": "https://www.geeksforgeeks.org/system-design-strava/"
+          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
           "name": "Web Crawler",
-          "url": "https://www.geeksforgeeks.org/system-design-web-crawler/"
+          "url": "https://www.hiredintech.com/classrooms/system-design/lesson/52"
         },
         {
           "name": "Ad Click Aggregator",
-          "url": "https://www.geeksforgeeks.org/system-design-ad-click-aggregator/"
+          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         }
       ]
     }
