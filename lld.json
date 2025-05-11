@@ -2,21 +2,36 @@
   "name": "Low Level Design (LLD)",
   "children": [
     {
-      "name": "OOP Concepts",
+      "name": "Object-Oriented Programming (OOP)",
       "children": [
-        { "name": "Classes and Objects", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/classesandobjects" },
-        { "name": "Interfaces", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/interfaces" },
-        { "name": "Inheritance", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/inheritance" },
-        { "name": "Polymorphism", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/polymorphism" },
-        { "name": "Abstraction", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/abstraction" },
-        { "name": "Encapsulation", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/encapsulation" },
-        { "name": "Aggregation", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/aggregation" },
-        { "name": "Composition", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/composition" },
-        { "name": "Association", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/association" }
+        {
+          "name": "Core Concepts",
+          "children": [
+            { "name": "Classes and Objects", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/classesandobjects" },
+            { "name": "Interfaces", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/interfaces" }
+          ]
+        },
+        {
+          "name": "Principles",
+          "children": [
+            { "name": "Inheritance", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/inheritance" },
+            { "name": "Polymorphism", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/polymorphism" },
+            { "name": "Abstraction", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/abstraction" },
+            { "name": "Encapsulation", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/encapsulation" }
+          ]
+        },
+        {
+          "name": "Relationships",
+          "children": [
+            { "name": "Aggregation", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/aggregation" },
+            { "name": "Composition", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/composition" },
+            { "name": "Association", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/oop/java/association" }
+          ]
+        }
       ]
     },
     {
-      "name": "SOLID Principles",
+      "name": "Design Principles",
       "children": [
         { "name": "SOLID Principles Explained", "url": "https://blog.algomaster.io/p/solid-principles-explained-with-code" }
       ]
@@ -24,9 +39,17 @@
     {
       "name": "UML Diagrams",
       "children": [
-        { "name": "UML Class Diagram", "url": "https://blog.algomaster.io/p/uml-class-diagram-explained-with-examples" },
-        { "name": "Activity Diagram", "url": "https://www.visual-paradigm.com/guide/uml-unified-modeling-language/what-is-activity-diagram/" },
-        { "name": "State Machine Diagram", "url": "https://www.visual-paradigm.com/guide/uml-unified-modeling-language/what-is-state-machine-diagram/" }
+        {
+          "name": "Class Diagrams",
+          "url": "https://blog.algomaster.io/p/uml-class-diagram-explained-with-examples"
+        },
+        {
+          "name": "Behavioral Diagrams",
+          "children": [
+            { "name": "Activity Diagram", "url": "https://www.visual-paradigm.com/guide/uml-unified-modeling-language/what-is-activity-diagram/" },
+            { "name": "State Machine Diagram", "url": "https://www.visual-paradigm.com/guide/uml-unified-modeling-language/what-is-state-machine-diagram/" }
+          ]
+        }
       ]
     },
     {
@@ -75,50 +98,85 @@
       "name": "Interview Problems",
       "children": [
         {
-          "name": "Easy Problems",
+          "name": "Machine/Device Design",
           "children": [
             { "name": "Parking Lot", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/parkinglot" },
-            { "name": "Stack Overflow", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/stackoverflow" },
             { "name": "Vending Machine", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/vendingmachine" },
-            { "name": "Logging Framework", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/loggingframework" },
             { "name": "Coffee Vending Machine", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/coffeevendingmachine" },
-            { "name": "Task Management System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/taskmanagementsystem" },
+            { "name": "ATM", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/atm" },
+            { "name": "Elevator System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/elevatorsystem" },
             { "name": "Traffic Signal Control System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/trafficsignalcontrolsystem" }
           ]
         },
         {
-          "name": "Medium Problems",
+          "name": "Games",
           "children": [
-            { "name": "ATM", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/atm" },
-            { "name": "LinkedIn", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/linkedin" },
-            { "name": "LRU Cache", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/lrucache" },
             { "name": "Tic Tac Toe", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/tictactoe" },
-            { "name": "Pub-Sub System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/pubsubsystem" },
-            { "name": "Elevator System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/elevatorsystem" },
-            { "name": "Car Rental System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/carrentalsystem" },
-            { "name": "Online Auction System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/onlineauctionsystem" },
-            { "name": "Hotel Management System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/hotelmanagementsystem" },
+            { "name": "Chess Game", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/chessgame" },
+            { "name": "Snake and Ladder Game", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/snakeandladdergame" }
+          ]
+        },
+        {
+          "name": "Social & Communication",
+          "children": [
+            { "name": "Stack Overflow", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/stackoverflow" },
+            { "name": "LinkedIn", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/linkedin" },
+            { "name": "Social Networking Service", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/socialnetworkingservice" }
+          ]
+        },
+        {
+          "name": "Finance & Commerce",
+          "children": [
             { "name": "Digital Wallet Service", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/digitalwalletservice" },
-            { "name": "Airline Management System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/airlinemanagementsystem" },
-            { "name": "Library Management System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/librarymanagementsystem" },
-            { "name": "Restaurant Management System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/restaurantmanagementsystem" },
+            { "name": "Online Auction System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/onlineauctionsystem" },
+            { "name": "Online Stock Brokerage System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/onlinestockbrokeragesystem" },
+            { "name": "Online Shopping Service", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/onlineshoppingservice" }
+          ]
+        },
+        {
+          "name": "Media & Entertainment",
+          "children": [
+            { "name": "Music Streaming Service", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/musicstreamingservice" },
+            { "name": "Movie Ticket Booking System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/movieticketbookingsystem" },
             { "name": "Concert Ticket Booking System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/concertticketbookingsystem" }
           ]
         },
         {
-          "name": "Hard Problems",
+          "name": "Transport",
           "children": [
-            { "name": "Social Networking Service", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/socialnetworkingservice" },
-            { "name": "CricInfo", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/cricinfo" },
-            { "name": "Splitwise", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/splitwise" },
-            { "name": "Chess Game", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/chessgame" },
-            { "name": "Snake and Ladder Game", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/snakeandladdergame" },
-            { "name": "Course Registration System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/courseregistrationsystem" },
-            { "name": "Movie Ticket Booking System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/movieticketbookingsystem" },
-            { "name": "Online Stock Brokerage System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/onlinestockbrokeragesystem" },
+            { "name": "Car Rental System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/carrentalsystem" },
             { "name": "Ride-Sharing Service", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/ridesharingservice" },
-            { "name": "Music Streaming Service", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/musicstreamingservice" },
-            { "name": "Online Shopping Service", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/onlineshoppingservice" },
+            { "name": "Airline Management System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/airlinemanagementsystem" }
+          ]
+        },
+        {
+          "name": "Hospitality",
+          "children": [
+            { "name": "Hotel Management System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/hotelmanagementsystem" },
+            { "name": "Restaurant Management System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/restaurantmanagementsystem" }
+          ]
+        },
+        {
+          "name": "Utilities",
+          "children": [
+            { "name": "Logging Framework", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/loggingframework" },
+            { "name": "Task Management System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/taskmanagementsystem" },
+            { "name": "LRU Cache", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/lrucache" },
+            { "name": "Pub-Sub System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/pubsubsystem" }
+          ]
+        },
+        {
+          "name": "Education",
+          "children": [
+            { "name": "Course Registration System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/courseregistrationsystem" },
+            { "name": "Library Management System", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/librarymanagementsystem" }
+          ]
+        },
+        {
+          "name": "Other",
+          "children": [
+            { "name": "Splitwise", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/splitwise" },
+            { "name": "CricInfo", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/cricinfo" },
             { "name": "Food Delivery Service", "url": "https://github.com/ashishps1/awesome-low-level-design/tree/main/solutions/java/src/fooddeliveryservice" }
           ]
         }
