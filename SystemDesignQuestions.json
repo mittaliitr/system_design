@@ -1,0 +1,209 @@
+{
+  "name": "System Design Problems",
+  "children": [
+    {
+      "name": "Distributed Systems",
+      "children": [
+        {
+          "name": "Distributed Priority Queue",
+          "url": "https://engineering.fb.com/2021/02/22/production-engineering/foqs-scaling-a-distributed-priority-queue/"
+        },
+        {
+          "name": "Distributed Lock",
+          "url": "https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html"
+        },
+        {
+          "name": "Distributed Cache",
+          "url": "https://www.geeksforgeeks.org/designing-a-distributed-cache-system/"
+        },
+        {
+          "name": "Distributed Metrics",
+          "url": "https://www.oreilly.com/library/view/designing-data-intensive-applications/9781449373320/ch04.html"
+        },
+        {
+          "name": "Job Scheduler",
+          "url": "https://www.youtube.com/watch?v=ta5x62cDxf4"
+        },
+        {
+          "name": "Notification Service",
+          "url": "https://medium.com/@in10se/system-design-interview-question-3-realtime-notification-service-14fe1dec8e2a"
+        },
+        {
+          "name": "Rate Limiter",
+          "url": "https://www.geeksforgeeks.org/design-rate-limiter-system/"
+        },
+        {
+          "name": "Unique Users Problem",
+          "url": "https://www.geeksforgeeks.org/system-design-unique-users-problem/"
+        },
+        {
+          "name": "Top K Problem",
+          "url": "https://serhatgiydiren.com/system-design-interview-top-k-problem-heavy-hitters/"
+        }
+      ]
+    },
+    {
+      "name": "Social Media & Communication",
+      "children": [
+        {
+          "name": "LinkedIn Mutual Search",
+          "url": "https://www.linkedin.com/blog/engineering/search/building-a-more-intuitive-and-streamlined-search-experience"
+        },
+        {
+          "name": "Messenger/WhatsApp",
+          "url": "https://www.youtube.com/watch?v=9YQxB46xbOI"
+        },
+        {
+          "name": "Instagram/Twitter/Facebook/Reddit",
+          "url": "https://www.geeksforgeeks.org/system-design-instagram/"
+        },
+        {
+          "name": "Facebook News Feed",
+          "url": "https://www.geeksforgeeks.org/system-design-facebook-news-feed/"
+        },
+        {
+          "name": "Reddit Comments",
+          "url": "https://www.geeksforgeeks.org/system-design-reddit-comments/"
+        },
+        {
+          "name": "fb-live-comments",
+          "url": "https://www.geeksforgeeks.org/system-design-facebook-live-comments/"
+        },
+        {
+          "name": "fb-post-search",
+          "url": "https://www.geeksforgeeks.org/system-design-facebook-post-search/"
+        }
+      ]
+    },
+    {
+      "name": "E-commerce & Marketplaces",
+      "children": [
+        {
+          "name": "Payment Gateway",
+          "url": "https://www.youtube.com/watch?v=NxjGFIgFCbg"
+        },
+        {
+          "name": "Bidding Platform",
+          "url": "https://www.youtube.com/watch?v=g8XqFuDkga0"
+        },
+        {
+          "name": "Stock Exchange",
+          "url": "https://www.youtube.com/watch?v=PzuL3lxtrs0"
+        },
+        {
+          "name": "Amazon Retail",
+          "url": "https://www.geeksforgeeks.org/system-design-amazon-retail/"
+        },
+        {
+          "name": "Online Auction",
+          "url": "https://www.geeksforgeeks.org/system-design-online-auction/"
+        },
+        {
+          "name": "Uber",
+          "url": "https://www.geeksforgeeks.org/system-design-uber/"
+        },
+        {
+          "name": "Yelp",
+          "url": "https://www.geeksforgeeks.org/system-design-yelp/"
+        }
+      ]
+    },
+    {
+      "name": "Streaming & Media",
+      "children": [
+        {
+          "name": "Twitch",
+          "url": "https://www.youtube.com/watch?v=NF-Mw-V-yfM"
+        },
+        {
+          "name": "Zoom",
+          "url": "https://www.geeksforgeeks.org/designing-zoom-system-design/"
+        },
+        {
+          "name": "Netflix/YouTube",
+          "url": "https://www.geeksforgeeks.org/system-design-netflix/"
+        },
+        {
+          "name": "Google Docs",
+          "url": "https://www.geeksforgeeks.org/system-design-google-docs/"
+        },
+        {
+          "name": "Google Maps",
+          "url": "https://www.geeksforgeeks.org/system-design-google-maps/"
+        },
+        {
+          "name": "Ticket Master",
+          "url": "https://www.geeksforgeeks.org/system-design-ticket-master/"
+        }
+      ]
+    },
+    {
+      "name": "Games & Entertainment",
+      "children": [
+        {
+          "name": "Battle Royale Game",
+          "url": "https://www.youtube.com/watch?v=8XqFuDkga0"
+        }
+      ]
+    },
+    {
+      "name": "Recommendation & Search",
+      "children": [
+        {
+          "name": "Recommendation Engine",
+          "url": "https://www.youtube.com/watch?v=FoSCaue3lcg"
+        },
+        {
+          "name": "Type Ahead Suggestion",
+          "url": "https://www.geeksforgeeks.org/system-design-type-ahead-suggestion/"
+        }
+      ]
+    },
+    {
+      "name": "Storage & Files",
+      "children": [
+        {
+          "name": "Dropbox/Google Drive",
+          "url": "https://www.geeksforgeeks.org/system-design-dropbox-google-drive/"
+        },
+        {
+          "name": "TinyUrl/PasteBin",
+          "url": "https://www.geeksforgeeks.org/system-design-tinyurl-pastebin/"
+        }
+      ]
+    },
+    {
+      "name": "Miscellaneous",
+      "children": [
+        {
+          "name": "Bitly",
+          "url": "https://www.linkedin.com/posts/gouravdhar_behind-every-tiny-url-is-a-huge-system-design-activity-7280444229431042048-MQak"
+        },
+        {
+          "name": "Gopuff",
+          "url": "https://www.geeksforgeeks.org/system-design-gopuff/"
+        },
+        {
+          "name": "Tinder",
+          "url": "https://www.geeksforgeeks.org/system-design-tinder/"
+        },
+        {
+          "name": "Leetcode",
+          "url": "https://www.geeksforgeeks.org/system-design-leetcode/"
+        },
+        {
+          "name": "Strava",
+          "url": "https://www.geeksforgeeks.org/system-design-strava/"
+        },
+        {
+          "name": "Web Crawler",
+          "url": "https://www.geeksforgeeks.org/system-design-web-crawler/"
+        },
+        {
+          "name": "Ad Click Aggregator",
+          "url": "https://www.geeksforgeeks.org/system-design-ad-click-aggregator/"
+        }
+      ]
+    }
+  ]
+}
