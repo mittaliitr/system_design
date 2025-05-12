@@ -1,6 +1,6 @@
 {
   "name": "Distributed Systems and Databases",
-  "categories": [
+  "children": [
     {
       "name": "Replication and Consistency",
       "children": [
