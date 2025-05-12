@@ -58,7 +58,7 @@
         root.descendants().forEach((d, i) => {
           d.id = i;
           d._children = d.children;
-          if (d.depth && d.depth > 1) d.children = null; // Collapse after 1st level
+          if (d.depth && d.depth > 0) d.children = null; // Collapse after 1st level
         });
 
         const svgWidth = 4000;
