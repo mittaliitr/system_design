@@ -14,7 +14,7 @@
         },
         {
           "name": "Distributed Cache",
-          "url": "https://ravisystemdesign.substack.com/p/interview-prep-designing-a-distributed"   // replaced GeeksforGeeks with Ravi's Substack[1]
+          "url": "https://ravisystemdesign.substack.com/p/interview-prep-designing-a-distributed"
         },
         {
           "name": "Distributed Metrics",
@@ -30,11 +30,11 @@
         },
         {
           "name": "Rate Limiter",
-          "url": "https://www.linkedin.com/pulse/detailed-system-design-rate-limiter-application-manas-rath-v9fpc" // replaced GeeksforGeeks with LinkedIn[2]
+          "url": "https://www.linkedin.com/pulse/detailed-system-design-rate-limiter-application-manas-rath-v9fpc"
         },
         {
           "name": "Unique Users Problem",
-          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR" // widely cited alternative
+          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
           "name": "Top K Problem",
@@ -55,11 +55,11 @@
         },
         {
           "name": "Instagram/Twitter/Facebook/Reddit",
-          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR" // Educative Grokking course covers these
+          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
           "name": "Facebook News Feed",
-          "url": "https://www.hiredintech.com/classrooms/system-design/lesson/52" // HiredInTech system design resource
+          "url": "https://www.hiredintech.com/classrooms/system-design/lesson/52"
         },
         {
           "name": "Reddit Comments",
