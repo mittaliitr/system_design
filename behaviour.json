@@ -1,0 +1,140 @@
+{
+  "name": "Staff Software Engineer Behavioral Interview Types",
+  "children": [
+    {
+      "name": "Leadership and Ownership",
+      "children": [
+        {
+          "name": "Describe a time you led a project or initiative from start to finish.",
+          "url": "https://www.techinterviewhandbook.org/behavioral-interview-questions/"
+        },
+        {
+          "name": "Tell me about a time you influenced a team or organization beyond your immediate group.",
+          "url": "https://www.techinterviewhandbook.org/behavioral-interview-questions/"
+        },
+        {
+          "name": "How have you delegated work and ensured accountability?",
+          "url": "https://interviewing.io/mocks/faang-behavioral-tech-lead-manager"
+        },
+        {
+          "name": "Give an example of mentoring or growing others on your team.",
+          "url": "https://interviewing.io/mocks/faang-behavioral-tech-lead-manager"
+        },
+        {
+          "name": "Describe a situation where you had to drive alignment across multiple teams or stakeholders.",
+          "url": "https://igotanoffer.com/blogs/product-manager/behavioral-interview-questions-tech-companies"
+        }
+      ]
+    },
+    {
+      "name": "Conflict Resolution and Communication",
+      "children": [
+        {
+          "name": "Tell me about a time you had a disagreement with your manager or a peer. How did you handle it?",
+          "url": "https://interviewing.io/mocks/faang-behavioral-tech-lead-manager"
+        },
+        {
+          "name": "Give an example of resolving conflict between team members or stakeholders.",
+          "url": "https://igotanoffer.com/blogs/product-manager/behavioral-interview-questions-tech-companies"
+        },
+        {
+          "name": "How do you handle situations where you must communicate a decision you disagree with?",
+          "url": "https://interviewing.io/mocks/faang-behavioral-tech-lead-manager"
+        },
+        {
+          "name": "Describe a time you had to deliver difficult feedback or news.",
+          "url": "https://www.techinterviewhandbook.org/behavioral-interview-questions/"
+        }
+      ]
+    },
+    {
+      "name": "Problem-Solving and Technical Challenge",
+      "children": [
+        {
+          "name": "What is the most complex technical challenge you have faced? How did you approach it?",
+          "url": "https://www.techinterviewhandbook.org/behavioral-interview-questions/"
+        },
+        {
+          "name": "Tell me about a project where you had to make a critical decision with limited data.",
+          "url": "https://www.interviewnode.com/post/cracking-the-faang-behavioral-interview-top-questions-and-how-to-ace-them"
+        },
+        {
+          "name": "Describe a time you solved a problem that had a significant business or technical impact.",
+          "url": "https://www.techinterviewhandbook.org/behavioral-interview-questions/"
+        },
+        {
+          "name": "How do you ensure technical excellence while balancing business needs?",
+          "url": "https://www.interviewnode.com/post/cracking-the-faang-behavioral-interview-top-questions-and-how-to-ace-them"
+        }
+      ]
+    },
+    {
+      "name": "Dealing with Ambiguity and Change",
+      "children": [
+        {
+          "name": "Give an example of a time you worked on an ambiguous project. How did you bring clarity?",
+          "url": "https://www.interviewnode.com/post/cracking-the-faang-behavioral-interview-top-questions-and-how-to-ace-them"
+        },
+        {
+          "name": "Describe a situation where you had to adapt quickly to new priorities or changes.",
+          "url": "https://www.interviewnode.com/post/cracking-the-faang-behavioral-interview-top-questions-and-how-to-ace-them"
+        },
+        {
+          "name": "How do you approach projects with unclear requirements or shifting goals?",
+          "url": "https://www.techinterviewhandbook.org/behavioral-interview-questions/"
+        }
+      ]
+    },
+    {
+      "name": "Learning, Growth, and Failure",
+      "children": [
+        {
+          "name": "Tell me about a failure or setback. What did you learn, and what would you do differently?",
+          "url": "https://www.techinterviewhandbook.org/behavioral-interview-questions/"
+        },
+        {
+          "name": "Share an experience where you had to learn a new skill or domain quickly.",
+          "url": "https://www.interviewnode.com/post/cracking-the-faang-behavioral-interview-top-questions-and-how-to-ace-them"
+        },
+        {
+          "name": "Describe a time you received constructive criticism. How did you respond?",
+          "url": "https://igotanoffer.com/blogs/product-manager/behavioral-interview-questions-tech-companies"
+        }
+      ]
+    },
+    {
+      "name": "Collaboration and Cross-Functional Work",
+      "children": [
+        {
+          "name": "Tell me about a time you worked with cross-functional teams (e.g., Product, Design, other Engineering teams).",
+          "url": "https://igotanoffer.com/blogs/product-manager/behavioral-interview-questions-tech-companies"
+        },
+        {
+          "name": "How have you built relationships and trust across teams or organizations?",
+          "url": "https://igotanoffer.com/blogs/product-manager/behavioral-interview-questions-tech-companies"
+        },
+        {
+          "name": "Give an example of driving a project that required buy-in from multiple groups.",
+          "url": "https://www.techinterviewhandbook.org/behavioral-interview-questions/"
+        }
+      ]
+    },
+    {
+      "name": "Cultural Fit and Motivation",
+      "children": [
+        {
+          "name": "Why do you want to work at this company?",
+          "url": "https://www.techinterviewhandbook.org/behavioral-interview-questions/"
+        },
+        {
+          "name": "What excites you about this role or team?",
+          "url": "https://www.techinterviewhandbook.org/behavioral-interview-questions/"
+        },
+        {
+          "name": "How do you align with our company’s values and mission?",
+          "url": "https://www.techinterviewhandbook.org/behavioral-interview-questions/"
+        }
+      ]
+    }
+  ]
+}
