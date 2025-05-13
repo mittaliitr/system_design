@@ -5,39 +5,35 @@
       "name": "Distributed Systems",
       "children": [
         {
-          "name": "Distributed Priority Queue",
+          "name": "Distributed Priority Queue (May 13)",
           "url": "https://engineering.fb.com/2021/02/22/production-engineering/foqs-scaling-a-distributed-priority-queue/"
         },
         {
-          "name": "Distributed Lock",
+          "name": "Distributed Lock (May 14)",
           "url": "https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html"
         },
         {
-          "name": "Distributed Cache",
+          "name": "Distributed Cache (May 15)",
           "url": "https://ravisystemdesign.substack.com/p/interview-prep-designing-a-distributed"
         },
         {
-          "name": "Distributed Metrics",
+          "name": "Distributed Metrics (May 16)",
           "url": "https://www.oreilly.com/library/view/designing-data-intensive-applications/9781449373320/ch04.html"
         },
         {
-          "name": "Job Scheduler",
+          "name": "Job Scheduler (May 17)",
           "url": "https://www.youtube.com/watch?v=ta5x62cDxf4"
         },
         {
-          "name": "Notification Service",
+          "name": "Notification Service (May 18)",
           "url": "https://medium.com/@in10se/system-design-interview-question-3-realtime-notification-service-14fe1dec8e2a"
         },
         {
-          "name": "Rate Limiter",
+          "name": "Rate Limiter + Unique Users (May 19)",
           "url": "https://www.linkedin.com/pulse/detailed-system-design-rate-limiter-application-manas-rath-v9fpc"
         },
         {
-          "name": "Unique Users Problem",
-          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
-        },
-        {
-          "name": "Top K Problem",
+          "name": "Top K Problem (May 20)",
           "url": "https://serhatgiydiren.com/system-design-interview-top-k-problem-heavy-hitters/"
         }
       ]
@@ -46,31 +42,31 @@
       "name": "Social Media & Communication",
       "children": [
         {
-          "name": "LinkedIn Mutual Search",
+          "name": "LinkedIn Mutual Search (May 21)",
           "url": "https://www.linkedin.com/blog/engineering/search/building-a-more-intuitive-and-streamlined-search-experience"
         },
         {
-          "name": "Messenger/WhatsApp",
+          "name": "Messenger/WhatsApp (May 22)",
           "url": "https://www.youtube.com/watch?v=9YQxB46xbOI"
         },
         {
-          "name": "Instagram/Twitter/Facebook/Reddit",
+          "name": "Instagram/Twitter/Facebook/Reddit (May 23)",
           "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
-          "name": "Facebook News Feed",
+          "name": "Facebook News Feed (May 24)",
           "url": "https://www.hiredintech.com/classrooms/system-design/lesson/52"
         },
         {
-          "name": "Reddit Comments",
+          "name": "Reddit Comments (May 25)",
           "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
-          "name": "fb-live-comments",
+          "name": "fb-live-comments (May 25)",
           "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
-          "name": "fb-post-search",
+          "name": "fb-post-search (May 26)",
           "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         }
       ]
@@ -79,31 +75,23 @@
       "name": "E-commerce & Marketplaces",
       "children": [
         {
-          "name": "Payment Gateway",
+          "name": "Payment Gateway (May 27)",
           "url": "https://www.youtube.com/watch?v=NxjGFIgFCbg"
         },
         {
-          "name": "Bidding Platform",
+          "name": "Bidding Platform (May 28)",
           "url": "https://www.youtube.com/watch?v=g8XqFuDkga0"
         },
         {
-          "name": "Stock Exchange",
+          "name": "Stock Exchange (May 29)",
           "url": "https://www.youtube.com/watch?v=PzuL3lxtrs0"
         },
         {
-          "name": "Amazon Retail",
+          "name": "Amazon Retail + Online Auction (May 30)",
           "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
-          "name": "Online Auction",
-          "url": "https://www.youtube.com/watch?v=g8XqFuDkga0"
-        },
-        {
-          "name": "Uber",
-          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
-        },
-        {
-          "name": "Yelp",
+          "name": "Uber + Yelp (May 31)",
           "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         }
       ]
@@ -112,27 +100,15 @@
       "name": "Streaming & Media",
       "children": [
         {
-          "name": "Twitch",
+          "name": "Twitch + Zoom (June 1)",
           "url": "https://www.youtube.com/watch?v=NF-Mw-V-yfM"
         },
         {
-          "name": "Zoom",
-          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
-        },
-        {
-          "name": "Netflix/YouTube",
+          "name": "Netflix/YouTube + Google Docs (June 2)",
           "url": "https://www.hiredintech.com/classrooms/system-design/lesson/52"
         },
         {
-          "name": "Google Docs",
-          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
-        },
-        {
-          "name": "Google Maps",
-          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
-        },
-        {
-          "name": "Ticket Master",
+          "name": "Google Maps + Ticket Master (June 3)",
           "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         }
       ]
@@ -141,7 +117,7 @@
       "name": "Games & Entertainment",
       "children": [
         {
-          "name": "Battle Royale Game",
+          "name": "Battle Royale Game (June 4)",
           "url": "https://www.youtube.com/watch?v=8XqFuDkga0"
         }
       ]
@@ -150,11 +126,11 @@
       "name": "Recommendation & Search",
       "children": [
         {
-          "name": "Recommendation Engine",
+          "name": "Recommendation Engine (June 5)",
           "url": "https://www.youtube.com/watch?v=FoSCaue3lcg"
         },
         {
-          "name": "Type Ahead Suggestion",
+          "name": "Type Ahead Suggestion (June 6)",
           "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         }
       ]
@@ -163,11 +139,11 @@
       "name": "Storage & Files",
       "children": [
         {
-          "name": "Dropbox/Google Drive",
+          "name": "Dropbox/Google Drive (June 7)",
           "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
-          "name": "TinyUrl/PasteBin",
+          "name": "TinyUrl/PasteBin + Bitly (June 8)",
           "url": "https://www.hiredintech.com/classrooms/system-design/lesson/52"
         }
       ]
@@ -176,32 +152,16 @@
       "name": "Miscellaneous",
       "children": [
         {
-          "name": "Bitly",
-          "url": "https://www.linkedin.com/posts/gouravdhar_behind-every-tiny-url-is-a-huge-system-design-activity-7280444229431042048-MQak"
-        },
-        {
-          "name": "Gopuff",
+          "name": "Gopuff + Tinder (June 9)",
           "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
-          "name": "Tinder",
+          "name": "Leetcode + Strava (June 10)",
           "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
-          "name": "Leetcode",
-          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
-        },
-        {
-          "name": "Strava",
-          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
-        },
-        {
-          "name": "Web Crawler",
+          "name": "Web Crawler + Ad Click Aggregator (June 11)",
           "url": "https://www.hiredintech.com/classrooms/system-design/lesson/52"
-        },
-        {
-          "name": "Ad Click Aggregator",
-          "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         }
       ]
     }
