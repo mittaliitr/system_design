@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Performance | Distributed Priority Queue</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Distributed Priority Queue System Design</h1>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="requirements.html">Requirements</a>
+    <a href="principles.html">Design Principles</a>
+    <a href="data_structures.html">Data Structures</a>
+    <a href="replication.html">Replication & Partitioning</a>
+    <a href="performance.html" class="active">Performance</a>
+    <a href="summary.html">Summary</a>
+  </nav>
+</header>
+<main>
+  <h2>Back-of-the-Envelope Calculations</h2>
+  <div class="table-container">
+    <table>
+      <thead>
+      <tr>
+        <th>Metric</th>
+        <th>Value</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td>Jobs</td>
+        <td>1 billion</td>
+      </tr>
+      <tr>
+        <td>In-Memory Index</td>
+        <td>16 GB</td>
+      </tr>
+      <tr>
+        <td>Disk Size</td>
+        <td>1 TB (3 TB with replication)</td>
+      </tr>
+      <tr>
+        <td>Disk I/O per job</td>
+        <td>1 KB</td>
+      </tr>
+      <tr>
+        <td>Enqueue throughput per node</td>
+        <td>100,000 jobs/sec</td>
+      </tr>
+      <tr>
+        <td>Dequeue latency</td>
+        <td>~1 ms (SSD)</td>
+      </tr>
+      <tr>
+        <td>Max jobs/sec (10-node cluster)</td>
+        <td>1 million/sec</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note">
+    <strong>Summary:</strong> The hybrid design enables high throughput, scalable storage, and efficient priority access using commodity hardware.
+  </div>
+  <h2>Design Summary</h2>
+  <div class="table-container">
+    <table>
+      <thead>
+      <tr>
+        <th>In-Memory</th>
+        <th>On-Disk</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td>Heap or Sorted List<br>[JobID, Priority, Ptr]</td>
+        <td>Write-Ahead Log (WAL)<br>[JobID, Data, Priority]</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <ul>
+    <li>Fast inserts: <code>O(1)</code> to disk, <code>O(log n)</code> or <code>O(1)</code> to memory</li>
+    <li>Lookups and priority ordering in memory</li>
+    <li>Job data stored on disk for scalability</li>
+  </ul>
+</main>
+</body>
+</html>

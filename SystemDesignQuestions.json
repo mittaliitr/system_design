@@ -6,7 +6,7 @@
       "children": [
         {
           "name": "Distributed Priority Queue (May 13)",
-          "url": "https://engineering.fb.com/2021/02/22/production-engineering/foqs-scaling-a-distributed-priority-queue/"
+          "url": "/system_design/DistributedPriorityQueue/index.html"
         },
         {
           "name": "Distributed Lock (May 14)",

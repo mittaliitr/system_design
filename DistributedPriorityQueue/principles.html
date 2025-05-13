@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Design Principles | Distributed Priority Queue</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+    <h1>Distributed Priority Queue System Design</h1>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="requirements.html">Requirements</a>
+        <a href="principles.html" class="active">Design Principles</a>
+        <a href="data_structures.html">Data Structures</a>
+        <a href="replication.html">Replication & Partitioning</a>
+        <a href="performance.html">Performance</a>
+        <a href="summary.html">Summary</a>
+    </nav>
+</header>
+<main>
+    <h2>Design Principles</h2>
+    <ul>
+        <li>Not a strict FIFO queue; focus is on scalable throughput and approximate prioritization.</li>
+        <li>Perfect ordering is only possible with a single consumer.</li>
+        <li>Multiple consumers enable higher throughput but sacrifice strict order.</li>
+    </ul>
+</main>
+</body>
+</html>

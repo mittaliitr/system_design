@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Structures | Distributed Priority Queue</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Distributed Priority Queue System Design</h1>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="requirements.html">Requirements</a>
+    <a href="principles.html">Design Principles</a>
+    <a href="data_structures.html" class="active">Data Structures</a>
+    <a href="replication.html">Replication & Partitioning</a>
+    <a href="performance.html">Performance</a>
+    <a href="summary.html">Summary</a>
+  </nav>
+</header>
+<main>
+  <h2>Data Structures for Priority Queues</h2>
+  <h3>Heap-based (In-memory)</h3>
+  <ul>
+    <li>Min-heap/Max-heap: <code>O(1)</code> top access, <code>O(log n)</code> insertion.</li>
+    <li>Not disk-friendly due to non-sequential access and array shuffling.</li>
+  </ul>
+  <h3>B-Tree / LSM-tree Index (Disk-friendly)</h3>
+  <ul>
+    <li>Supports sorted list of items by priority, efficient reads.</li>
+    <li>Slower writes due to disk I/O, rebalancing, and random seeks.</li>
+  </ul>
+  <h3>Hybrid Approach (Recommended)</h3>
+  <ul>
+    <li>
+      <strong>In-Memory:</strong> Sorted index or heap of job IDs by priority.
+    </li>
+    <li>
+      <strong>Disk:</strong> Write-Ahead Log (WAL) appends jobs in <code>O(1)</code> with job ID, data, and priority.
+    </li>
+    <li>Only priority and pointer stored in memory; disk holds full job payload.</li>
+    <li>Memory cost for 1B jobs: ~16 GB (assuming 16 bytes per job entry).</li>
+  </ul>
+  <div class="note">
+    <strong>Why not just use a heap on disk?</strong><br>
+    Heap operations involve random access and shuffling, which is slow on disk. B-Trees/LSM Trees are better for disk but have higher write costs. The hybrid approach combines the speed of memory with the durability of disk.
+  </div>
+
+  <h3>Hybrid Priority Queue Diagram</h3>
+  <div style="text-align:center; margin: 2em 0;">
+    <img src="/system_design/DistributedPriorityQueue/data_structures.png"
+         alt="Hybrid Priority Queue Diagram"
+         style="max-width: 600px; width: 100%; height: auto; border: 1px solid #e3e7ef; border-radius: 8px;">
+    <div style="font-size: 0.95em; color: #555; margin-top: 0.5em;">
+      Illustration of a hybrid priority queue: in-memory heap for priorities, on-disk log for data and durability.
+    </div>
+  </div>
+
+  <h3>Modifying Existing Jobs</h3>
+  <ul>
+    <li><strong>Change Data (Same Priority):</strong> Lookup by Job ID, update payload on disk.</li>
+    <li><strong>Change Priority:</strong> Update in-memory priority structure (delete + reinsert if heap, or use Linked List + HashMap for <code>O(1)</code> access).</li>
+  </ul>
+  <h3>Persistence & Durability</h3>
+  <ul>
+    <li>Disk-based WAL for durability; in-memory index for fast access.</li>
+    <li>In-memory data is transient-rebuilt on restart by scanning WAL.</li>
+  </ul>
+</main>
+</body>
+</html>

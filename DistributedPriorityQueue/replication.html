@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Replication & Partitioning | Distributed Priority Queue</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Distributed Priority Queue System Design</h1>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="requirements.html">Requirements</a>
+    <a href="principles.html">Design Principles</a>
+    <a href="data_structures.html">Data Structures</a>
+    <a href="replication.html" class="active">Replication & Partitioning</a>
+    <a href="performance.html">Performance</a>
+    <a href="summary.html">Summary</a>
+  </nav>
+</header>
+<main>
+  <h2>Replication Strategy</h2>
+  <ul>
+    <li><strong>Multi-Leader:</strong> High complexity, not necessary for this use case.</li>
+    <li><strong>Leaderless (Quorum):</strong> High durability, medium speed-reasonable if strong consistency is critical.</li>
+    <li><strong>Single-Leader (Async):</strong> Fast, but not reliable enough alone.</li>
+    <li><strong>Single-Leader + Consensus (e.g., Raft):</strong> Recommended for balancing speed and reliability.</li>
+  </ul>
+  <div class="table-container">
+    <table>
+      <thead>
+      <tr>
+        <th>Strategy</th>
+        <th>Durability</th>
+        <th>Speed</th>
+        <th>Complexity</th>
+        <th>Recommended?</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td>Multi-Leader</td>
+        <td>Medium</td>
+        <td>Medium</td>
+        <td>High</td>
+        <td>No</td>
+      </tr>
+      <tr>
+        <td>Leaderless (Quorum)</td>
+        <td>High</td>
+        <td>Medium</td>
+        <td>Medium</td>
+        <td>Maybe</td>
+      </tr>
+      <tr>
+        <td>Single-Leader (Async)</td>
+        <td>Low</td>
+        <td>High</td>
+        <td>Low</td>
+        <td>No</td>
+      </tr>
+      <tr>
+        <td>Single-Leader + Consensus</td>
+        <td>High</td>
+        <td>High</td>
+        <td>Medium</td>
+        <td>Yes</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note">
+    <strong>Recommended:</strong> Use a consensus protocol (like Raft). Leader waits for at least one follower to acknowledge before confirming write. Ensures no data loss if leader fails and fast reads from the leader.
+  </div>
+  <h2>Partitioning & Consumer Strategy</h2>
+  <ul>
+    <li><strong>Partitioning:</strong> Use round-robin to assign events, not by priority (avoids hotspots and uneven load).</li>
+    <li><strong>Local Priority Queues:</strong> Each partition has an on-disk log and in-memory heap for fast reads.</li>
+    <li><strong>Consumers:</strong> Pull top events from each partition, aggregate into a global heap, process highest-priority event.</li>
+    <li><strong>Event Acknowledgment:</strong> Consumers acknowledge after processing; events are then deleted or marked complete.</li>
+    <li><strong>Replication:</strong> Each partition is replicated using consensus (e.g., Raft) for durability.</li>
+  </ul>
+</main>
+</body>
+</html>

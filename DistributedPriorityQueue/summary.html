@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Summary | Distributed Priority Queue</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Distributed Priority Queue System Design</h1>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="requirements.html">Requirements</a>
+    <a href="principles.html">Design Principles</a>
+    <a href="data_structures.html">Data Structures</a>
+    <a href="replication.html">Replication & Partitioning</a>
+    <a href="performance.html">Performance</a>
+    <a href="summary.html" class="active">Summary</a>
+  </nav>
+</header>
+<main>
+  <h3>Hybrid Priority Queue Diagram</h3>
+  <div style="text-align:center; margin: 2em 0;">
+    <img src="/system_design/DistributedPriorityQueue/DPQ.png"
+         alt="Hybrid Priority Queue Diagram"
+         style="max-width: 600px; width: 100%; height: auto; border: 1px solid #e3e7ef; border-radius: 8px;">
+    <div style="font-size: 0.95em; color: #555; margin-top: 0.5em;">
+Final Design
+    </div>
+  </div>
+  <h2>Key Takeaways</h2>
+  <ul>
+    <li>Global strict ordering is sacrificed for horizontal scalability and throughput.</li>
+    <li>Approximate priority ordering suffices for most real-world distributed queue applications.</li>
+    <li>Hybrid memory+disk and consensus replication strategies provide both performance and durability.</li>
+  </ul>
+  <div class="note">
+    <strong>Thank you for exploring the distributed priority queue system design!</strong>
+  </div>
+</main>
+</body>
+</html>

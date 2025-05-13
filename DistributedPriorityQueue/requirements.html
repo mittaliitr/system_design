@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Requirements | Distributed Priority Queue</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+    <h1>Distributed Priority Queue System Design</h1>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="requirements.html" class="active">Requirements</a>
+        <a href="principles.html">Design Principles</a>
+        <a href="data_structures.html">Data Structures</a>
+        <a href="replication.html">Replication & Partitioning</a>
+        <a href="performance.html">Performance</a>
+        <a href="summary.html">Summary</a>
+    </nav>
+</header>
+<main>
+    <h2>Functional Requirements</h2>
+    <ul>
+        <li>Ordered list with per-item priority (not just FIFO)</li>
+        <li>Supported operations: Enqueue, Dequeue, Modify (priority/data)</li>
+        <li>At-least-once delivery (idempotency at job handler level)</li>
+    </ul>
+    <h3>Non-Functional Requirements</h3>
+    <ul>
+        <li>Scalability: Billions of messages</li>
+        <li>Fault tolerance: No single point of failure</li>
+        <li>No strict ordering: Ordered processing not guaranteed with multiple consumers</li>
+    </ul>
+    <section class="highlight">
+        <h3>🔄 Ordered vs Unordered Consumption</h3>
+        <ul>
+            <li><strong>With multiple consumers, strict ordering is not feasible</strong> (due to race conditions).</li>
+            <li><strong>Priority is approximate, not absolute ordering.</strong></li>
+            <li><strong>Accept out-of-order execution</strong> to benefit from parallelism.</li>
+        </ul>
+        <p>
+            We’re aiming to build a large-scale priority queue system. To ground this, let’s first talk about some basics.<br><br>
+            In traditional FIFO queues-like those managed by ActiveMQ or JMS brokers-message consumption isn’t necessarily ordered. In contrast, systems like Kafka do provide ordering guarantees, but only within a single partition. That means if you have one consumer per partition, the messages within that partition will be consumed in order.<br><br>
+            The same concept loosely applies to what we’re trying to do. Can we guarantee that all messages are processed in strict order? <strong>Yes-but only if there's a single consumer.</strong><br><br>
+            However, the moment we introduce multiple consumers (which we typically do to scale throughput), we inherently sacrifice strict ordering. Here’s why: messages are delivered to consumers concurrently. Due to natural race conditions, a later message may get fully processed before an earlier one.
+        </p>
+        <div style="margin: 1em 0 1em 2em;">
+            <strong>Imagine this:</strong>
+            <ul>
+                <li>Message A (earlier) is delivered first</li>
+                <li>Message B (later) is delivered second</li>
+            </ul>
+            <p>
+                But due to parallel processing, Message B might be written to the database before Message A, despite being later in the queue. This is a challenge we’ll need to acknowledge and handle.
+            </p>
+        </div>
+        <p>
+            That said, perfect ordering is not our goal here.<br>
+            We’re not designing a traditional, strict FIFO queue. We could build a simple in-memory heap if we only needed a single consumer and a strict order. But our requirements are different. We’re targeting scalable throughput with approximate prioritization, not exact order.<br><br>
+            So keep in mind: <strong>our focus is on building an approximate priority queue that works well in a distributed, multi-consumer setup, not one that guarantees perfect ordering of every message.</strong>
+        </p>
+    </section>
+    <div class="note">
+        <strong>Key Point:</strong> With multiple consumers, strict ordering is infeasible due to race conditions. Priority is approximate, not absolute. Out-of-order execution is accepted to maximize parallelism.
+    </div>
+</main>
+</body>
+</html>
