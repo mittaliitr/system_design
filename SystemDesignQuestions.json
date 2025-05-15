@@ -10,7 +10,7 @@
         },
         {
           "name": "Distributed Lock (May 14)",
-          "url": "https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html"
+          "url": "/system_design/DistributedLock/DistributedLock.html"
         },
         {
           "name": "Distributed Cache (May 15)",

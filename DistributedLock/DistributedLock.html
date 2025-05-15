@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Distributed Locking: Systems Design Deep Dive</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; background: #f9f9f9; color: #222; }
+    h1, h2 { color: #2a4d7b; }
+    h2 { margin-top: 2em; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+    th, td { border: 1px solid #bbb; padding: 0.5em 1em; text-align: left; }
+    th { background: #e8eef7; }
+    code { background: #eef; padding: 2px 4px; border-radius: 3px; }
+    blockquote { border-left: 4px solid #2a4d7b; margin: 1em 0; padding: 1em; background: #f3f6fa; }
+    ul { margin-bottom: 1em; }
+  </style>
+</head>
+<body>
+<h1>Distributed Locking: Systems Design Deep Dive</h1>
+
+<h2>1. Motivation and Problem Statement</h2>
+<h2>Distributed Locking Example Diagram</h2>
+<img src="/system_design/DistributedLock/ProblemRequiremnt.png" alt="Distributed Locking Example">
+
+<ul>
+  <li>Distributed locks ensure mutual exclusion across nodes, preventing concurrent writes to shared resources (e.g., S3 files) and avoiding data corruption.</li>
+  <li>Locks must be fault tolerant; relying on a single node is insufficient in distributed environments.</li>
+  <li>The system should support many nodes (potentially 100+) competing for the same lock without excessive load.</li>
+</ul>
+
+<h2>2. Consistency Requirements</h2>
+<img src="/system_design/DistributedLock/consistency.png" alt="consistency">
+<ul>
+  <li>Strong consistency (linearizability) is required so that only one node can hold the lock at any time.</li>
+  <li>Stale reads or eventual consistency are not sufficient, as they can result in multiple clients holding the lock simultaneously and corrupting data.</li>
+</ul>
+
+<h2>3. Lease Expiry and Fencing Tokens</h2>
+<img src="/system_design/DistributedLock/fencingToken.png" alt="fencingToken">
+
+<ul>
+  <li>Clients acquire locks with a <strong>lease</strong> and must periodically renew it (heartbeat).</li>
+  <li>If a client (e.g., due to a process pause like garbage collection) misses heartbeats, the lock service expires the lease after a TTL.</li>
+  <li>Another client can then acquire the lock and is issued a newer <strong>fencing token</strong> (monotonically increasing sequence number).</li>
+  <li>When writing to the shared resource, clients include their fencing token. The resource only accepts writes with higher (newer) tokens, preventing stale clients from overwriting newer data.</li>
+</ul>
+<img src="/system_design/DistributedLock/fencingTokenGC.png" alt="fencingTokenGC">
+
+<blockquote>
+  <strong>Example:</strong>
+  Client A acquires lock (token 20), pauses, and misses renewals. Lock expires.
+  Client B acquires lock (token 21), writes to S3.
+  Client A resumes and tries to write with token 20-S3 rejects the write because 21 is newer.
+</blockquote>
+
+<h2>4. Replication Strategies and Limitations</h2>
+<h3>Single Leader Replication</h3>
+<img src="/system_design/DistributedLock/singleLeaderReplication.png" alt="singleLeaderReplication">
+
+<ul>
+  <li>Writing/reading only from the leader is not fault tolerant. If the leader fails before replicating state, a failover can result in two clients with the same fencing token, risking data corruption.</li>
+</ul>
+<h3>Synchronous Replication</h3>
+<img src="/system_design/DistributedLock/syncReplication.png" alt="syncReplication">
+
+<ul>
+  <li>Requires all nodes to acknowledge writes, which halts progress if any node is down-no fault tolerance.</li>
+</ul>
+<h3>Quorum-Based Replication</h3>
+<img src="/system_design/DistributedLock/Quoram.png" alt="Quoram">
+<img src="/system_design/DistributedLock/QuoramPartialFailure.png" alt="QuoramPartialFailure">
+
+<ul>
+  <li>Uses <code>W</code> (write) and <code>R</code> (read) quorums such that <code>W + R > N</code> (total nodes).</li>
+  <li>Not inherently linearizable; can result in consistency anomalies:</li>
+  <ul>
+    <li><strong>Partial writes:</strong> If a client crashes mid-write, only some nodes may have the new value.</li>
+    <li><strong>Ambiguous ordering:</strong> Multiple clients may end up with the same fencing token, leading to concurrent writes with the same token.</li>
+    <li><strong>Difficult rollback:</strong> If a client crashes, there’s no guaranteed way to roll back partial writes, leaving the system in an inconsistent state.</li>
+  </ul>
+</ul>
+
+<h2>5. Detailed Quorum Issues</h2>
+<img src="/system_design/DistributedLock/QuoramPartialFailure.png" alt="QuoramPartialFailure">
+
+<h3>Inability to Order Events Uniquely (Duplicate Fencing Tokens)</h3>
+<ul>
+  <li>Quorum systems assign fencing tokens based on version numbers or timestamps, but without a global ordering mechanism, two clients can be assigned the same token.</li>
+  <li>
+    <strong>Example:</strong>
+    - Client A writes token 20 to nodes A and B (write quorum=2), but not to C.<br>
+    - Client B reads from B and C (read quorum=2): sees 20 (B), 19 (C)-assumes 20 is latest.<br>
+    - Client C reads from A and C: also gets 20.<br>
+    Both B and C now believe they have token 20 and can write concurrently, risking data corruption.
+  </li>
+  <li>
+    In leaderless systems, nodes may independently assign the same fencing token to different clients if they haven't fully synchronized, breaking the monotonicity guarantee.
+  </li>
+</ul>
+
+<h3>Difficulties in Rolling Back Partial Writes</h3>
+<ul>
+  <li>If a client crashes after writing to only some nodes, those nodes retain the new value indefinitely.</li>
+  <li>Subsequent reads may include this partial value, causing confusion about the true state of the lock.</li>
+  <li>Unlike consensus systems, there's no automated rollback. Manual intervention or lazy read repair is needed, which is slow and unreliable.</li>
+  <li>
+    <strong>Example:</strong>
+    - Client X writes token 21 to nodes A and B, but not C, then crashes.<br>
+    - Client Y reads from B and C: sees 21 (B), 20 (C)-assumes 21 is valid.<br>
+    - Client Z reads from A and C: also assumes 21 is valid.<br>
+    Multiple clients now operate with the same token, risking data corruption.
+  </li>
+</ul>
+
+<h2>6. Distributed Consensus Algorithms</h2>
+<img src="/system_design/DistributedLock/consensus.png" alt="consensus">
+<img src="/system_design/DistributedLock/consunsesBackfill.png" alt="consunsesBackfill">
+
+
+<ul>
+  <li>Algorithms like <strong>Raft</strong> are required for linearizable, fault-tolerant distributed locks.</li>
+  <li>Raft uses a leader to propose writes to followers. If a majority acknowledge, the write is committed.</li>
+  <li>Followers that fall behind are backfilled with missing log entries, ensuring all committed writes are preserved during failover.</li>
+  <li>Consensus ensures only one client can acquire the lock at a time, and fencing tokens are unique and strictly increasing.</li>
+</ul>
+
+<h2>7. Implementation Details</h2>
+<img src="/system_design/DistributedLock/consunsesElection.png" alt="consunsesElection">
+<img src="/system_design/DistributedLock/ConsenusInPractise.png" alt="ConsenusInPractise">
+
+
+<ul>
+  <li>Lock state is stored in both a distributed log (for durability) and in-memory (for fast reads).</li>
+  <li>To avoid excessive polling, use server-side push (WebSockets, server-sent events) to notify clients when the lock is available.</li>
+  <li>To prevent the "thundering herd" problem, use a queue for each lock; only the next client is notified when the lock is released.</li>
+  <li>Clients holding the lock must send regular heartbeats to the server to maintain their lease.</li>
+</ul>
+<img src="/system_design/DistributedLock/Waiting.png" alt="Waiting">
+
+<h2>8. Example Flow</h2>
+
+<ol>
+  <li>Client A requests a lock via WebSocket.</li>
+  <li>Leader node performs a two-phase commit with followers; if successful, client A receives fencing token (e.g., 20).</li>
+  <li>Client B requests the lock and is placed in the queue.</li>
+  <li>When client A releases the lock, client B is notified and receives the next fencing token (e.g., 21).</li>
+  <li>If client A attempts to write with an old token, the write is rejected.</li>
+</ol>
+
+<h2>9. Comparison Table: Replication Approaches</h2>
+<table>
+  <tr>
+    <th>Approach</th>
+    <th>Fault Tolerance</th>
+    <th>Consistency</th>
+    <th>Drawbacks</th>
+  </tr>
+  <tr>
+    <td>Single Leader</td>
+    <td>No</td>
+    <td>Not linearizable</td>
+    <td>Failover can cause duplicate fencing tokens</td>
+  </tr>
+  <tr>
+    <td>Synchronous Replication</td>
+    <td>No</td>
+    <td>Strong</td>
+    <td>Progress halts if any node is down</td>
+  </tr>
+  <tr>
+    <td>Quorum-Based</td>
+    <td>Partial</td>
+    <td>Not linearizable</td>
+    <td>Partial writes, ambiguous ordering, duplicate tokens</td>
+  </tr>
+  <tr>
+    <td>Distributed Consensus</td>
+    <td>Yes</td>
+    <td>Linearizable</td>
+    <td>More complex, but solves correctness issues</td>
+  </tr>
+</table>
+
+<h2>10. Conclusion</h2>
+<ul>
+  <li>Distributed locking requires strong consistency and fault tolerance, best achieved with consensus algorithms like Raft.</li>
+  <li>Quorum-based and single-leader approaches have significant drawbacks for distributed locks.</li>
+  <li>Fencing tokens, consensus, and robust notification/heartbeat mechanisms ensure correctness and reliability even in the face of process pauses and partial failures.</li>
+</ul>
+</body>
+</html>
