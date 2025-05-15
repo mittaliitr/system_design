@@ -21,6 +21,10 @@
           "url": "https://www.oreilly.com/library/view/designing-data-intensive-applications/9781449373320/ch04.html"
         },
         {
+          "name": "Distributed Counter (May 16)",
+          "url": "https://netflixtechblog.com/netflixs-distributed-counter-abstraction-8d0c45eb66b2"
+        },
+        {
           "name": "Job Scheduler (May 17)",
           "url": "https://www.youtube.com/watch?v=ta5x62cDxf4"
         },
