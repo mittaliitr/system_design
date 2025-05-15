@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Back of the Envelope | Distributed Priority Queue</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Only for the summary box on this page */
+        .summary-box {
+          background: #ecf0f1;
+          padding: 1rem;
+          border-left: 5px solid #3498db;
+          margin: 2em 0;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Distributed Priority Queue System Design</h1>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="requirements.html">Requirements</a>
+        <a href="principles.html">Design Principles</a>
+        <a href="data_structures.html">Data Structures</a>
+        <a href="replication.html">Replication & Partitioning</a>
+        <a href="performance.html">Performance</a>
+        <a href="backOfEnvelope.html" class="active">Back-of-the-Envelope</a>
+        <a href="summary.html">Summary</a>
+    </nav>
+</header>
+<main>
+    <h2>Back-of-the-Envelope Calculation: Fox Distributed Priority Queue</h2>
+
+    <h3>Assumptions</h3>
+    <div class="table-container">
+        <table>
+            <tr><th>Parameter</th><th>Assumption</th></tr>
+            <tr><td>Number of jobs</td><td>1 billion</td></tr>
+            <tr><td>Average job metadata size</td><td>1 KB</td></tr>
+            <tr><td>Priority bits</td><td>8 bits (1 byte)</td></tr>
+            <tr><td>Job ID size</td><td>8 bytes</td></tr>
+            <tr><td>Memory per job (index)</td><td>~16 bytes</td></tr>
+            <tr><td>RAM per server</td><td>64 GB</td></tr>
+            <tr><td>Disk throughput</td><td>100 MB/s</td></tr>
+            <tr><td>Enqueue/Dequeue rate</td><td>10,000 jobs/sec</td></tr>
+            <tr><td>Consumer threads</td><td>1,000</td></tr>
+        </table>
+    </div>
+
+    <h3>Memory Calculation</h3>
+    <p>Each job requires ~16 bytes in the in-memory index:</p>
+    <p><strong>1e9 × 16 bytes = 16 GB</strong></p>
+
+    <h3>Disk Storage Calculation</h3>
+    <p>Each job payload = 1 KB. Total for 1 billion jobs:</p>
+    <p><strong>1e9 × 1 KB = 1 TB (×3 with replication = 3 TB)</strong></p>
+
+    <h3>Enqueue Throughput</h3>
+    <p>1 KB/job and 100 MB/s per node:</p>
+    <p><strong>100,000 jobs/sec per node</strong></p>
+
+    <h3>Dequeue Throughput</h3>
+    <p>90% memory hit, 10% disk read:</p>
+    <p><strong>SSD latency ~1 ms, enough for 1,000+ consumers</strong></p>
+
+    <h3>Update Job Cost</h3>
+    <p>Index update: O(1) for lookup, O(log n) for reordering.</p>
+
+    <h3>Summary</h3>
+    <div class="summary-box">
+        <ul>
+            <li><strong>Memory footprint:</strong> ~16 GB for 1B jobs</li>
+            <li><strong>Disk usage:</strong> ~1 TB (3 TB with replication)</li>
+            <li><strong>Enqueue/Dequeue throughput:</strong> 100K ops/sec per node</li>
+            <li><strong>Highly scalable with commodity hardware</strong></li>
+        </ul>
+    </div>
+</main>
+</body>
+</html>
