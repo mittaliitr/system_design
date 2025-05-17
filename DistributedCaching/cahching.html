@@ -170,39 +170,173 @@
       <span class="timestamp">(07:10)</span> There is no single right answer for choosing an eviction policy, but some are better than others (e.g., LRU is generally better than FIFO or random).
     </div>
   </section>
+  <img src="/system_design/DistributedCaching/resis_memcached.jpg" alt=redis vs memcached>
 
   <section>
-    <h2>Redis vs. Memcached</h2>
-    <img src="/system_design/DistributedCaching/resis_memcached.jpg" alt="redis vs memchached">
+    <h2>Redis vs. Memcached (Detailed Comparison)</h2>
 
     <div class="block">
-      <span class="timestamp">(00:00)</span> Redis and Memcached are both in-memory distributed caching systems. Both store data in memory for fast access but differ in features and architecture.
+      <span class="timestamp">(00:00)</span> So, Redis and Memcached are both super popular in-memory caching solutions, but they’re actually pretty different once you get into the details. Let’s break it down.
     </div>
-    <div class="block">
-      <span class="timestamp">(03:25)</span> <b>Memcached:</b>
-      <ul>
-        <li>Simple, in-memory key-value store.</li>
-        <li>Supports partitioning with consistent hashing for distribution across nodes.</li>
-        <li>Multi-threaded for high concurrency.</li>
-        <li>Uses LRU eviction policy.</li>
-      </ul>
-    </div>
-    <div class="block">
-      <span class="timestamp">(05:13)</span> <b>Redis:</b>
-      <ul>
-        <li>Feature-rich in-memory data store supporting strings, hashes, sorted sets, geospatial indexes, and more.</li>
-        <li>Uses a fixed number of partitions and a gossip protocol for cluster management.</li>
-        <li>Single-threaded for operations, enabling strong isolation and simple transactions.</li>
-        <li>Supports write-ahead logging for atomic operations.</li>
-        <li>Single-leader replication model by default.</li>
-      </ul>
-    </div>
-    <div class="block">
-      <span class="timestamp">(07:33)</span> Choose Redis for advanced data types, transactions, and managed clustering. Choose Memcached for simplicity, high concurrency, and when only basic key-value caching is needed.
-    </div>
-    <a href=https://ravisystemdesign.substack.com/p/interview-prep-designing-a-distributed>More reads</a>
 
+    <div class="block">
+      <b>Core Purpose and Use Case</b>
+      <ul>
+        <li>Memcached is your classic, no-frills, high-speed cache. It’s a simple key-value store-just strings, no fancy data types. If you need to cache database query results, HTML fragments, or session tokens, Memcached is super lightweight and easy to set up. It’s like a RAM-powered sticky note for your app <span class="timestamp">(03:25)</span>[3][4][7].</li>
+        <li>Redis is more of a Swiss Army knife. It’s a cache, but also a data structure server, message broker, and even a lightweight database if you want it to be. You get strings, but also lists, sets, sorted sets, hashes, bitmaps, hyperloglogs, geospatial indexes, and more. If you want to build leaderboards, session stores, real-time analytics, or anything with more complex data, Redis is your go-to <span class="timestamp">(05:13)</span>[2][3][4][5][6][7].</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <b>Data Structures</b>
+      <ul>
+        <li><b>Memcached:</b> Strings only. Everything is a string, so if you want to cache an object, you have to serialize it yourself. No way to update a single field in a cached object-you have to replace the whole thing <span class="timestamp">(03:25)</span>[3][6][7].</li>
+        <li><b>Redis:</b> Strings, lists, sets, sorted sets, hashes, bitmaps, hyperloglogs, geospatial data. You can update just one field in a hash, push to a list, increment a counter, or run set operations-all in-memory and super fast <span class="timestamp">(05:13)</span>[2][3][4][5][6][7].</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <b>Persistence</b>
+      <ul>
+        <li><b>Memcached:</b> Purely in-memory. If the server restarts, all data is gone. No built-in way to persist data to disk <span class="timestamp">(03:25)</span>[3][4][7].</li>
+        <li><b>Redis:</b> Optional persistence. You can snapshot data to disk at intervals (RDB), or log every write operation (AOF). If you want your cache to survive restarts or act as a lightweight database, Redis has you covered <span class="timestamp">(05:13)</span>[2][3][4][5][7].</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <b>Threading and Performance</b>
+      <ul>
+        <li><b>Memcached:</b> Multi-threaded. Can use all CPU cores, so it’s great for high-concurrency, high-throughput workloads. Handles lots of simultaneous requests very efficiently <span class="timestamp">(03:43)</span>[2][3][4][6][7].</li>
+        <li><b>Redis:</b> Historically single-threaded (one command at a time), but highly optimized with event-driven, non-blocking I/O. Recent versions support multi-threaded I/O for reads. Still, for pure parallelism, Memcached has the edge <span class="timestamp">(05:13)</span>[2][3][4][6][7].</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <b>Scalability and Clustering</b>
+      <ul>
+        <li><b>Memcached:</b> Scales horizontally by adding more nodes. Uses consistent hashing for partitioning data across nodes. No built-in replication or clustering-if a node fails, its data is lost <span class="timestamp">(03:43)</span>[2][3][4][6][7].</li>
+        <li><b>Redis:</b> Supports clustering, replication, and sharding out of the box. Redis Cluster uses a fixed number of slots (partitions) distributed across nodes, with automatic failover. Also supports replicas for high availability <span class="timestamp">(05:50)</span>[2][3][4][5][6][7].</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <b>Advanced Features</b>
+      <ul>
+        <li><b>Memcached:</b> Keeps it simple-just caching, no extra features. LRU eviction by default, predictable memory usage via slab allocation <span class="timestamp">(04:54)</span>[3][4][7].</li>
+        <li><b>Redis:</b>
+          <ul>
+            <li>Transactions (MULTI/EXEC)</li>
+            <li>Pub/Sub messaging for real-time feeds and chat</li>
+            <li>Lua scripting for custom logic</li>
+            <li>Geospatial queries</li>
+            <li>Bitmaps and HyperLogLogs for analytics</li>
+            <li>Snapshots and append-only file for durability</li>
+          </ul>
+          <span class="timestamp">(06:22)</span>[2][3][4][5][6][7].
+        </li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <b>Memory Management</b>
+      <ul>
+        <li><b>Memcached:</b> Allocates a fixed amount of memory up front, uses slab allocation to minimize fragmentation. Predictable, but if you run out of memory, old data is evicted <span class="timestamp">(03:43)</span>[3][4][7][8].</li>
+        <li><b>Redis:</b> Uses jemalloc for dynamic allocation and has a built-in defragmentation tool. Can be configured with or without a memory limit; supports multiple eviction policies <span class="timestamp">(05:13)</span>[3][4][7][8].</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <b>Programming Language Support</b>
+      <ul>
+        <li>Both Redis and Memcached have open-source clients for nearly every language: Java, Python, PHP, C, C++, C#, JavaScript, Node.js, Ruby, Go, and more <span class="timestamp">(General)</span>[2][3][4][7].</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <b>Typical Use Cases</b>
+      <ul>
+        <li><b>Memcached:</b> Simple, high-speed cache for database query results, session tokens, HTML fragments, and other string data. Great for web apps that need to cache lots of small, frequently accessed items <span class="timestamp">(03:25)</span>[3][4][7].</li>
+        <li><b>Redis:</b> Session stores, leaderboards, real-time analytics, queues, pub/sub systems, geospatial lookups, and any use case that benefits from advanced data types or persistence <span class="timestamp">(05:13)</span>[2][3][4][5][6][7].</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <b>Summary Table</b>
+      <div class="table-wrap">
+        <table>
+          <tr>
+            <th>Feature</th>
+            <th>Redis</th>
+            <th>Memcached</th>
+          </tr>
+          <tr>
+            <td>Data Types</td>
+            <td>Strings, hashes, lists, sets, sorted sets, bitmaps, hyperloglogs, geospatial</td>
+            <td>Strings only</td>
+          </tr>
+          <tr>
+            <td>Persistence</td>
+            <td>Optional (RDB snapshots, AOF logs)</td>
+            <td>None (RAM only)</td>
+          </tr>
+          <tr>
+            <td>Threading</td>
+            <td>Single-threaded (multi-threaded I/O in new versions)</td>
+            <td>Multi-threaded</td>
+          </tr>
+          <tr>
+            <td>Clustering</td>
+            <td>Built-in clustering, replication, failover</td>
+            <td>Manual sharding, no built-in replication</td>
+          </tr>
+          <tr>
+            <td>Eviction Policy</td>
+            <td>Configurable (LRU, LFU, etc.)</td>
+            <td>LRU by default</td>
+          </tr>
+          <tr>
+            <td>Transactions</td>
+            <td>Yes</td>
+            <td>No</td>
+          </tr>
+          <tr>
+            <td>Pub/Sub</td>
+            <td>Yes</td>
+            <td>No</td>
+          </tr>
+          <tr>
+            <td>Lua Scripting</td>
+            <td>Yes</td>
+            <td>No</td>
+          </tr>
+          <tr>
+            <td>Geospatial</td>
+            <td>Yes</td>
+            <td>No</td>
+          </tr>
+          <tr>
+            <td>Memory Management</td>
+            <td>jemalloc, dynamic, defragmentation</td>
+            <td>Slab allocation, fixed</td>
+          </tr>
+          <tr>
+            <td>Best For</td>
+            <td>Complex data, persistence, advanced features</td>
+            <td>Simple, high-throughput caching</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="block">
+      <b>Which Should You Use?</b>
+      <ul>
+        <li>If you just need a blazing-fast, distributed cache for simple key-value pairs, Memcached is lightweight, easy, and efficient <span class="timestamp">(03:25)</span>[3][4][7].</li>
+        <li>If you want advanced data types, persistence, clustering, or features like pub/sub and scripting, Redis is the clear winner. Redis can do everything Memcached can-and a lot more <span class="timestamp">(05:13)</span>[2][3][4][5][6][7].</li>
+      </ul>
+    </div>
   </section>
+
 </main>
 </body>
 </html>
