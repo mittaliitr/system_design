@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Distributed Caching: Cleaned Full Transcript</title>
+  <style>
+    body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: #f8f9fa;
+        color: #23272f;
+        margin: 0;
+        padding: 0 0 3em 0;
+    }
+    main {
+        max-width: 900px;
+        margin: 2em auto;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        padding: 2em 2.5em;
+    }
+    h1, h2 {
+        color: #1a4d7a;
+        margin-top: 1.5em;
+    }
+    h1 {
+        text-align: center;
+        margin-bottom: 0.5em;
+    }
+    section {
+        margin-bottom: 2.5em;
+    }
+    ul, ol {
+        margin-left: 1.5em;
+    }
+    .quote {
+        color: #555;
+        background: #f1f3f6;
+        border-left: 4px solid #a2c2e2;
+        padding: 0.8em 1.2em;
+        margin: 1em 0;
+        font-style: italic;
+    }
+    .subsection {
+        margin-top: 1.2em;
+        font-weight: bold;
+        color: #2d5a88;
+    }
+    .table-wrap {
+        overflow-x: auto;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 1em 0;
+    }
+    th, td {
+        border: 1px solid #d0d7de;
+        padding: 0.6em 0.9em;
+        text-align: left;
+    }
+    th {
+        background: #e6f0fa;
+    }
+    .timestamp {
+        color: #999;
+        font-size: 0.95em;
+    }
+    .speaker {
+        color: #1a4d7a;
+        font-weight: bold;
+    }
+    .block {
+        margin-bottom: 1.2em;
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Distributed Caching: Full Transcript (Cleaned)</h1>
+
+  <section>
+    <h2>Introduction to Distributed Caching</h2>
+    <img src="/system_design/DistributedCaching/distributed_Caching.png" alt="Distributed Caching">
+
+    <div class="block">
+      <span class="timestamp">(00:00)</span> Welcome back. I've changed my camera angle, switched up my desk setup, and things are looking clean. We're getting close to the end of this systems design concepts series. Let's start talking about caching.
+    </div>
+    <div class="block">
+      <span class="timestamp">(00:32)</span> If you remember from your operating systems class, here's what a CPU looks like: cores, layers of cache, memory, and finally disk. The point is, we have this hierarchy of cache that enables faster reads and writes, and shields some accesses to slower forms of data like memory and disk. In distributed systems, we're basically doing the same thing.
+    </div>
+    <div class="block">
+      <span class="timestamp">(01:27)</span> Benefits of caching in distributed systems:
+      <ul>
+        <li>Reads and writes should be faster because you're using a faster form of storage, usually memory instead of disk.</li>
+        <li>You might save a lot of network calls by not reaching out to the database every time.</li>
+        <li>You can place the cache physically closer to the client, so packets travel less distance.</li>
+        <li>Caching can reduce load on key components like a single database node if many clients are asking for the same data.</li>
+      </ul>
+    </div>
+    <div class="block">
+      <span class="timestamp">(02:56)</span> Drawbacks:
+      <ul>
+        <li>Cache misses are expensive and slow you down.</li>
+        <li>Data consistency is complex. Different caches might have different values, leading to stale data.</li>
+        <li>Complexity increases if you care about strong consistency.</li>
+      </ul>
+    </div>
+    <div class="block">
+      <span class="timestamp">(04:08)</span> What do we cache? Anything that's expensive to compute or load, like database results, computations done by application servers, or popular static content.
+    </div>
+    <div class="block">
+      <span class="timestamp">(04:57)</span> Where do we store the cache?
+      <ul>
+        <li><b>Server-local caching:</b> Data is cached on the application servers themselves. This could be a database, message broker, application server, or coordination service.</li>
+        <li>Example: If you keep checking who liked you on Tinder, it's more efficient to cache the result on the application server.</li>
+      </ul>
+    </div>
+    <div class="block">
+      <span class="timestamp">(06:21)</span> With multiple application servers, it's important to reach the same server every time for your specific cached data. Consistent hashing is used to maximize cache hits.
+    </div>
+    <div class="block">
+      <span class="timestamp">(07:31)</span> Pros of server-local caching: fewer network calls, faster access. Cons: if the server goes down, the cache is lost; limited by the number of application servers.
+    </div>
+    <div class="block">
+      <span class="timestamp">(08:03)</span> <b>Global caching layer:</b> A separate, scalable caching layer shared by all servers. Pros: can scale independently. Cons: cache is no longer local, more network calls, more moving parts.
+    </div>
+    <div class="block">
+      <span class="timestamp">(09:30)</span> Caches improve latencies for reads and writes, use faster storage, and can be placed closer to the user. But cache misses are bad, and data consistency issues can arise. Next up: cache writes and eviction policies.
+    </div>
+  </section>
+
+  <section>
+    <h2>Distributed Cache Write Strategies</h2>
+    <img src="/system_design/DistributedCaching/cache_Write.jpg" alt="Distributed cache write">
+
+    <div class="block">
+      <span class="timestamp">(00:00)</span> Quick recap: caching can make reads faster, sometimes writes too. Caching can act as a wall between the database and users, reducing load. But cache misses are expensive, and data consistency can be tough.
+    </div>
+    <div class="block">
+      <span class="timestamp">(01:59)</span> Three ways to handle writes:
+      <ol>
+        <li><b>Write-Around Cache:</b> Write directly to the database, bypassing the cache. The cache is updated on the next read (either after cache expiry or manual invalidation). Pros: simple, database is the source of truth. Cons: cache misses after writes, potential for stale reads until cache is refreshed.</li>
+        <li><b>Write-Through Cache:</b> Write to both the cache and the database at the same time. Ensures cache and database are kept in sync unless a failure occurs. Two-phase commit can be used for stronger consistency, but it's slow. Pros: consistent data. Cons: slower writes, complexity.</li>
+        <li><b>Write-Back Cache:</b> Write to the cache first, then asynchronously write to the database (possibly in batches). Very fast writes, but risk of data loss if the cache fails before data is persisted. Consistency can be improved with distributed locks, but adds complexity and latency. Pros: very fast writes. Cons: risk of data loss, potential for stale reads, added complexity.</li>
+      </ol>
+    </div>
+    <div class="block">
+      <span class="timestamp">(10:55)</span> No clear winner: each write strategy has different use cases and tradeoffs.
+    </div>
+  </section>
+
+  <section>
+    <h2>Cache Eviction Policies</h2>
+    <img src="/system_design/DistributedCaching/chace_Eviction_policy.jpg" alt="Distributed eviction">
+
+    <div class="block">
+      <span class="timestamp">(00:00)</span> When you have too much data in the cache, you have to get rid of some of it. The eviction policy determines what to remove.
+    </div>
+    <div class="block">
+      <span class="timestamp">(01:56)</span> Eviction policies:
+      <ul>
+        <li><b>FIFO (First-In, First-Out):</b> Oldest cached item is removed first. Simple, but may evict frequently accessed data.</li>
+        <li><b>LRU (Least Recently Used):</b> Removes the item that hasn't been accessed for the longest time. Implemented with a hashmap and doubly-linked list for O(1) updates. Common in practice.</li>
+        <li><b>LFU (Least Frequently Used):</b> Removes the item accessed the least number of times. More complex to implement, but can better retain "hot" data.</li>
+        <li><b>Random:</b> Evicts a random item. Simple, minimal metadata, but can remove useful data.</li>
+      </ul>
+    </div>
+    <div class="block">
+      <span class="timestamp">(07:10)</span> There is no single right answer for choosing an eviction policy, but some are better than others (e.g., LRU is generally better than FIFO or random).
+    </div>
+  </section>
+
+  <section>
+    <h2>Redis vs. Memcached</h2>
+    <img src="/system_design/DistributedCaching/resis_memcached.jpg" alt="redis vs memchached">
+
+    <div class="block">
+      <span class="timestamp">(00:00)</span> Redis and Memcached are both in-memory distributed caching systems. Both store data in memory for fast access but differ in features and architecture.
+    </div>
+    <div class="block">
+      <span class="timestamp">(03:25)</span> <b>Memcached:</b>
+      <ul>
+        <li>Simple, in-memory key-value store.</li>
+        <li>Supports partitioning with consistent hashing for distribution across nodes.</li>
+        <li>Multi-threaded for high concurrency.</li>
+        <li>Uses LRU eviction policy.</li>
+      </ul>
+    </div>
+    <div class="block">
+      <span class="timestamp">(05:13)</span> <b>Redis:</b>
+      <ul>
+        <li>Feature-rich in-memory data store supporting strings, hashes, sorted sets, geospatial indexes, and more.</li>
+        <li>Uses a fixed number of partitions and a gossip protocol for cluster management.</li>
+        <li>Single-threaded for operations, enabling strong isolation and simple transactions.</li>
+        <li>Supports write-ahead logging for atomic operations.</li>
+        <li>Single-leader replication model by default.</li>
+      </ul>
+    </div>
+    <div class="block">
+      <span class="timestamp">(07:33)</span> Choose Redis for advanced data types, transactions, and managed clustering. Choose Memcached for simplicity, high concurrency, and when only basic key-value caching is needed.
+    </div>
+    <a href=https://ravisystemdesign.substack.com/p/interview-prep-designing-a-distributed>More reads</a>
+
+  </section>
+</main>
+</body>
+</html>

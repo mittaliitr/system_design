@@ -14,7 +14,7 @@
         },
         {
           "name": "Distributed Cache (May 15)",
-          "url": "https://ravisystemdesign.substack.com/p/interview-prep-designing-a-distributed"
+          "url": "/system_design/DistributedCaching/cahching.html"
         },
         {
           "name": "Distributed Metrics (May 16)",
