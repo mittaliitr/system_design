@@ -22,7 +22,7 @@
         },
         {
           "name": "Distributed Counter (May 16)",
-          "url": "https://netflixtechblog.com/netflixs-distributed-counter-abstraction-8d0c45eb66b2"
+          "url": "https://systemdesign.one/distributed-counter-system-design/"
         },
         {
           "name": "Job Scheduler (May 17)",
