@@ -26,18 +26,18 @@
         },
         {
           "name": "Job Scheduler (May 17)",
-          "url": "https://www.youtube.com/watch?v=ta5x62cDxf4"
+          "url": " https://medium.com/@mayilb77/design-a-distributed-job-scheduler-for-millions-of-tasks-in-daily-operations-4132dc6d645f"
         },
         {
-          "name": "Notification Service (May 18)",
+          "name": "Notification Service (May 28)",
           "url": "https://medium.com/@in10se/system-design-interview-question-3-realtime-notification-service-14fe1dec8e2a"
         },
         {
-          "name": "Rate Limiter + Unique Users (May 19)",
+          "name": "Rate Limiter + Unique Users (May 30)",
           "url": "https://www.linkedin.com/pulse/detailed-system-design-rate-limiter-application-manas-rath-v9fpc"
         },
         {
-          "name": "Top K Problem (May 20)",
+          "name": "Top K Problem (June 2)",
           "url": "https://serhatgiydiren.com/system-design-interview-top-k-problem-heavy-hitters/"
         }
       ]
@@ -46,31 +46,31 @@
       "name": "Social Media & Communication",
       "children": [
         {
-          "name": "LinkedIn Mutual Search (May 21)",
+          "name": "LinkedIn Mutual Search (June 4)",
           "url": "https://www.linkedin.com/blog/engineering/search/building-a-more-intuitive-and-streamlined-search-experience"
         },
         {
-          "name": "Messenger/WhatsApp (May 22)",
+          "name": "Messenger/WhatsApp (June 6)",
           "url": "https://www.youtube.com/watch?v=9YQxB46xbOI"
         },
         {
-          "name": "Instagram/Twitter/Facebook/Reddit (May 23)",
+          "name": "Instagram/Twitter/Facebook/Reddit (June 8)",
           "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
-          "name": "Facebook News Feed (May 24)",
+          "name": "Facebook News Feed (June 10)",
           "url": "https://www.hiredintech.com/classrooms/system-design/lesson/52"
         },
         {
-          "name": "Reddit Comments (May 25)",
+          "name": "Reddit Comments (June 12)",
           "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
-          "name": "fb-live-comments (May 25)",
+          "name": "fb-live-comments (June 14)",
           "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
-          "name": "fb-post-search (May 26)",
+          "name": "fb-post-search (June 16)",
           "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         }
       ]
@@ -79,23 +79,23 @@
       "name": "E-commerce & Marketplaces",
       "children": [
         {
-          "name": "Payment Gateway (May 27)",
+          "name": "Payment Gateway (June 18)",
           "url": "https://www.youtube.com/watch?v=NxjGFIgFCbg"
         },
         {
-          "name": "Bidding Platform (May 28)",
+          "name": "Bidding Platform (June 20)",
           "url": "https://www.youtube.com/watch?v=g8XqFuDkga0"
         },
         {
-          "name": "Stock Exchange (May 29)",
+          "name": "Stock Exchange (June 22)",
           "url": "https://www.youtube.com/watch?v=PzuL3lxtrs0"
         },
         {
-          "name": "Amazon Retail + Online Auction (May 30)",
+          "name": "Amazon Retail + Online Auction (June 24)",
           "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
-          "name": "Uber + Yelp (May 31)",
+          "name": "Uber + Yelp (June 26)",
           "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         }
       ]
@@ -104,15 +104,15 @@
       "name": "Streaming & Media",
       "children": [
         {
-          "name": "Twitch + Zoom (June 1)",
+          "name": "Twitch + Zoom (June 28)",
           "url": "https://www.youtube.com/watch?v=NF-Mw-V-yfM"
         },
         {
-          "name": "Netflix/YouTube + Google Docs (June 2)",
+          "name": "Netflix/YouTube + Google Docs (June 30)",
           "url": "https://www.hiredintech.com/classrooms/system-design/lesson/52"
         },
         {
-          "name": "Google Maps + Ticket Master (June 3)",
+          "name": "Google Maps + Ticket Master (July 2)",
           "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         }
       ]
@@ -121,7 +121,7 @@
       "name": "Games & Entertainment",
       "children": [
         {
-          "name": "Battle Royale Game (June 4)",
+          "name": "Battle Royale Game (July 4)",
           "url": "https://www.youtube.com/watch?v=8XqFuDkga0"
         }
       ]
@@ -130,11 +130,11 @@
       "name": "Recommendation & Search",
       "children": [
         {
-          "name": "Recommendation Engine (June 5)",
+          "name": "Recommendation Engine ( July 6)",
           "url": "https://www.youtube.com/watch?v=FoSCaue3lcg"
         },
         {
-          "name": "Type Ahead Suggestion (June 6)",
+          "name": "Type Ahead Suggestion (July 8)",
           "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         }
       ]
@@ -143,11 +143,11 @@
       "name": "Storage & Files",
       "children": [
         {
-          "name": "Dropbox/Google Drive (June 7)",
+          "name": "Dropbox/Google Drive (July 10)",
           "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
-          "name": "TinyUrl/PasteBin + Bitly (June 8)",
+          "name": "TinyUrl/PasteBin + Bitly (July 12)",
           "url": "https://www.hiredintech.com/classrooms/system-design/lesson/52"
         }
       ]
@@ -156,15 +156,15 @@
       "name": "Miscellaneous",
       "children": [
         {
-          "name": "Gopuff + Tinder (June 9)",
+          "name": "Gopuff + Tinder (July 14)",
           "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
-          "name": "Leetcode + Strava (June 10)",
+          "name": "Leetcode + Strava (July 16)",
           "url": "https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR"
         },
         {
-          "name": "Web Crawler + Ad Click Aggregator (June 11)",
+          "name": "Web Crawler + Ad Click Aggregator (July 18)",
           "url": "https://www.hiredintech.com/classrooms/system-design/lesson/52"
         }
       ]
