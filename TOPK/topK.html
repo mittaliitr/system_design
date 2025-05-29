@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Top K Problem (Leaderboard) System Design</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0 0 40px 0; background: #f7f9fa; color: #222; }
+    header { background: #2d3e50; color: #fff; padding: 24px 0; text-align: center; }
+    section { background: #fff; margin: 32px auto; padding: 24px; max-width: 900px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);}
+    h1, h2, h3 { color: #2d3e50; }
+    ul { margin-left: 1.5em; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0;}
+    th, td { border: 1px solid #ddd; padding: 8px; }
+    th { background: #f0f4f8; }
+    .diagram-placeholder {
+        display: flex; align-items: center; justify-content: center;
+        background: #e3e8ee; color: #888;
+        border: 2px dashed #bfc9d1; border-radius: 6px;
+        height: 180px; margin: 20px 0; font-size: 1.1em;
+    }
+    a { color: #2176ae; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { background: #f5f5f5; padding: 2px 6px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Top K Problem (Leaderboard) System Design</h1>
+  <p>Efficient, Scalable, and Real-Time Leaderboard Architecture</p>
+</header>
+
+<section>
+  <h2>Overview</h2>
+  <p>
+    The <strong>Top K Problem</strong>—also known as the "Heavy Hitters" or "Leaderboard" problem—focuses on efficiently identifying the K highest scoring or most frequent elements in a large, dynamic dataset or real-time stream. This is a common requirement for online games, social platforms, and analytics dashboards.
+  </p>
+  <ul>
+    <li>Find the top K users, posts, or items based on score, frequency, or another metric</li>
+    <li>Support real-time updates and queries from millions of users</li>
+    <li>Ensure low latency, scalability, and accuracy</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Key Algorithms for Top K</h2>
+  <h3>1. HashMap + Min-Heap</h3>
+  <ul>
+    <li>Track frequencies/scores using a <code>HashMap</code></li>
+    <li>Maintain a <code>Min-Heap</code> of size K for the top elements</li>
+    <li>Time Complexity: <code>O(n log k)</code></li>
+    <li>Best for batch processing or small datasets</li>
+  </ul>
+  <h3>2. Count-Min Sketch + Heap</h3>
+  <ul>
+    <li>Probabilistic data structure for frequency estimation with low memory</li>
+    <li>Combine with a heap to extract Top K</li>
+    <li>Time Complexity: <code>O(n + k log k)</code></li>
+    <li>Great for streaming data with memory constraints</li>
+  </ul>
+  <h3>3. Redis Sorted Sets (ZSET)</h3>
+  <ul>
+    <li>In-memory sorted set with fast score updates and range queries</li>
+    <li>Supports <code>ZRANGE</code> for Top K queries and <code>ZINCRBY</code> for score updates</li>
+    <li>Time Complexity: <code>O(log N)</code> per update</li>
+    <li>Ideal for real-time, production leaderboards</li>
+  </ul>
+  <table>
+    <tr>
+      <th>Algorithm</th>
+      <th>Best Use Case</th>
+      <th>Time Complexity</th>
+      <th>Memory Usage</th>
+    </tr>
+    <tr>
+      <td>HashMap + Heap</td>
+      <td>Batch, small data</td>
+      <td>O(n log k)</td>
+      <td>High (proportional to n)</td>
+    </tr>
+    <tr>
+      <td>Count-Min Sketch + Heap</td>
+      <td>Streaming, large data</td>
+      <td>O(n + k log k)</td>
+      <td>Low (fixed, tunable)</td>
+    </tr>
+    <tr>
+      <td>Redis ZSET</td>
+      <td>Real-time, scalable</td>
+      <td>O(log N)</td>
+      <td>Medium (proportional to N)</td>
+    </tr>
+  </table>
+</section>
+
+<section>
+  <h2>System Design & Architecture</h2>
+  <div class="diagram-placeholder">
+    <strong>Diagram 1: High-Level System Architecture</strong><br>
+    <span>(Frontend &rarr; API Gateway &rarr; Message Broker &rarr; Processing Layer &rarr; Redis/DB &rarr; WebSocket/Clients)</span>
+  </div>
+  <ul>
+    <li><strong>Frontend/Clients</strong>: Send score updates and leaderboard queries</li>
+    <li><strong>API Gateway</strong>: Handles REST/WebSocket requests</li>
+    <li><strong>Message Broker</strong> (e.g., Kafka): Decouples ingestion from processing</li>
+    <li><strong>Processing Layer</strong>: Updates scores, calculates Top K</li>
+    <li><strong>Redis Sorted Sets</strong>: Store and retrieve leaderboard data</li>
+    <li><strong>WebSocket/Notification Server</strong>: Pushes real-time updates to clients</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Database Schema & Data Structures</h2>
+  <div class="diagram-placeholder">
+    <strong>Diagram 2: Database Schema & Redis Data Structures</strong><br>
+    <span>(Tables: Players, Games, Leaderboards, Friends; Redis: Sorted Sets, Hashes)</span>
+  </div>
+  <ul>
+    <li><strong>Players</strong>: <code>player_id</code>, <code>name</code>, <code>metadata</code></li>
+    <li><strong>Leaderboards</strong>: <code>leaderboard_id</code>, <code>type</code>, <code>game_id</code></li>
+    <li><strong>Redis ZSET</strong>: Key = <code>leaderboard_id</code>, Member = <code>player_id</code>, Score = points</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Data Flow Examples</h2>
+  <div class="diagram-placeholder">
+    <strong>Diagram 3: Data Flow - Score Update & Top K Query</strong><br>
+    <span>(Step-by-step arrows: Client &rarr; API &rarr; Processing &rarr; Redis &rarr; Response)</span>
+  </div>
+  <ol>
+    <li><strong>Score Update:</strong> Client &rarr; API &rarr; Message Broker &rarr; Processing &rarr; Redis ZSET</li>
+    <li><strong>Top K Query:</strong> Client &rarr; API &rarr; Redis ZSET (<code>ZRANGE</code>) &rarr; Response</li>
+  </ol>
+</section>
+
+<section>
+  <h2>Real-Time Update Mechanism</h2>
+  <div class="diagram-placeholder">
+    <strong>Diagram 4: Real-Time Updates to Clients</strong><br>
+    <span>(Redis change &rarr; WebSocket/SSE &rarr; Clients)</span>
+  </div>
+  <ul>
+    <li>Leaderboard changes trigger events</li>
+    <li>WebSocket/SSE server pushes updates to all subscribed clients</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Scaling & Optimization</h2>
+  <div class="diagram-placeholder">
+    <strong>Diagram 5: Sharding & Scaling</strong><br>
+    <span>(Multiple Redis instances/partitions; consistent hashing)</span>
+  </div>
+  <ul>
+    <li><strong>Sharding:</strong> Partition leaderboards by game, region, or user group</li>
+    <li><strong>Replication:</strong> Use Redis replication for high availability</li>
+    <li><strong>Approximate Algorithms:</strong> Use Count-Min Sketch or Space-Saving for massive scale</li>
+  </ul>
+</section>
+
+<section>
+  <h2>References & Further Reading</h2>
+  <ul>
+    <li>
+      <a href="https://serhatgiydiren.com/system-design-interview-top-k-problem-heavy-hitters/" target="_blank">
+        System Design Interview – Top K Problem (Heavy Hitters)
+      </a>
+    </li>
+    <li>
+      <a href="https://medium.com/@mayilb77/design-a-real-time-leaderboard-system-for-millions-of-users-08b96b4b64ce" target="_blank">
+        Design a Real-Time Leaderboard System for Millions of Users
+      </a>
+    </li>
+    <li>
+      <a href="https://www.youtube.com/watch?v=kx-XDoPjoHw" target="_blank">
+        System Design Interview – Top K Problem Youtube
+      </a>
+    </li>
+  </ul>
+</section>
+</body>
+</html>

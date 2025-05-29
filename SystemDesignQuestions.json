@@ -34,11 +34,11 @@
         },
         {
           "name": "Rate Limiter + Unique Users (May 30)",
-          "url": "https://www.linkedin.com/pulse/detailed-system-design-rate-limiter-application-manas-rath-v9fpc"
+          "url": "https://systemsdesign.cloud/SystemDesign/RateLimiter"
         },
         {
           "name": "Top K Problem (June 2)",
-          "url": "https://serhatgiydiren.com/system-design-interview-top-k-problem-heavy-hitters/"
+          "url": "/system_design/TOPK/topK.html"
         }
       ]
     },
