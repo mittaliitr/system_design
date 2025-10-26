@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary Search Boundary — Java + Execution</title>
+    <style>
+        body {
+          font-family: 'Segoe UI', sans-serif;
+          background-color: #f7fafc;
+          color: #2d3748;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 40px;
+        }
+        h1 {
+          color: #2b6cb0;
+          margin-bottom: 10px;
+        }
+        pre {
+          background-color: #1a202c;
+          color: #edf2f7;
+          padding: 16px;
+          border-radius: 8px;
+          max-width: 700px;
+          overflow-x: auto;
+          font-size: 14px;
+          line-height: 1.4;
+        }
+        input, button {
+          margin-top: 12px;
+          padding: 10px 16px;
+          font-size: 16px;
+          border: 1px solid #cbd5e0;
+          border-radius: 6px;
+        }
+        button {
+          background-color: #2b6cb0;
+          color: white;
+          cursor: pointer;
+        }
+        button:hover {
+          background-color: #1e4e8c;
+        }
+        #output {
+          margin-top: 20px;
+          font-weight: bold;
+          font-size: 18px;
+          color: #2f855a;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Binary Search Boundary Demo</h1>
+
+<h3>🧩 Java Code:</h3>
+<pre><code>
+public class BinarySearchBoundary {
+
+    public static void main(String[] args) {
+        boolean[] nums = new boolean[]{false, false, true, true, true};
+        int result = binarySearch(nums);
+        System.out.println("First true index: " + result);
+    }
+
+    public static int binarySearch(boolean[] nums) {
+        int left = 0;
+        int right = nums.length - 1;
+        int ans = -1;
+
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid]) {
+                ans = mid;
+                right = mid - 1;
+            } else {
+                left = mid + 1;
+            }
+        }
+
+        return ans;
+    }
+}
+  </code></pre>
+
+<h3>💻 Try it yourself:</h3>
+<input type="text" id="inputArray" value="false,false,true,true,true" size="40">
+<button onclick="runBinarySearch()">Run Java Logic</button>
+
+<div id="output"></div>
+
+<script>
+    // Java-equivalent logic in JavaScript
+    function binarySearch(nums) {
+      let left = 0, right = nums.length - 1;
+      let ans = -1;
+      while (left <= right) {
+        const mid = Math.floor(left + (right - left) / 2);
+        if (nums[mid]) {
+          ans = mid;
+          right = mid - 1;
+        } else {
+          left = mid + 1;
+        }
+      }
+      return ans;
+    }
+
+    function runBinarySearch() {
+      const input = document.getElementById("inputArray").value.trim();
+      const nums = input.split(",").map(v => v.trim().toLowerCase() === "true");
+
+      const result = binarySearch(nums);
+
+      const output = result >= 0
+        ? `✅ First true found at index: ${result}`
+        : "❌ No true found in array.";
+
+      document.getElementById("output").innerText = output;
+    }
+</script>
+
+</body>
+</html>
