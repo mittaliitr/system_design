@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swim in Rising Water – Interactive Visualization</title>
+    <style>
+        body { font-family: "Segoe UI", Arial, sans-serif; background: #f8fafc; color: #333; margin: 20px; line-height: 1.6; }
+        h1, h2, h3 { color: #005f8f; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 6px; overflow-x: auto; }
+        code { color: #d6336c; }
+        .grid { display: grid; grid-template-columns: repeat(3, 60px); gap: 6px; margin-top: 10px; }
+        .cell {
+          width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;
+          font-weight: bold; border-radius: 6px; transition: all 0.3s ease;
+        }
+        .unvisited { background: #d0d7de; }
+        .visited { background: #60a5fa; color: white; }
+        .path { background: #22c55e; color: white; }
+        button { background: #2563eb; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-top: 8px; }
+        button:hover { background: #1d4ed8; }
+        .log { background: #fff; border: 1px solid #ddd; padding: 10px; border-radius: 6px; margin-top: 10px; height: 140px; overflow-y: auto; font-size: 14px; }
+        .example { background: #fff8dc; padding: 10px; border-left: 4px solid #ffcc00; margin: 10px 0; }
+        table { border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #999; padding: 6px 10px; }
+    </style>
+</head>
+<body>
+
+<h1>🏊 Swim in Rising Water (LeetCode 778)</h1>
+
+<h2>🧩 Problem Explanation</h2>
+<p>You are given an <code>n × n</code> grid where each cell represents an elevation (height). Water rises over time, and you can only move to a cell if the current water level is at least equal to that cell’s height.</p>
+<p>Your goal: start at <b>(0, 0)</b> and reach <b>(n − 1, n − 1)</b> in the minimum possible time.</p>
+
+<div class="example">
+    <h3>Example:</h3>
+    <pre>
+Input: grid = [
+  [0,2],
+  [1,3]
+]
+Output: 3
+
+Explanation:
+At time = 0, you're at (0,0)
+At time = 1, water=1 → move to (1,0)
+At time = 2, water=2 → still can’t reach (1,1)
+At time = 3, water=3 → now you can reach (1,1)
+  </pre>
+</div>
+
+<hr>
+
+<h2>💡 Approach 1: Binary Search + DFS (True/False Pattern)</h2>
+
+<p>
+    We can use <b>binary search</b> over the possible time (water level) to find the smallest time <code>T</code> such that a path exists from start to end.
+</p>
+
+<h3>🎯 Logic:</h3>
+<ul>
+    <li>Binary search between <code>min = grid[0][0]</code> and <code>max = n² - 1</code>.</li>
+    <li>For each <code>mid</code>, check if you can reach the end using DFS where every cell ≤ <code>mid</code>.</li>
+    <li>If path exists → <code>true</code> → try smaller <code>mid</code>.</li>
+    <li>If path doesn’t exist → <code>false</code> → try larger <code>mid</code>.</li>
+</ul>
+
+<h3>🧠 Java Code:</h3>
+<pre><code>
+class Solution {
+    private int n;
+    private int[][] grid;
+    private boolean[][] visited;
+    private int[][] dirs = {{1,0}, {-1,0}, {0,1}, {0,-1}};
+
+    public int swimInWater(int[][] grid) {
+        this.grid = grid;
+        n = grid.length;
+        int left = grid[0][0], right = n * n - 1, ans = right;
+
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            visited = new boolean[n][n];
+
+            if (canReach(mid, 0, 0)) {
+                ans = mid;
+                right = mid - 1;
+            } else {
+                left = mid + 1;
+            }
+        }
+        return ans;
+    }
+
+    private boolean canReach(int time, int r, int c) {
+        if (r == n-1 && c == n-1) return true;
+        visited[r][c] = true;
+        for (int[] d : dirs) {
+            int nr = r+d[0], nc = c+d[1];
+            if (nr>=0 && nc>=0 && nr<n && nc<n && !visited[nr][nc] && grid[nr][nc] <= time) {
+                if (canReach(time, nr, nc)) return true;
+            }
+        }
+        return false;
+    }
+}
+</code></pre>
+
+<hr>
+
+<h2>Interactive Binary Search + DFS Simulation</h2>
+<div class="grid" id="dfsGrid"></div>
+<button onclick="runDFS()">▶ Run Binary Search + DFS</button>
+<div class="log" id="dfsLog"></div>
+
+<hr>
+
+<h2>⚙️ Approach 2: Dijkstra / Min-Heap (Priority Queue)</h2>
+
+<p>
+    We can treat each cell as a node, and move in the direction of the smallest elevation first.
+    The answer is the maximum height encountered on the shortest path.
+</p>
+
+<h3>🧠 Java Code:</h3>
+<pre><code>
+import java.util.*;
+class Solution {
+    public int swimInWater(int[][] grid) {
+        int n = grid.length;
+        boolean[][] visited = new boolean[n][n];
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a,b)->a[0]-b[0]);
+        pq.offer(new int[]{grid[0][0], 0, 0});
+        int ans = 0;
+        int[][] dirs = {{1,0},{-1,0},{0,1},{0,-1}};
+
+        while(!pq.isEmpty()) {
+            int[] cur = pq.poll();
+            int h = cur[0], r = cur[1], c = cur[2];
+            ans = Math.max(ans, h);
+            if (r == n-1 && c == n-1) return ans;
+            if (visited[r][c]) continue;
+            visited[r][c] = true;
+            for (int[] d : dirs) {
+                int nr=r+d[0], nc=c+d[1];
+                if (nr>=0 && nc>=0 && nr<n && nc<n && !visited[nr][nc]) {
+                                                   pq.offer(new int[]{grid[nr][nc], nr, nc});
+                                                   }
+                                                   }
+                                                   }
+                                                   return ans;
+                                                   }
+                                                   }
+</code></pre>
+
+<h2>Interactive Dijkstra Simulation</h2>
+<div class="grid" id="pqGrid"></div>
+<button onclick="runPQ()">▶ Run Dijkstra Simulation</button>
+<div class="log" id="pqLog"></div>
+
+<hr>
+
+<h2>📘 Complexity Summary</h2>
+<table>
+    <tr><th>Approach</th><th>Technique</th><th>Time Complexity</th><th>Space Complexity</th></tr>
+    <tr><td>DFS + Binary Search</td><td>True/False pattern with left ≤ right</td><td>O(n² log n²)</td><td>O(n²)</td></tr>
+    <tr><td>Dijkstra / Min-Heap</td><td>Greedy shortest path</td><td>O(n² log n²)</td><td>O(n²)</td></tr>
+</table>
+
+<script>
+    const gridData = [
+      [0, 2, 5],
+      [1, 3, 7],
+      [4, 6, 8]
+    ];
+
+    function renderGrid(id) {
+      const container = document.getElementById(id);
+      container.innerHTML = '';
+      gridData.flat().forEach(v => {
+        const cell = document.createElement('div');
+        cell.className = 'cell unvisited';
+        cell.textContent = v;
+        container.appendChild(cell);
+      });
+    }
+
+    function colorCell(id, r, c, state) {
+      const index = r * gridData.length + c;
+      const cell = document.getElementById(id).children[index];
+      cell.className = 'cell ' + state;
+    }
+
+    // ---------- DFS + Binary Search ----------
+    function runDFS() {
+      renderGrid('dfsGrid');
+      const log = document.getElementById('dfsLog');
+      log.innerHTML = '';
+      let n = gridData.length;
+      let left = gridData[0][0], right = n*n-1, ans = right;
+      const delay = ms => new Promise(r => setTimeout(r, ms));
+
+      function dfs(time, r, c, visited) {
+        if (r < 0 || c < 0 || r >= n || c >= n || visited[r][c] || gridData[r][c] > time) return false;
+        visited[r][c] = true;
+        colorCell('dfsGrid', r, c, 'visited');
+        if (r === n-1 && c === n-1) return true;
+        return dfs(time, r+1, c, visited) || dfs(time, r-1, c, visited)
+            || dfs(time, r, c+1, visited) || dfs(time, r, c-1, visited);
+      }
+
+      (async () => {
+        while (left <= right) {
+          const mid = Math.floor((left + right) / 2);
+          let visited = Array.from({length:n}, ()=>Array(n).fill(false));
+          log.innerHTML += `<div>Checking time = ${mid}</div>`;
+          const ok = dfs(mid, 0, 0, visited);
+          await delay(600);
+          if (ok) {
+            log.innerHTML += `<div>✅ Possible at ${mid} → right = mid - 1</div>`;
+            ans = mid; right = mid - 1;
+          } else {
+            log.innerHTML += `<div>❌ Not possible → left = mid + 1</div>`;
+            left = mid + 1;
+          }
+        }
+        log.innerHTML += `<b>Result: Minimum time = ${ans}</b>`;
+      })();
+    }
+
+    // ---------- Dijkstra (Priority Queue) ----------
+    function runPQ() {
+      renderGrid('pqGrid');
+      const log = document.getElementById('pqLog');
+      log.innerHTML = '';
+      const n = gridData.length;
+      const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
+      const visited = Array.from({length:n},()=>Array(n).fill(false));
+      const pq = [[gridData[0][0],0,0]];
+      let ans = 0;
+
+      const delay = ms => new Promise(r => setTimeout(r, ms));
+      const cmp = (a,b)=>a[0]-b[0];
+
+      (async () => {
+        while (pq.length) {
+          pq.sort(cmp);
+          const [time,r,c] = pq.shift();
+          if (visited[r][c]) continue;
+          visited[r][c]=true;
+          ans = Math.max(ans,time);
+          colorCell('pqGrid',r,c,'visited');
+          log.innerHTML += `<div>Exploring (${r},${c}) height=${time}</div>`;
+          await delay(400);
+          if (r===n-1 && c===n-1) {
+            log.innerHTML += `<b>✅ Reached goal | Answer = ${ans}</b>`;
+            break;
+          }
+          for (let [dr,dc] of dirs) {
+            let nr=r+dr,nc=c+dc;
+            if(nr>=0&&nc>=0&&nr<n&&nc<n&&!visited[nr][nc])
+              pq.push([gridData[nr][nc],nr,nc]);
+          }
+        }
+      })();
+    }
+
+    renderGrid('dfsGrid');
+    renderGrid('pqGrid');
+</script>
+
+</body>
+</html>
