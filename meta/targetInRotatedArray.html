@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Search in Rotated Sorted Array — T / F Visualization</title>
+    <style>
+        :root{
+          --bg:#fbfcfd; --card:#fff; --muted:#6b7280; --accent:#0ea5e9;
+          --good:#10b981; --bad:#ef4444; --cell:#f1f5f9;
+        }
+        body {font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+              background:var(--bg); color:#0f172a; margin:20px; padding:0;}
+        .wrap {max-width:980px; margin:0 auto;}
+        h1 {color: #0b5b78; margin-bottom:6px;}
+        p.lead {color:var(--muted); margin-top:0;}
+        .grid {display:flex; gap:8px; flex-wrap:wrap; margin:12px 0;}
+        .cell {
+          min-width:56px; height:56px; background:var(--cell); border-radius:8px;
+          display:flex; align-items:center; justify-content:center; flex-direction:column;
+          box-shadow:0 1px 0 rgba(2,6,23,0.04); font-weight:600;
+        }
+        .val {font-size:18px;}
+        .label {font-size:12px; color:var(--muted); margin-top:4px;}
+        .tf-true {background: linear-gradient(180deg, #d1fae5, #bbf7d0); border:1px solid rgba(16,185,129,0.12);}
+        .tf-false {background: linear-gradient(180deg, #fee2e2, #fecaca); border:1px solid rgba(239,68,68,0.12);}
+        .controls {display:flex; gap:8px; align-items:center; margin-top:12px;}
+        button {background:var(--accent); color:white; border:0; padding:8px 12px; border-radius:8px; cursor:pointer;}
+        button.secondary {background:#94a3b8;}
+        .panel {background:var(--card); padding:12px; border-radius:10px; box-shadow:0 6px 18px rgba(2,6,23,0.06); margin-top:16px;}
+        .state-row {display:flex; gap:12px; align-items:center; margin:6px 0; flex-wrap:wrap;}
+        .pill {background:#eef2ff; padding:6px 10px; border-radius:20px; color:#0b3a57; font-weight:600;}
+        pre {background:#0b1220; color:#dbeafe; padding:12px; border-radius:8px; overflow:auto;}
+        table {width:100%; border-collapse:collapse; margin-top:10px;}
+        th, td {padding:8px; border-bottom:1px solid #eef2f6; text-align:left;}
+        .explain {margin-top:10px; color:var(--muted);}
+        .small {font-size:13px; color:var(--muted);}
+        .footer {margin-top:20px; color:var(--muted); font-size:13px;}
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <h1>Search in Rotated Sorted Array — T / F Visualization</h1>
+    <p class="lead">This page explains the rotated-array binary search and visualizes each iteration as a T / F classification of the halves (where T = target could be here, F = cannot be here). The example used: <code>[4,5,6,7,0,1,2]</code>, <strong>target = 0</strong>.</p>
+
+    <div class="panel">
+        <strong>Problem (short)</strong>
+        <p class="explain small">Given a sorted array rotated at unknown pivot, find the index of <code>target</code> in O(log n), or -1 if not found. Elements are distinct.</p>
+
+        <strong>Key invariant</strong>
+        <p class="explain small">At any step [left..right], one half (left..mid or mid..right) is strictly sorted. Decide which half is sorted, check whether <code>target</code> lies inside that half → that half is logically <strong>True</strong> (possible), the other half <strong>False</strong> (impossible). Continue binary search inside True half.</p>
+    </div>
+
+    <h2 style="margin-top:18px">Interactive T / F Stepper — example</h2>
+    <p class="small">Array: <code id="arrText"></code> — Target: <input id="targetInput" style="width:60px;padding:6px;border-radius:6px;border:1px solid #e6eef6" value="0"> <button id="applyBtn" class="secondary">Apply</button></p>
+
+    <div id="visual" class="panel">
+        <div class="state-row" style="margin-bottom:8px;">
+            <div class="pill">left = <span id="leftIdx">0</span></div>
+            <div class="pill">mid = <span id="midIdx">3</span></div>
+            <div class="pill">right = <span id="rightIdx">6</span></div>
+            <div class="pill">nums[mid] = <span id="midVal">7</span></div>
+            <div style="margin-left:auto"><strong>Decision:</strong> <span id="decisionText">Left half sorted? → No → Right half considered True</span></div>
+        </div>
+
+        <div id="arrayArea" class="grid" aria-hidden="false"></div>
+
+        <div class="controls">
+            <button id="prevBtn" class="secondary">◀ Prev</button>
+            <button id="nextBtn">Next ▶</button>
+            <button id="autoBtn" class="secondary">Auto ▶</button>
+            <div style="margin-left:12px" class="small">Iteration <span id="iterNo">0</span> / <span id="iterMax">0</span></div>
+        </div>
+
+        <div style="margin-top:12px" class="small">
+            <strong>Legend:</strong>
+            <span style="display:inline-block;padding:6px 10px;border-radius:8px;background:#d1fae5;margin-left:8px">T — target could be here</span>
+            <span style="display:inline-block;padding:6px 10px;border-radius:8px;background:#fee2e2;margin-left:8px">F — cannot be here</span>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h3>Step-by-step (table)</h3>
+        <table>
+            <thead><tr><th>Step</th><th>left</th><th>mid</th><th>right</th><th>nums[mid]</th><th>Which half is sorted?</th><th>target in sorted half?</th><th>Action</th></tr></thead>
+            <tbody id="stepsTable"></tbody>
+        </table>
+
+        <h3 style="margin-top:14px">Java implementation (while left ≤ right)</h3>
+        <pre>
+// typical inclusive binary-search on indices
+class Solution {
+  public int search(int[] nums, int target) {
+    int left = 0, right = nums.length - 1;
+    while (left <= right) {
+      int mid = left + (right - left) / 2;
+      if (nums[mid] == target) return mid;
+
+      // left half sorted?
+      if (nums[left] <= nums[mid]) {
+        if (nums[left] <= target && target < nums[mid]) {
+          right = mid - 1;    // target in left sorted half
+        } else {
+          left = mid + 1;     // otherwise go right
+        }
+      } else {
+        // right half sorted
+        if (nums[mid] < target && target <= nums[right]) {
+          left = mid + 1;     // target in right sorted half
+        } else {
+          right = mid - 1;    // otherwise go left
+        }
+      }
+    }
+    return -1;
+  }
+}
+      </pre>
+        <p class="explain small">The interactive stepper below uses the same logic and shows which half is classified as T or F each iteration.</p>
+    </div>
+
+    <div class="footer">Want this turned into an HTML file with more examples and an export button? Ask and I’ll add it.</div>
+</div>
+
+<script>
+    (function(){
+      // default example
+      let nums = [4,5,6,7,0,1,2];
+      const arrText = document.getElementById('arrText');
+      const arrayArea = document.getElementById('arrayArea');
+      const leftIdx = document.getElementById('leftIdx'), midIdx = document.getElementById('midIdx'), rightIdx = document.getElementById('rightIdx');
+      const midVal = document.getElementById('midVal'), decisionText = document.getElementById('decisionText');
+      const iterNo = document.getElementById('iterNo'), iterMax = document.getElementById('iterMax');
+      const stepsTable = document.getElementById('stepsTable');
+      const targetInput = document.getElementById('targetInput');
+      const applyBtn = document.getElementById('applyBtn');
+      const prevBtn = document.getElementById('prevBtn'), nextBtn = document.getElementById('nextBtn'), autoBtn = document.getElementById('autoBtn');
+
+      let target = parseInt(targetInput.value,10) || 0;
+
+      // build iteration trace for the algorithm on this input
+      function buildTrace(nums, target) {
+        const n = nums.length;
+        let left = 0, right = n-1;
+        const trace = [];
+        while (left <= right) {
+          const mid = Math.floor(left + (right - left)/2);
+          const midVal = nums[mid];
+          let sortedHalf = null, targetInSorted = null, action = null;
+          if (nums[left] <= nums[mid]) {
+            sortedHalf = 'Left ['+left+'..'+mid+']';
+            targetInSorted = (nums[left] <= target && target < nums[mid]);
+            if (nums[mid] === target) { action = 'Found at mid'; }
+            else if (targetInSorted) { action = 'Search left -> right = mid-1'; right = mid - 1; }
+            else { action = 'Search right -> left = mid+1'; left = mid + 1; }
+          } else {
+            sortedHalf = 'Right ['+mid+'..'+right+']';
+            targetInSorted = (nums[mid] < target && target <= nums[right]);
+            if (nums[mid] === target) { action = 'Found at mid'; }
+            else if (targetInSorted) { action = 'Search right -> left = mid+1'; left = mid + 1; }
+            else { action = 'Search left -> right = mid-1'; right = mid - 1; }
+          }
+
+          // compute T/F array mapping for visualization at this step:
+          let tf = new Array(n).fill(null);
+          if (sortedHalf.startsWith('Left')) {
+            // mark left..mid as "could be (T)" only if targetInSorted true; else left..mid = F
+            for (let i=0;i<n;i++){
+              if (i>=left && i<=mid) tf[i] = targetInSorted ? 'T' : 'F';
+              else if (i>=mid+1 && i<=right) tf[i] = targetInSorted ? 'F' : 'T';
+              else tf[i] = null;
+            }
+          } else {
+            for (let i=0;i<n;i++){
+              if (i>=mid && i<=right) tf[i] = targetInSorted ? 'T' : 'F';
+              else if (i>=left && i<mid) tf[i] = targetInSorted ? 'F' : 'T';
+              else tf[i] = null;
+            }
+          }
+
+          trace.push({
+            left, mid, right, midVal, sortedHalf, targetInSorted, action, tf: tf.slice()
+          });
+
+          if (action === 'Found at mid') break;
+        }
+        return trace;
+      }
+
+      let trace = buildTrace(nums, target);
+      let step = 0, playing = false, timer = null;
+
+      function renderStep(i) {
+        arrText.textContent = nums.join(', ');
+        arrayArea.innerHTML = '';
+        const n = nums.length;
+        for (let idx=0; idx<n; idx++){
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          const val = document.createElement('div'); val.className='val'; val.textContent = nums[idx];
+          const label = document.createElement('div'); label.className='label';
+          let tf = null;
+          if (trace[i] && trace[i].tf[idx]) tf = trace[i].tf[idx];
+          if (tf === 'T') { cell.classList.add('tf-true'); label.textContent = 'T (possible)'; }
+          else if (tf === 'F') { cell.classList.add('tf-false'); label.textContent = 'F (no)'; }
+          else { label.textContent = ''; }
+          cell.appendChild(val); cell.appendChild(label);
+          arrayArea.appendChild(cell);
+        }
+
+        // Update indices and decision
+        const t = trace[i];
+        leftIdx.textContent = t.left;
+        midIdx.textContent = t.mid;
+        rightIdx.textContent = t.right;
+        midVal.textContent = t.midVal;
+        decisionText.textContent = `${t.sortedHalf} sorted. targetInSorted = ${t.targetInSorted}. Action: ${t.action}`;
+        iterNo.textContent = (i+1);
+        iterMax.textContent = trace.length;
+        // fill steps table
+        stepsTable.innerHTML = '';
+        for (let s=0;s<trace.length;s++){
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${s+1}${s===i ? ' ←' : ''}</td>
+                          <td>${trace[s].left}</td>
+                          <td>${trace[s].mid}</td>
+                          <td>${trace[s].right}</td>
+                          <td>${trace[s].midVal}</td>
+                          <td>${trace[s].sortedHalf}</td>
+                          <td>${trace[s].targetInSorted}</td>
+                          <td>${trace[s].action}</td>`;
+          if (s===i) tr.style.background = '#f1f9ff';
+          stepsTable.appendChild(tr);
+        }
+      }
+
+      function gotoStep(idx) {
+        if (idx<0) idx = 0;
+        if (idx >= trace.length) idx = trace.length - 1;
+        step = idx;
+        renderStep(step);
+      }
+
+      nextBtn.addEventListener('click', ()=> {
+        if (step < trace.length-1) step++;
+        renderStep(step);
+      });
+      prevBtn.addEventListener('click', ()=> {
+        if (step > 0) step--;
+        renderStep(step);
+      });
+
+      autoBtn.addEventListener('click', ()=> {
+        if (!playing) {
+          playing = true; autoBtn.textContent = 'Stop ■';
+          timer = setInterval(()=> {
+            if (step < trace.length-1) { step++; renderStep(step); }
+            else { clearInterval(timer); playing=false; autoBtn.textContent='Auto ▶'; }
+          }, 1000);
+        } else {
+          playing = false; autoBtn.textContent = 'Auto ▶';
+          clearInterval(timer);
+        }
+      });
+
+      applyBtn.addEventListener('click', ()=> {
+        const v = parseInt(targetInput.value,10);
+        if (!Number.isFinite(v)) return;
+        target = v;
+        trace = buildTrace(nums, target);
+        step = 0;
+        renderStep(0);
+      });
+
+      // init
+      trace = buildTrace(nums, target);
+      iterMax.textContent = trace.length;
+      renderStep(0);
+    })();
+</script>
+</body>
+</html>
