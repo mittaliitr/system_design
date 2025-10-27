@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Capacity To Ship Packages Within D Days — Explanation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            color: #333;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 4px;
+            font-family: Consolas, monospace;
+        }
+        pre {
+            background: #f8f8f8;
+            padding: 10px;
+            overflow: auto;
+        }
+        .highlight {
+            background: #eaf2f8;
+            padding: 5px;
+        }
+        .dryrun {
+            background: #f0f8ff;
+            padding: 10px;
+            border-left: 4px solid #3498db;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Problem Explanation — Capacity To Ship Packages Within D Days</h1>
+
+<h2>Problem Statement</h2>
+<p>You are given an array <code>weights[]</code>, where <code>weights[i]</code> is the weight of the i-th package in shipping order (you cannot change the order).
+    Also you are given integer <code>D</code> (the number of days you have). You must ship all packages within exactly or at most <code>D</code> days.
+    Each day you load your ship with a contiguous sequence of the remaining packages (in order) such that the **sum of weights** you load that day does **not exceed** the ship’s capacity.
+    The goal: find the **minimum capacity** of the ship that allows you to finish shipping all packages within ≤ D days.</p>
+
+<h2>Key Insights</h2>
+<ul>
+    <li>The minimum possible capacity is at least the weight of the heaviest single package, i.e., <code>max(weights)</code>. Because you must ship each package and you cannot split a package. </li>
+    <li>The maximum capacity you might need is the sum of all package weights, i.e., <code>sum(weights)</code>, when you ship everything in one day.</li>
+    <li>Define a candidate capacity <code>C</code>, and simulate: if you use capacity = C, how many days will it take (greedily)? If days ≤ D → capacity is “feasible”. If days > D → too small. This gives a true/false predicate: <code>feasible(C)</code>.</li>
+    <li>The predicate is monotonic: if capacity C is feasible (true), then any capacity > C is also feasible (true). Hence we can binary-search on C. </li>
+</ul>
+
+<h2>The “left ≤ right” Binary Search Pattern</h2>
+<p>We’ll use the classic inclusive bound pattern:</p>
+<pre><code>
+int left = maxWeight;
+int right = sumWeights;
+
+while (left <= right) {
+    int mid = left + (right - left) / 2;
+    if (feasible(mid)) {
+        // mid works, try smaller
+        right = mid - 1;
+    } else {
+        // mid fails, need larger
+        left = mid + 1;
+    }
+}
+// when loop ends: left is the smallest capacity that works
+return left;
+    </code></pre>
+
+<p><strong>Why this pattern?</strong></p>
+<ul>
+    <li>We maintain an invariant: the answer (the minimum feasible capacity) lies in the range [left … right] inclusive.</li>
+    <li>When we test <code>mid</code>:</li>
+    <ul>
+        <li>If <code>feasible(mid) == true</code>, then we know we can possibly do even smaller: so set <code>right = mid − 1</code>.</li>
+        <li>If <code>feasible(mid) == false</code>, capacity too small, we set <code>left = mid + 1</code>.</li>
+    </ul>
+    <li>The loop stops when <code>left > right</code>. At that point, <code>left</code> is the first capacity in which `feasible(left)==true`, so that is the minimal capacity. </li>
+</ul>
+
+<h2>Java Implementation (using left ≤ right)</h2>
+<pre><code>
+public class Solution {
+    public int shipWithinDays(int[] weights, int D) {
+        int maxW = 0;
+        long sum = 0;
+        for (int w : weights) {
+            maxW = Math.max(maxW, w);
+            sum += w;
+        }
+
+        int left = maxW;
+        int right = (int) sum;  // safe if sum fits in int; else use long etc.
+
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (feasible(weights, D, mid)) {
+                right = mid - 1;
+            } else {
+                left = mid + 1;
+            }
+        }
+        // left is the minimum capacity that works
+        return left;
+    }
+
+    private boolean feasible(int[] weights, int D, int cap) {
+        int days = 1;
+        int currentLoad = 0;
+        for (int w : weights) {
+            if (currentLoad + w <= cap) {
+                currentLoad += w;
+            } else {
+                days++;
+                currentLoad = w;
+                if (days > D) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+}
+    </code></pre>
+
+<h2>Dry-run Example</h2>
+<p>Let <code>weights = [1,2,3,4,5,6,7,8,9,10]</code> and <code>D = 5</code> (as in a typical example). Then:</p>
+<div class="dryrun">
+    <p><strong>Initial:</strong> left = max = 10, right = sum = 55.</p>
+    <ol>
+        <li>mid = (10 + 55)/2 → 32. Test feasible(32):
+            <ul>
+                <li>Day 1: load 1+2+3+4+5+6+7 = 28 (next 8 would exceed) → stop.</li>
+                <li>Day 2: load 8+9 = 17.</li>
+                <li>Day 3: load 10.</li>
+                <li>Total days = 3 ≤ 5 → feasible = true.</li>
+            </ul>
+            → true ⇒ right = mid − 1 = 31.</li>
+        <li>Now left=10, right=31 → mid = (10+31)/2 = 20. feasible(20):
+            <ul>
+                <li>Day 1: 1+2+3+4+5+6 = 21 (actually 1+2+3+4+5+6 =21>20 so Day1=1+2+3+4+5=15)
+                    → Day2: 6+7=13 → Day3:8 → Day4:9 → Day5:10 → total days=5 → =D => feasible = true.</li>
+            </ul>
+            → right = 19.</li>
+        <li>Now left=10, right=19 → mid = 14. feasible(14):
+            <ul>
+                <li>Day1: 1+2+3+4+5 =15>14 so Day1=1+2+3+4=10</li>
+                <li>Day2: 5+6=11</li>
+                <li>Day3: 7</li>
+                <li>Day4: 8</li>
+                <li>Day5: 9</li>
+                <li>Day6: 10 → days=6 > D → feasible = false.</li>
+            </ul>
+            → false ⇒ left = mid + 1 = 15.</li>
+        <li>Now left=15, right=19 → mid = 17. Test feasible(17) → days = 5 (or less) → feasible = true → right = 16.</li>
+        <li>Now left=15, right=16 → mid = 15. feasible(15) → days=5 → feasible true → right = 14.</li>
+        <li>Now left=15, right=14 → loop ends. Answer = left = 15.</li>
+    </ol>
+    <p>So minimum capacity = <strong>15</strong>.</p>
+</div>
+
+<h2>Complexity Analysis</h2>
+<ul>
+    <li>Feasibility check: one pass through weights → O(n).</li>
+    <li>Binary search range: from maxW to sumW → number of steps = O(log(sumW − maxW)).</li>
+    <li>Total time: O(n × log (sumW)).</li>
+    <li>Space: O(1) extra (aside from input).</li>
+</ul>
+
+<h2>Summary</h2>
+<p>Hence by defining a proper predicate (<code>feasible(C)</code>) and using the inclusive binary search pattern with <code>while (left <= right)</code>, we can find the minimum required capacity efficiently. The key is the monotonic nature: once a capacity works, larger ones also work.</p>
+
+</body>
+</html>
