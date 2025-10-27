@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeetCode 1004: Max Consecutive Ones III</title>
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        padding: 20px;
+        background-color: #f9f9f9;
+        color: #333;
+    }
+    h1, h2, h3 {
+        color: #2c3e50;
+    }
+    pre {
+        background-color: #272822;
+        color: #f8f8f2;
+        padding: 15px;
+        overflow-x: auto;
+        border-radius: 5px;
+    }
+    code {
+        font-family: Consolas, monospace;
+    }
+    .window-step {
+        background-color: #ecf0f1;
+        padding: 10px;
+        margin: 5px 0;
+        border-left: 5px solid #3498db;
+        font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+<h1>LeetCode 1004: Max Consecutive Ones III</h1>
+
+<h2>Problem Statement</h2>
+<p>You are given:</p>
+<ul>
+  <li>An array <code>nums</code> consisting of only 0s and 1s.</li>
+  <li>An integer <code>k</code>.</li>
+</ul>
+<p>You can flip at most <code>k</code> zeros to ones. Find the length of the longest contiguous subarray containing only 1s after flipping.</p>
+
+<h2>Example</h2>
+<p><strong>Input:</strong></p>
+<pre>nums = [1,1,0,0,1,1,1,0,1,1], k = 2</pre>
+<p><strong>Output:</strong> 7</p>
+<p><strong>Explanation:</strong> Flip two zeros to ones to get the longest sequence of 1s of length 7.</p>
+
+<h2>Solution Approach</h2>
+<p>We can solve this using the <strong>sliding window technique</strong>:</p>
+<ol>
+  <li>Keep a window <code>[left, right]</code> representing the current subarray.</li>
+  <li>Count how many zeros are in the window.</li>
+  <li>If the zero count exceeds <code>k</code>, shrink the window from the left until zeros ≤ k.</li>
+  <li>Keep track of the maximum window length where zeros ≤ k.</li>
+</ol>
+
+<h2>Java Code</h2>
+<pre><code>
+class Solution {
+    public int longestOnes(int[] nums, int k) {
+        int left = 0;
+        int maxLen = 0;
+        int zeroCount = 0;
+
+        for (int right = 0; right < nums.length; right++) {
+            if (nums[right] == 0) {
+                zeroCount++;
+            }
+
+            while (zeroCount > k) {
+                if (nums[left] == 0) {
+                    zeroCount--;
+                }
+                left++;
+            }
+
+            maxLen = Math.max(maxLen, right - left + 1);
+        }
+
+        return maxLen;
+    }
+}
+    </code></pre>
+
+<h2>Step-by-Step Sliding Window Example</h2>
+<p>Using <code>nums = [1, 1, 0, 0, 1, 1, 1, 0, 1, 1], k = 2</code>:</p>
+
+<div class="window-step"><strong>Step 1:</strong> Window: [1], zeroCount=0, maxLen=1</div>
+<div class="window-step"><strong>Step 2:</strong> Window: [1, 1], zeroCount=0, maxLen=2</div>
+<div class="window-step"><strong>Step 3:</strong> Window: [1, 1, 0], zeroCount=1, maxLen=3</div>
+<div class="window-step"><strong>Step 4:</strong> Window: [1, 1, 0, 0], zeroCount=2, maxLen=4</div>
+<div class="window-step"><strong>Step 5:</strong> Window: [1, 1, 0, 0, 1], zeroCount=2, maxLen=5</div>
+<div class="window-step"><strong>Step 6:</strong> Window: [1, 1, 0, 0, 1, 1], zeroCount=2, maxLen=6</div>
+<div class="window-step"><strong>Step 7:</strong> Window: [1, 1, 0, 0, 1, 1, 1], zeroCount=2, maxLen=7</div>
+<div class="window-step"><strong>Step 8:</strong> Window: [1,1,1,1,1], zeroCount=2 (after shrinking), maxLen=7</div>
+<div class="window-step"><strong>Step 9:</strong> Window: [0,1,1,1,0,1], zeroCount=2, maxLen=7</div>
+<div class="window-step"><strong>Step 10:</strong> Window: [0,1,1,1,0,1,1], zeroCount=2, maxLen=7</div>
+
+<h2>Final Answer</h2>
+<p><strong>maxLen = 7</strong></p>
+
+</body>
+</html>
