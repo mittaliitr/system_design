@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Koko Eating Bananas — Explanation + Java Solution</title>
+    <style>
+        :root{--bg:#0f1724;--card:#0b1220;--muted:#9aa4b2;--accent:#7dd3fc;--glass:rgba(255,255,255,0.03)}
+        body{font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial; background:linear-gradient(180deg,#071026 0%, #071a2a 100%); color:#e6eef6; padding:28px;}
+        .container{max-width:900px;margin:0 auto}
+        header{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
+        h1{font-size:20px;margin:0}
+        p.lead{color:var(--muted);margin:6px 0 18px}
+        .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px;padding:18px;box-shadow: 0 6px 18px rgba(2,6,23,0.6);}
+        pre{background:var(--card);padding:12px;border-radius:8px;overflow:auto;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;font-size:13px}
+        code{font-family:inherit}
+        h2{margin-top:18px}
+        ul{color:var(--muted)}
+        .meta{color:var(--muted);font-size:13px}
+        .kbd{background:var(--glass);padding:4px 8px;border-radius:6px;font-weight:600;color:var(--accent)}
+        .example{background:linear-gradient(90deg, rgba(125,211,252,0.03), rgba(125,211,252,0.01)); border-left:3px solid rgba(125,211,252,0.14); padding:12px;border-radius:8px}
+        .footer{color:var(--muted);font-size:13px;margin-top:16px}
+        .btn{display:inline-block;background:transparent;border:1px solid rgba(125,211,252,0.14);padding:8px 10px;border-radius:8px;color:var(--accent);cursor:pointer;text-decoration:none}
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <div>
+            <h1>Koko Eating Bananas — Explanation + Java Solution</h1>
+            <div class="meta">LeetCode 875 — Binary search on the answer (first-true pattern)</div>
+        </div>
+    </header>
+
+    <div class="card">
+        <p class="lead">This page explains the problem, why binary search is the right tool, the <span class="kbd">true/false</span> boundary pattern used, a dry run example, and a well-commented Java implementation you can copy.
+        </p>
+
+        <h2>Problem (short)</h2>
+        <p>Given piles of bananas and <strong>h</strong> hours, Koko eats <strong>k</strong> bananas per hour (she picks one pile per hour and eats up to <code>k</code> from it; if pile &lt; k she finishes it and wastes the hour). Find the <strong>minimum integer k</strong> so she can finish all piles within <strong>h</strong> hours.</p>
+
+        <h2>Key idea — monotonic predicate</h2>
+        <p>Define <code>canFinish(k)</code> = whether Koko can finish all piles in ≤ <code>h</code> hours at speed <code>k</code>. This predicate is monotonic:
+            if <code>canFinish(k)</code> is <strong>true</strong>, then <code>canFinish(k')</code> is also true for any <code>k' &gt; k</code>. That gives a boolean sequence like:</p>
+        <pre><code>false, false, ..., false, true, true, ..., true</code></pre>
+        <p>We want the <strong>first true</strong> index (minimum <code>k</code> making the predicate true) — ideal for binary search.</p>
+
+        <h2>Bounds for binary search</h2>
+        <ul>
+            <li><strong>left</strong> = 1 (minimum possible speed)</li>
+            <li><strong>right</strong> = max(piles) (no need to try speeds larger than the biggest pile)</li>
+        </ul>
+
+        <h2>Checking function</h2>
+        <p>To compute hours needed at speed <code>k</code>, sum <code>ceil(pile / k)</code> across piles. Use integer math: <code>(pile + k - 1) / k</code>. If total hours &gt; <code>h</code>, return <code>false</code> early.</p>
+
+        <h2>Dry run (brief)</h2>
+        <div class="example">
+            <strong>piles</strong> = [3, 6, 7, 11], <strong>h</strong> = 8
+            <ul>
+                <li>maxPile = 11 → search [1, 11]</li>
+                <li>mid=6 → hours = 1+1+2+2 = 6 → true → shrink right</li>
+                <li>mid=3 → hours = 1+2+3+4 = 10 → false → increase left</li>
+                <li>mid=4 → hours = 1+2+2+3 = 8 → true → answer = 4</li>
+            </ul>
+        </div>
+
+        <h2>Java implementation (first-true binary search)</h2>
+        <pre><code>// Koko Eating Bananas — Java solution (binary search on answer)
+public class Solution {
+    public int minEatingSpeed(int[] piles, int h) {
+        // right bound = max pile
+        int maxPile = 0;
+        for (int x : piles) maxPile = Math.max(maxPile, x);
+
+        int left = 1;
+        int right = maxPile;
+        int answer = maxPile;
+
+        // first-true pattern: find smallest k such that canFinish(k) is true
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (canFinish(piles, mid, h)) {
+                answer = mid;      // mid works, try smaller
+                right = mid - 1;
+            } else {
+                left = mid + 1;    // mid too slow, try larger
+            }
+        }
+        return answer;
+    }
+
+    private boolean canFinish(int[] piles, int k, int h) {
+        long hoursNeeded = 0L; // use long to avoid overflow
+        for (int pile : piles) {
+            // ceil(pile / k) using integer math
+            hoursNeeded += (pile + (long)k - 1) / k;
+            if (hoursNeeded > h) return false; // early exit
+        }
+        return hoursNeeded <= h;
+    }
+
+    // small main for quick local testing
+    public static void main(String[] args) {
+        Solution s = new Solution();
+        int[] piles = {3, 6, 7, 11};
+        int h = 8;
+        System.out.println(s.minEatingSpeed(piles, h)); // prints 4
+    }
+}
+</code></pre>
+
+        <h2>Variant: while (left &lt; right) style</h2>
+        <pre><code>// alternative binary search style returning left
+int left = 1, right = maxPile;
+while (left < right) {
+    int mid = left + (right - left) / 2;
+    if (canFinish(piles, mid, h)) {
+        right = mid; // mid might be the answer
+    } else {
+        left = mid + 1;
+    }
+}
+// left == right == minimum good k
+</code></pre>
+
+        <h2>Tips & gotchas</h2>
+        <ul>
+            <li>Always use <code>long</code> when summing hours to avoid overflow on big inputs.</li>
+            <li>Compute <code>mid</code> as <code>left + (right - left) / 2</code> to avoid overflow.</li>
+            <li>Early exit from the hour-summing loop helps performance.</li>
+        </ul>
+
+        <div class="footer">If you want, I can also:
+            <a class="btn" onclick="copyCode()">Copy Java code</a>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function copyCode(){
+      const code = document.querySelector('pre code').innerText;
+      navigator.clipboard.writeText(code).then(()=>alert('Java code copied to clipboard'));
+    }
+
+</script>
+</body>
+</html>
