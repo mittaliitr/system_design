@@ -440,17 +440,17 @@
         },
         {
           "name": "Kth Missing Positive Number",
-          "url": "/system_design/meta/max_Consecutive_Ones_III.html",
+          "url": "https://leetcode.com/problems/kth-missing-positive-number/",
           "tag": "30 days"
         },
         {
           "name": "Max Consecutive Ones III",
-          "url": "https://leetcode.com/problems/max-consecutive-ones-iii/",
+          "url": "/system_design/meta/max_Consecutive_Ones_III.html",
           "tag": "30 days"
         },
         {
           "name": "Friends Of Appropriate Ages",
-          "url": "https://leetcode.com/problems/friends-of-appropriate-ages/",
+          "url": "/system_design/meta/friendsOfappropriateAge.html",
           "tag": "30 days"
         },
         {

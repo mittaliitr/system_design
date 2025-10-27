@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeetCode 825: Friends of Appropriate Ages</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        pre {
+            background-color: #272822;
+            color: #f8f8f2;
+            padding: 15px;
+            overflow-x: auto;
+            border-radius: 5px;
+        }
+        code {
+            font-family: Consolas, monospace;
+        }
+        .example {
+            background-color: #e2e2e2;
+            padding: 10px;
+            border-left: 4px solid #555;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>LeetCode 825: Friends of Appropriate Ages</h1>
+
+<h2>Problem Explanation</h2>
+<p>
+    You are given an integer array <code>ages</code> where <code>ages[i]</code> represents the age of the i-th person.
+    A person <strong>x</strong> will not send a friend request to a person <strong>y</strong> (where <code>x != y</code>) if any of the following are true:
+</p>
+<ul>
+    <li><code>age[y] <= 0.5 * age[x] + 7</code></li>
+    <li><code>age[y] > age[x]</code></li>
+    <li><code>age[y] > 100 && age[x] < 100</code></li>
+</ul>
+<p>Your task is to return the total number of friend requests that can be made.</p>
+
+<h2>Approach</h2>
+<ol>
+    <li>Sort the <code>ages</code> array.</li>
+    <li>For each person's age <code>ageX</code>, calculate the lower and upper bounds for valid friend requests:</li>
+    <pre><code>lower = 0.5 * ageX + 7
+upper = ageX</code></pre>
+    <li>Use binary search to find how many people fall in the valid range (lower, upper].</li>
+    <li>Count all valid friend requests.</li>
+</ol>
+
+<h2>Java Code Implementation</h2>
+<pre><code>import java.util.Arrays;
+
+public class Solution {
+    public int numFriendRequests(int[] ages) {
+        Arrays.sort(ages);
+        int n = ages.length;
+        int count = 0;
+
+        for (int i = 0; i &lt; n; i++) {
+            int ageX = ages[i];
+            int lower = (int) (0.5 * ageX + 7);
+            int upper = ageX;
+
+            int left = binarySearchLower(ages, lower + 1);
+            int right = binarySearchUpper(ages, upper);
+
+            count += (right - left);
+        }
+
+        return count;
+    }
+
+    private int binarySearchLower(int[] ages, int target) {
+        int left = 0, right = ages.length - 1;
+        int ans = ages.length;
+        while (left &lt;= right) {
+            int mid = left + (right - left) / 2;
+            if (ages[mid] &gt;= target) {
+                ans = mid;
+                right = mid - 1;
+            } else {
+                left = mid + 1;
+            }
+        }
+        return ans;
+    }
+
+    private int binarySearchUpper(int[] ages, int target) {
+        int left = 0, right = ages.length - 1;
+        int ans = -1;
+        while (left &lt;= right) {
+            int mid = left + (right - left) / 2;
+            if (ages[mid] &lt;= target) {
+                ans = mid;
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+        return ans + 1;
+    }
+
+    public static void main(String[] args) {
+        Solution sol = new Solution();
+        int[] ages = {16, 16};
+        System.out.println(sol.numFriendRequests(ages)); // Output: 2
+    }
+}</code></pre>
+
+<h2>Dry Run Example 1</h2>
+<div class="example">
+    <strong>Input:</strong> ages = [16, 16]<br>
+    <strong>Sorted:</strong> [16, 16]<br>
+    <strong>Valid friend requests:</strong> Each 16 can friend the other 16<br>
+    <strong>Output:</strong> 2<br>
+    <strong>Requests:</strong>
+    <ul>
+        <li>Person 0 → Person 1</li>
+        <li>Person 1 → Person 0</li>
+    </ul>
+</div>
+
+<h2>Dry Run Example 2</h2>
+<div class="example">
+    <strong>Input:</strong> ages = [16, 17, 18]<br>
+    <strong>Sorted:</strong> [16, 17, 18]<br>
+    <strong>Friend requests calculation:</strong>
+    <ul>
+        <li>Person 0 (16) → none</li>
+        <li>Person 1 (17) → Person 0</li>
+        <li>Person 2 (18) → Person 1</li>
+    </ul>
+    <strong>Total friend requests:</strong> 2
+</div>
+
+<h2>Dry Run Example 3</h2>
+<div class="example">
+    <strong>Input:</strong> ages = [20, 30, 100, 110, 120]<br>
+    <strong>Sorted:</strong> [20, 30, 100, 110, 120]<br>
+    <strong>Friend requests calculation:</strong>
+    <ul>
+        <li>Person 0 (20) → none</li>
+        <li>Person 1 (30) → none</li>
+        <li>Person 2 (100) → none</li>
+        <li>Person 3 (110) → Person 2</li>
+        <li>Person 4 (120) → Person 2, Person 3</li>
+    </ul>
+    <strong>Total friend requests:</strong> 3
+</div>
+
+</body>
+</html>
