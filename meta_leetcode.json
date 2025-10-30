@@ -485,22 +485,22 @@
         },
         {
           "name": "Sqrt(x)",
-          "url": "https://leetcode.com/problems/sqrtx/",
+          "url": "https://leetcode.com/problems/sqrtx/submissions/1691216398",
           "tag": "30 days"
         },
         {
           "name": "Closest Binary Search Tree Value",
-          "url": "https://leetcode.com/problems/closest-binary-search-tree-value/",
+          "url": "https://leetcode.com/problems/closest-binary-search-tree-value/solutions/70331/clean-and-concise-java-solution-by-larry-p6iu",
           "tag": "30 days"
         },
         {
           "name": "Maximum Frequency of an Element After Performing Operations I",
-          "url": "https://leetcode.com/problems/maximum-frequency-of-an-element-after-performing-operations-i/",
+          "url": "/system_design/meta/maxOperation.html",
           "tag": "30 days"
         },
         {
           "name": "Find First and Last Position of Element in Sorted Array",
-          "url": "https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/",
+          "url": "https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/solutions/7307249/you-dont-understand-youll-understand-now-54uy",
           "tag": "30 days"
         }
       ]

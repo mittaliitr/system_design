@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>LeetCode 270 — Closest Binary Search Tree Value</title>
+    <style>
+        body{font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;max-width:900px;margin:36px auto;padding:18px;color:#0b1220}
+        header{display:flex;justify-content:space-between;align-items:center}
+        h1{font-size:20px;margin:0}
+        .meta{color:#556;text-transform:uppercase;font-size:11px}
+        pre{background:#0f1720;color:#e6eef8;padding:14px;border-radius:8px;overflow:auto}
+        code{font-family:SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+        .card{border:1px solid #e6eef8;border-radius:10px;padding:14px;margin-top:12px;background:#fbfdff}
+        .grid{display:grid;grid-template-columns:1fr 320px;gap:18px}
+        label{display:block;margin:8px 0 4px;font-weight:600}
+        input,button,select{width:100%;padding:8px;border-radius:6px;border:1px solid #cbd5e1}
+        button{cursor:pointer}
+        .result{margin-top:10px;padding:10px;border-radius:8px;background:#eef7ff}
+        .small{font-size:13px;color:#334}
+    </style>
+</head>
+<body>
+<header>
+    <div>
+        <h1>LeetCode 270 — Closest Binary Search Tree Value</h1>
+        <div class="meta">Problem • Binary Search Tree • Simulation</div>
+    </div>
+    <div class="small">Single-file HTML: statement, explanation, Java & JS solutions, interactive demo</div>
+</header>
+
+<section class="card">
+    <h2>Problem statement</h2>
+    <p>Given the <strong>root</strong> of a binary search tree and a <strong>target</strong> value, return the value in the BST that is closest to the target.</p>
+    <p><strong>Notes:</strong> The tree is a valid BST — left children &lt; node &lt; right children. You may assume there is at least one node.</p>
+    <h3>Example</h3>
+    <pre><code>Input: root = [4,2,5,1,3], target = 3.714286
+Output: 4
+Explanation: 4 is closer to the target than 3.</code></pre>
+</section>
+
+<div class="grid">
+    <main>
+        <section class="card">
+            <h2>Idea & approaches</h2>
+            <ol>
+                <li><strong>Iterative BST-guided search (best)</strong> — Use BST property. At each node, compare node.val with target; update the closest seen so far. Then move left or right depending on whether target &lt; node.val or &gt; node.val. This visits along a root-to-leaf path, so time O(h) where h is tree height (O(log n) average, O(n) worst).</li>
+                <li><strong>Recursive version</strong> — same logic but written recursively.</li>
+                <li><strong>In-order traversal</strong> — produce a sorted list of values and perform binary search on it; O(n) time and O(n) extra space. Useful if you want multiple queries on the same tree.</li>
+            </ol>
+
+            <h3>Why the iterative approach is optimal</h3>
+            <p>Because a BST orders values, you can discard one subtree at every comparison: if target &lt; node.val, the best candidate must be in the left subtree or the current node (so search left), otherwise search right. That gives O(h) time and O(1) extra space.</p>
+
+            <h2>Java — iterative (recommended)</h2>
+            <pre><code>// Java iterative solution: O(h) time, O(1) space
+public class Solution {
+    public int closestValue(TreeNode root, double target) {
+        int closest = root.val;
+        TreeNode node = root;
+        while (node != null) {
+            // update closest if current node is closer to target
+            if (Math.abs(node.val - target) &lt; Math.abs(closest - target)) {
+                closest = node.val;
+            }
+            // decide direction using BST property
+            if (target &lt; node.val) node = node.left;
+            else node = node.right;
+        }
+        return closest;
+    }
+}
+
+// Definition for a binary tree node (LeetCode style):
+public class TreeNode {
+    int val;
+    TreeNode left;
+    TreeNode right;
+    TreeNode(int x) { val = x; }
+}
+</code></pre>
+
+            <h2>Java — recursive</h2>
+            <pre><code>public class Solution {
+    public int closestValue(TreeNode root, double target) {
+        return closestHelper(root, target, root.val);
+    }
+
+    private int closestHelper(TreeNode node, double target, int closest) {
+        if (node == null) return closest;
+        if (Math.abs(node.val - target) &lt; Math.abs(closest - target)) {
+            closest = node.val;
+        }
+        if (target &lt; node.val) return closestHelper(node.left, target, closest);
+        else return closestHelper(node.right, target, closest);
+    }
+}
+</code></pre>
+
+            <h3>Complexity</h3>
+            <ul>
+                <li>Time: O(h) — h is tree height (balanced: O(log n), worst-case skewed: O(n))</li>
+                <li>Space: O(1) iterative, O(h) recursion stack for recursive approach</li>
+            </ul>
+
+            <h3>Dry run (iterative) — root=[4,2,5,1,3], target=3.714...</h3>
+            <ol>
+                <li>Start: closest = 4 (root). node = 4. |4 - 3.714| = 0.286</li>
+                <li>target &gt; 4? No — target &lt; 4, go left to node 2. Check |2 - target| = 1.714 &gt; 0.286 → closest stays 4.</li>
+                <li>target &gt; 2? Yes — go right to node 3. |3 - target| = 0.714 &gt; 0.286 → closest stays 4.</li>
+                <li>node 3 has no right child — done. Return 4.</li>
+            </ol>
+        </section>
+    </main>
+
+    <aside>
+        <section class="card">
+            <h2>Interactive demo (JS)</h2>
+            <p class="small">Enter tree as a level-order array (use <code>null</code> for missing nodes). The demo builds the tree and runs a JS equivalent of the iterative algorithm.</p>
+            <label for="arr">Tree array (JSON):</label>
+            <input id="arr" value='[4,2,5,1,3]' />
+            <label for="target">Target (number):</label>
+            <input id="target" value="3.714286" />
+            <button id="run">Find Closest Value</button>
+            <div id="out" class="result" style="display:none"></div>
+
+            <script>
+                function buildTreeFromArray(arr) {
+                  if (!arr || arr.length === 0) return null;
+                  const nodes = arr.map(v => v === null ? null : { val: v, left: null, right: null });
+                  let kid = 1;
+                  for (let i = 0; i < nodes.length && kid < nodes.length; i++) {
+                    if (nodes[i] !== null) {
+                      nodes[i].left = nodes[kid++] || null;
+                      if (kid < nodes.length) nodes[i].right = nodes[kid++] || null;
+                    }
+                  }
+                  return nodes[0];
+                }
+
+                function closestValueJS(root, target) {
+                  let closest = root.val;
+                  let node = root;
+                  while (node !== null) {
+                    if (Math.abs(node.val - target) < Math.abs(closest - target)) {
+                      closest = node.val;
+                    }
+                    if (target < node.val) node = node.left;
+                    else node = node.right;
+                  }
+                  return closest;
+                }
+
+                document.getElementById('run').addEventListener('click', () => {
+                  let arrStr = document.getElementById('arr').value;
+                  let tgt = parseFloat(document.getElementById('target').value);
+                  let arr;
+                  try { arr = JSON.parse(arrStr); }
+                  catch(e){ document.getElementById('out').style.display='block'; document.getElementById('out').textContent = 'Invalid JSON array.'; return; }
+                  const root = buildTreeFromArray(arr);
+                  if (!root) { document.getElementById('out').style.display='block'; document.getElementById('out').textContent = 'Empty tree.'; return; }
+                  const ans = closestValueJS(root, tgt);
+                  document.getElementById('out').style.display='block';
+                  document.getElementById('out').innerHTML = '<strong>Closest value:</strong> ' + ans + '<br/><span class="small">(JS iterative algorithm)</span>';
+                });
+            </script>
+
+            <h3 style="margin-top:12px">Quick tip</h3>
+            <p class="small">If you plan many queries on the same tree, you can store an in-order sorted array of node values (O(n) once) and binary-search it for each target in O(log n).</p>
+        </section>
+
+        <section class="card" style="margin-top:12px">
+            <h3>References</h3>
+            <ul>
+                <li class="small">LeetCode problem 270 — Closest Binary Search Tree Value</li>
+            </ul>
+        </section>
+    </aside>
+</div>
+
+<footer style="margin-top:18px" class="small">Feel free to copy this HTML file and run it locally — the JS demo uses the same logic as the Java iterative solution.</footer>
+</body>
+</html>

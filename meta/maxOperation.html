@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LeetCode 3346 - Maximum Frequency of an Element After Performing Operations I</title>
+    <style>
+        body {
+          font-family: "Segoe UI", Roboto, sans-serif;
+          background: #f9fafb;
+          color: #222;
+          line-height: 1.6;
+          margin: 0;
+          padding: 0 20px;
+        }
+        h1, h2, h3 {
+          color: #333;
+        }
+        code {
+          background: #f4f4f4;
+          padding: 2px 5px;
+          border-radius: 5px;
+          font-family: Consolas, monospace;
+        }
+        pre {
+          background: #272822;
+          color: #f8f8f2;
+          padding: 16px;
+          border-radius: 8px;
+          overflow-x: auto;
+        }
+        .section {
+          background: white;
+          border-radius: 10px;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+          margin: 20px 0;
+          padding: 20px;
+        }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 10px 0;
+        }
+        th, td {
+          border: 1px solid #ddd;
+          padding: 8px;
+          text-align: center;
+        }
+        th {
+          background-color: #f0f0f0;
+        }
+        .highlight {
+          background-color: #e0f7fa;
+          border-left: 5px solid #00acc1;
+          padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>💡 LeetCode 3346 — Maximum Frequency of an Element After Performing Operations I</h1>
+
+<div class="section">
+    <h2>🧩 Problem Explanation</h2>
+    <p>
+        You are given an integer array <code>nums</code>, and two integers <code>k</code> and <code>numOperations</code>.
+        <br><br>
+        You can perform at most <code>numOperations</code> operations. Each operation allows you to:
+    </p>
+    <ul>
+        <li>Pick one index <code>i</code> (not chosen before).</li>
+        <li>Add any integer in the range <code>[-k, k]</code> to <code>nums[i]</code>.</li>
+    </ul>
+    <p>
+        Your goal: maximize the frequency of a single value in the array after performing these operations.
+        <br><br>
+        Return the <strong>maximum possible frequency</strong>.
+    </p>
+</div>
+
+<div class="section">
+    <h2>📘 Example</h2>
+    <pre><code>Input: nums = [1, 4, 5], k = 1, numOperations = 2
+Output: 2
+
+Explanation:
+We can do the following:
+- Keep nums[0] = 1
+- Keep nums[1] = 4
+- Change nums[2] = 5 → 4  (subtract 1)
+
+Now the array is [1, 4, 4], and 4 appears twice.
+Maximum frequency = 2.
+</code></pre>
+</div>
+
+<div class="section">
+    <h2>🧠 Intuition</h2>
+    <div class="highlight">
+        Every element <code>nums[i]</code> can be changed to any value in <code>[nums[i] - k, nums[i] + k]</code>.
+        <br><br>
+        Two elements can be made equal if their ranges overlap.
+        <br><br>
+        So the problem becomes: find the largest group of elements whose ranges overlap (within ±k), limited by how many indices (<code>numOperations</code>) you can modify.
+    </div>
+</div>
+
+<div class="section">
+    <h2>⚙️ Approach</h2>
+    <ol>
+        <li>Sort the array <code>nums</code>.</li>
+        <li>Use two pointers (<code>left</code> and <code>right</code>) to maintain a sliding window of elements that can all become equal within ±k.</li>
+        <li>If <code>nums[right] - nums[left] > 2 * k</code>, move <code>left</code> forward (shrink the window).</li>
+        <li>The current window size gives how many can be equal, but you can only change <code>numOperations</code> of them — so limit by <code>min(windowSize, numOperations + 1)</code>.</li>
+        <li>Track the maximum window size → that’s your answer.</li>
+    </ol>
+</div>
+
+<div class="section">
+    <h2>💻 Java Code</h2>
+    <pre><code class="language-java">
+import java.util.*;
+
+public class Solution {
+    public int maxFrequency(int[] nums, int k, int numOperations) {
+        Arrays.sort(nums);
+        int n = nums.length;
+        int left = 0;
+        int maxFreq = 1;
+
+        for (int right = 0; right < n; right++) {
+            // Shrink the window if range exceeds 2*k
+            while (nums[right] - nums[left] > 2 * k) {
+                left++;
+            }
+
+            int windowSize = right - left + 1;
+            int possible = Math.min(windowSize, numOperations + 1);
+            maxFreq = Math.max(maxFreq, possible);
+        }
+
+        return maxFreq;
+    }
+
+    public static void main(String[] args) {
+        Solution sol = new Solution();
+        int[] nums = {1, 4, 5};
+        int k = 1, numOps = 2;
+        System.out.println(sol.maxFrequency(nums, k, numOps)); // Output: 2
+    }
+}
+</code></pre>
+</div>
+
+<div class="section">
+    <h2>🧾 Dry Run</h2>
+    <p><strong>Input:</strong> nums = [1, 4, 5], k = 1, numOperations = 2</p>
+    <table>
+        <thead>
+        <tr>
+            <th>right</th><th>left</th><th>nums[right]</th><th>range</th><th>window</th><th>window size</th><th>possible</th><th>maxFreq</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr><td>0</td><td>0</td><td>1</td><td>0 ≤ 2*k ✅</td><td>[1]</td><td>1</td><td>1</td><td>1</td></tr>
+        <tr><td>1</td><td>0→1</td><td>4</td><td>3 > 2*k ❌</td><td>[4]</td><td>1</td><td>1</td><td>1</td></tr>
+        <tr><td>2</td><td>1</td><td>5</td><td>1 ≤ 2*k ✅</td><td>[4, 5]</td><td>2</td><td>2</td><td><b>2</b></td></tr>
+        </tbody>
+    </table>
+    <p><strong>Answer = 2</strong></p>
+</div>
+
+<div class="section">
+    <h2>⏱️ Complexity</h2>
+    <ul>
+        <li><strong>Time:</strong> O(n log n) — due to sorting.</li>
+        <li><strong>Space:</strong> O(1) — two pointers and variables.</li>
+    </ul>
+</div>
+
+<div class="section">
+    <h2>🗝️ Key Takeaway</h2>
+    <p>
+        This is a <strong>range-overlap + sliding window</strong> problem.
+        <br>
+        By sorting, you can easily find contiguous segments where all elements can become equal within ±k, limited by <code>numOperations</code>.
+    </p>
+</div>
+
+</body>
+</html>
