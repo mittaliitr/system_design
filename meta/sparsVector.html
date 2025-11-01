@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeetCode 1570 - Dot Product of Two Sparse Vectors</title>
+    <style>
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background-color: #f7f9fc;
+          color: #333;
+          margin: 0;
+          padding: 30px;
+          line-height: 1.6;
+        }
+
+        h1, h2, h3 {
+          color: #2b4c7e;
+        }
+
+        pre {
+          background-color: #1e1e1e;
+          color: #dcdcdc;
+          padding: 15px;
+          border-radius: 10px;
+          overflow-x: auto;
+          font-size: 15px;
+          line-height: 1.5;
+        }
+
+        code {
+          font-family: 'Courier New', Courier, monospace;
+        }
+
+        .section {
+          background: #fff;
+          padding: 20px;
+          margin-bottom: 25px;
+          border-radius: 12px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .example {
+          background-color: #eef6ff;
+          padding: 10px 15px;
+          border-left: 4px solid #2b4c7e;
+          margin-top: 10px;
+          border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>LeetCode 1570 - Dot Product of Two Sparse Vectors</h1>
+
+<div class="section">
+    <h2>🧩 Problem Explanation</h2>
+    <p>
+        You are given two <strong>sparse vectors</strong> (vectors that have many zero elements).
+        Your task is to compute their <strong>dot product</strong>.
+    </p>
+
+    <div class="example">
+        <strong>Example:</strong><br>
+        <code>nums1 = [1, 0, 0, 2, 3]</code><br>
+        <code>nums2 = [0, 3, 0, 4, 0]</code><br><br>
+        The dot product is:<br>
+        <code>1*0 + 0*3 + 0*0 + 2*4 + 3*0 = 8</code>
+    </div>
+</div>
+
+<div class="section">
+    <h2>💡 Approach 1: Using HashMap (Efficient for Sparse Vectors)</h2>
+    <p>
+        Store only the non-zero elements of the vector in a map — key as index and value as number.
+        Then multiply values where both vectors have the same index.
+    </p>
+
+    <pre><code class="language-java">
+// Java code using HashMap
+
+class SparseVector {
+    Map<Integer, Integer> map;
+
+    SparseVector(int[] nums) {
+        map = new HashMap<>();
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] != 0) {
+                map.put(i, nums[i]);
+            }
+        }
+    }
+
+    public int dotProduct(SparseVector vec) {
+        int result = 0;
+        for (int index : map.keySet()) {
+            if (vec.map.containsKey(index)) {
+                result += map.get(index) * vec.map.get(index);
+            }
+        }
+        return result;
+    }
+}
+
+// Example usage:
+SparseVector v1 = new SparseVector(new int[]{1, 0, 0, 2, 3});
+SparseVector v2 = new SparseVector(new int[]{0, 3, 0, 4, 0});
+System.out.println(v1.dotProduct(v2)); // Output: 8
+    </code></pre>
+</div>
+
+<div class="section">
+    <h2>💡 Approach 2: Using Two Pointers (For Sorted Non-zero Indexes)</h2>
+    <p>
+        Store non-zero values as (index, value) pairs in two lists.
+        Then move pointers to match indices and calculate the dot product.
+    </p>
+
+    <pre><code class="language-java">
+// Java code using Two Pointers
+
+class SparseVector {
+    List<int[]> list;
+
+    SparseVector(int[] nums) {
+        list = new ArrayList<>();
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] != 0) {
+                list.add(new int[]{i, nums[i]});
+            }
+        }
+    }
+
+    public int dotProduct(SparseVector vec) {
+        int i = 0, j = 0, result = 0;
+        while (i < list.size() && j < vec.list.size()) {
+            int idx1 = list.get(i)[0], idx2 = vec.list.get(j)[0];
+            if (idx1 == idx2) {
+                result += list.get(i)[1] * vec.list.get(j)[1];
+                i++; j++;
+            } else if (idx1 < idx2) {
+                i++;
+            } else {
+                j++;
+            }
+        }
+        return result;
+    }
+}
+    </code></pre>
+</div>
+
+<div class="section">
+    <h2>💡 Approach 3: Using Binary Search (When One Vector is Much Larger)</h2>
+    <p>
+        If one vector has far fewer non-zero entries, we can binary search those indices
+        in the larger vector to find matches quickly.
+    </p>
+
+    <pre><code class="language-java">
+// Java code using Binary Search
+
+class SparseVector {
+    List<int[]> list; // store [index, value]
+
+    SparseVector(int[] nums) {
+        list = new ArrayList<>();
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] != 0) {
+                list.add(new int[]{i, nums[i]});
+            }
+        }
+    }
+
+    public int dotProduct(SparseVector vec) {
+        List<int[]> smaller = this.list.size() < vec.list.size() ? this.list : vec.list;
+        List<int[]> larger = this.list.size() >= vec.list.size() ? this.list : vec.list;
+
+        int result = 0;
+        for (int[] pair : smaller) {
+            int index = pair[0];
+            int value = pair[1];
+            int pos = binarySearch(larger, index);
+            if (pos != -1) {
+                result += value * larger.get(pos)[1];
+            }
+        }
+        return result;
+    }
+
+    private int binarySearch(List<int[]> list, int target) {
+        int left = 0, right = list.size() - 1;
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (list.get(mid)[0] == target) return mid;
+            else if (list.get(mid)[0] < target) left = mid + 1;
+            else right = mid - 1;
+        }
+        return -1;
+    }
+}
+    </code></pre>
+</div>
+
+<div class="section">
+    <h2>✅ Summary</h2>
+    <ul>
+        <li>Use <strong>HashMap</strong> when both vectors are sparse but not sorted.</li>
+        <li>Use <strong>Two Pointers</strong> when both vectors are sorted by index.</li>
+        <li>Use <strong>Binary Search</strong> when one vector is much smaller.</li>
+    </ul>
+</div>
+
+</body>
+</html>
