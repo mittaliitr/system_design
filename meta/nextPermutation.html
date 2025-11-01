@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Next Permutation — Visual Guide</title>
+    <style>
+        :root{--bg:#0f1724;--card:#0b1220;--muted:#94a3b8;--accent:#7c3aed;--white:#eef2ff}
+        body{font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:linear-gradient(180deg,#071227 0%, #071931 100%); color:var(--white); margin:0; padding:32px}
+        .container{max-width:980px;margin:0 auto}
+        h1{font-size:28px;margin:0 0 8px}
+        p.lead{color:var(--muted);margin:6px 0 24px}
+        .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; padding:18px; box-shadow:0 6px 24px rgba(2,6,23,0.6); margin-bottom:18px}
+        pre.code{background:#0b1220;color:var(--white);padding:12px;border-radius:8px;overflow:auto; font-family:SFMono-Regular,Menlo,monospace; font-size:13px}
+        .row{display:flex;gap:14px;flex-wrap:wrap}
+        .col{flex:1;min-width:260px}
+        .example{display:flex;align-items:center;gap:8px}
+        .digits{display:inline-grid;grid-auto-flow:column;gap:8px}
+        .digit{background:#07102a;padding:10px 12px;border-radius:8px;min-width:36px;text-align:center;font-weight:600}
+        label{display:block;margin-bottom:6px;color:var(--muted);font-size:13px}
+        input[type="text"]{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--white)}
+        button{background:var(--accent);border:none;padding:10px 12px;border-radius:8px;color:white;font-weight:600;cursor:pointer}
+        .steps{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+        .step{background:rgba(255,255,255,0.02);padding:10px;border-radius:8px;min-width:180px}
+        .visual{display:flex;gap:6px;align-items:center;margin-top:12px}
+        .index{font-size:12px;color:var(--muted)}
+        .muted{color:var(--muted)}
+        .small{font-size:13px}
+        .result{margin-top:12px;font-weight:700}
+        .code-bg{background:#07102a;padding:12px;border-radius:8px}
+        .controls{display:flex;gap:8px;align-items:center}
+        .hint{font-size:13px;color:var(--muted)}
+        .copy{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:6px 8px;border-radius:6px;cursor:pointer}
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <h1>Next Permutation — Visual Guide</h1>
+        <p class="lead">Interactive explanation of LeetCode 31 (<em>Next Permutation</em>). Start with simple 3-digit examples, step through the algorithm (pivot → successor → swap → reverse), and try your own inputs.</p>
+
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <strong>Quick algorithm (3 steps)</strong>
+                    <ol class="small">
+                        <li>Find the pivot: the first index <code>i</code> from the right where <code>nums[i] &lt; nums[i+1]</code>.</li>
+                        <li>Find the successor: smallest element to the right of <code>i</code> that is &gt; <code>nums[i]</code> (index <code>j</code>).</li>
+                        <li>Swap <code>nums[i]</code> and <code>nums[j]</code>, then reverse the suffix after <code>i</code> (to get the smallest arrangement).</li>
+                    </ol>
+                    <p class="muted small">If no pivot found, the array is the highest permutation → reverse whole array to get lowest.</p>
+                </div>
+
+                <div class="card">
+                    <strong>3-digit examples</strong>
+
+                    <div style="margin-top:10px">
+                        <div class="example">
+                            <div>
+                                <div class="muted">Input</div>
+                                <div class="digits" id="ex1-digits">
+                                    <div class="digit">1</div>
+                                    <div class="digit">2</div>
+                                    <div class="digit">3</div>
+                                </div>
+                            </div>
+                            <div style="margin-left:12px">
+                                <div class="muted">Next permutation</div>
+                                <div class="digits" id="ex1-out">
+                                    <div class="digit">1</div>
+                                    <div class="digit">3</div>
+                                    <div class="digit">2</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="example" style="margin-top:10px">
+                            <div>
+                                <div class="muted">Input</div>
+                                <div class="digits" id="ex2-digits">
+                                    <div class="digit">3</div>
+                                    <div class="digit">2</div>
+                                    <div class="digit">1</div>
+                                </div>
+                            </div>
+                            <div style="margin-left:12px">
+                                <div class="muted">Next permutation</div>
+                                <div class="digits" id="ex2-out">
+                                    <div class="digit">1</div>
+                                    <div class="digit">2</div>
+                                    <div class="digit">3</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="example" style="margin-top:10px">
+                            <div>
+                                <div class="muted">Input</div>
+                                <div class="digits" id="ex3-digits">
+                                    <div class="digit">1</div>
+                                    <div class="digit">3</div>
+                                    <div class="digit">2</div>
+                                </div>
+                            </div>
+                            <div style="margin-left:12px">
+                                <div class="muted">Next permutation</div>
+                                <div class="digits" id="ex3-out">
+                                    <div class="digit">2</div>
+                                    <div class="digit">1</div>
+                                    <div class="digit">3</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card">
+                    <strong>Try it yourself</strong>
+                    <label for="input">Enter digits or numbers separated by spaces or commas (e.g. <em>1 3 2</em>)</label>
+                    <div class="controls">
+                        <input id="input" type="text" value="1 3 2" />
+                        <button id="run">Next Permutation</button>
+                        <button id="step">Show Steps</button>
+                    </div>
+                    <div class="result muted" id="result"></div>
+
+                    <div id="visual" class="visual"></div>
+                    <div id="steps" class="steps"></div>
+                </div>
+
+                <div class="card">
+                    <strong>Java solution (reference)</strong>
+                    <div class="code-bg">
+              <pre class="code">class Solution {
+    public void nextPermutation(int[] nums) {
+        int n = nums.length;
+        int i = n - 2;
+        while (i >= 0 && nums[i] >= nums[i + 1]) i--;
+        if (i >= 0) {
+            int j = n - 1;
+            while (nums[j] <= nums[i]) j--;
+            swap(nums, i, j);
+        }
+        reverse(nums, i + 1, n - 1);
+    }
+
+    private void swap(int[] nums, int i, int j) {
+        int t = nums[i]; nums[i] = nums[j]; nums[j] = t;
+    }
+
+    private void reverse(int[] nums, int l, int r) {
+        while (l < r) { swap(nums, l++, r--); }
+    }
+}
+</pre>
+                        <button class="copy" id="copy-java">Copy Java</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card">
+            <strong>How the visualization works</strong>
+            <p class="muted small">When you click <em>Show Steps</em>, the page highlights the pivot index (i), successor (j), shows the swap, and then shows the suffix reversal — all with small animated updates for clarity.</p>
+        </div>
+    </div>
+
+    <div class="card small">
+        <strong>Notes / Tips</strong>
+        <ul>
+            <li>Finding the pivot from the right ensures we change the smallest possible suffix to get the immediate next permutation.</li>
+            <li>Reversing the suffix after swapping guarantees the suffix becomes the smallest possible order (ascending).</li>
+            <li>Time: O(n). Space: O(1) extra space (in-place).</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    function parseInput(s){
+      if(!s) return [];
+      return s.trim().split(/[,\s]+/).map(x=>{ const n = Number(x); return isNaN(n)?x.charCodeAt(0):n; });
+    }
+
+    function toStr(arr){ return arr.join(' '); }
+
+    function swap(a,i,j){ const t=a[i]; a[i]=a[j]; a[j]=t; }
+    function reverse(a,l,r){ while(l<r){ swap(a,l++,r--);} }
+
+    function nextPermutationInPlace(nums){
+      const n = nums.length;
+      let i = n - 2;
+      while(i>=0 && nums[i] >= nums[i+1]) i--;
+      if(i>=0){
+        let j = n-1; while(nums[j] <= nums[i]) j--;
+        swap(nums,i,j);
+      }
+      reverse(nums, i+1, n-1);
+      return nums;
+    }
+
+    function findSteps(nums){
+      const steps = [];
+      const a = nums.slice();
+      const n = a.length;
+      let i = n - 2;
+      while(i>=0 && a[i] >= a[i+1]) { steps.push({type:'scan',i:i,arr:a.slice()}); i--; }
+      if(i<0){ steps.push({type:'nomore',arr:a.slice()}); reverse(a,0,n-1); steps.push({type:'reversed',arr:a.slice()}); return steps; }
+      steps.push({type:'pivot',i:i,arr:a.slice()});
+      let j = n-1; while(a[j] <= a[i]) { j--; }
+      steps.push({type:'successor',j:j,arr:a.slice()});
+      swap(a,i,j); steps.push({type:'swap',i:i,j:j,arr:a.slice()});
+      reverse(a,i+1,n-1); steps.push({type:'reverse',arr:a.slice()});
+      return steps;
+    }
+
+    document.getElementById('run').addEventListener('click', ()=>{
+      const input = document.getElementById('input').value;
+      const arr = parseInput(input);
+      const out = nextPermutationInPlace(arr.slice());
+      document.getElementById('result').textContent = 'Result: ['+out.join(', ')+']';
+      renderVisual(out);
+    });
+
+    document.getElementById('step').addEventListener('click', ()=>{
+      const input = document.getElementById('input').value;
+      const arr = parseInput(input);
+      const steps = findSteps(arr.slice());
+      const stepsDiv = document.getElementById('steps'); stepsDiv.innerHTML='';
+      const visual = document.getElementById('visual'); visual.innerHTML='';
+      steps.forEach((s,idx)=>{
+        const box = document.createElement('div'); box.className='step';
+        if(s.type==='scan') box.innerHTML = '<strong>Scanning (from right)</strong><div class="muted small">i='+s.i+'</div><pre class="code">['+s.arr.join(', ')+']</pre>';
+        else if(s.type==='pivot') box.innerHTML = '<strong>Pivot found</strong><div class="muted small">i='+s.i+' (value='+s.arr[s.i]+')</div><pre class="code">['+s.arr.join(', ')+']</pre>';
+        else if(s.type==='successor') box.innerHTML = '<strong>Successor found</strong><div class="muted small">j='+s.j+' (value='+s.arr[s.j]+')</div><pre class="code">['+s.arr.join(', ')+']</pre>';
+        else if(s.type==='swap') box.innerHTML = '<strong>After swap</strong><pre class="code">['+s.arr.join(', ')+']</pre>';
+        else if(s.type==='reverse') box.innerHTML = '<strong>After reversing suffix</strong><pre class="code">['+s.arr.join(', ')+']</pre>';
+        else if(s.type==='nomore') box.innerHTML = '<strong>No pivot — highest permutation</strong><pre class="code">['+s.arr.join(', ')+']</pre>';
+        stepsDiv.appendChild(box);
+      });
+    });
+
+    function renderVisual(arr){
+      const v = document.getElementById('visual'); v.innerHTML='';
+      arr.forEach((x,idx)=>{
+        const d = document.createElement('div'); d.className='digit'; d.textContent = x; v.appendChild(d);
+      });
+    }
+
+    document.getElementById('copy-java').addEventListener('click', ()=>{
+      const code = `class Solution {\n    public void nextPermutation(int[] nums) {\n        int n = nums.length;\n        int i = n - 2;\n        while (i >= 0 && nums[i] >= nums[i + 1]) i--;\n        if (i >= 0) {\n            int j = n - 1;\n            while (nums[j] <= nums[i]) j--;\n            swap(nums, i, j);\n        }\n        reverse(nums, i + 1, n - 1);\n    }\n\n    private void swap(int[] nums, int i, int j) {\n        int t = nums[i]; nums[i] = nums[j]; nums[j] = t;\n    }\n\n    private void reverse(int[] nums, int l, int r) {\n        while (l < r) { swap(nums, l++, r--); }\n    }\n}`;
+      navigator.clipboard.writeText(code).then(()=>{ alert('Java code copied to clipboard'); }).catch(()=>{ alert('Could not copy'); });
+    });
+
+    // initial render for examples
+    renderVisual([1,3,2]);
+</script>
+</body>
+</html>
