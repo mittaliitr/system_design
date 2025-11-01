@@ -49,22 +49,17 @@
             },
             {
               "name": "Remove Nth Node From End of List",
-              "url": "https://leetcode.com/problems/remove-nth-node-from-end-of-list/",
+              "url": "https://leetcode.com/problems/remove-nth-node-from-end-of-list/solutions/7315281/simple-two-pointer-approach-by-bhorgen-w19u",
               "tag": "30 days"
             },
             {
               "name": "Strobogrammatic Number",
-              "url": "https://leetcode.com/problems/strobogrammatic-number/",
-              "tag": "30 days"
-            },
-            {
-              "name": "Friends Of Appropriate Ages",
-              "url": "https://leetcode.com/problems/friends-of-appropriate-ages/",
+              "url": "https://leetcode.com/problems/strobogrammatic-number/solutions/3350263/java-simple-solution-by-sanjevraj_r-46kx",
               "tag": "30 days"
             },
             {
               "name": "Container With Most Water",
-              "url": "https://leetcode.com/problems/container-with-most-water/",
+              "url": "https://leetcode.com/problems/container-with-most-water/solutions/7246605/greedy-2-pointerbeats-100-by-anwendeng-8flm",
               "tag": "30 days"
             },
             {
@@ -113,80 +108,44 @@
           "name": "Sliding Window",
           "children": [
             {
-              "name": "Sliding Window Maximum",
-              "url": "https://leetcode.com/problems/sliding-window-maximum/"
-            },
-            {
-              "name": "Minimum Size Subarray Sum",
-              "url": "https://leetcode.com/problems/minimum-size-subarray-sum/"
-            },
-            {
-              "name": "Longest Substring Without Repeating Characters",
-              "url": "https://leetcode.com/problems/longest-substring-without-repeating-characters/"
+              "name": "Max Consecutive Ones III",
+              "url": "https://leetcode.com/problems/max-consecutive-ones-iii/",
+              "tag": "30 days"
             },
             {
               "name": "Minimum Window Substring",
-              "url": "https://leetcode.com/problems/minimum-window-substring/"
+              "url": "https://leetcode.com/problems/minimum-window-substring/",
+              "tag": "30 days"
             },
             {
-              "name": "Permutation in String",
-              "url": "https://leetcode.com/problems/permutation-in-string/"
+              "name": "Contains Duplicate II",
+              "url": "https://leetcode.com/problems/contains-duplicate-ii/",
+              "tag": "30 days"
+            },
+            {
+              "name": "Longest Substring Without Repeating Characters",
+              "url": "https://leetcode.com/problems/longest-substring-without-repeating-characters/",
+              "tag": "30 days"
+            },
+            {
+              "name": "Best Time to Buy and Sell Stock using Strategy",
+              "url": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/",
+              "tag": "30 days"
             },
             {
               "name": "Longest Repeating Character Replacement",
-              "url": "https://leetcode.com/problems/longest-repeating-character-replacement/"
+              "url": "https://leetcode.com/problems/longest-repeating-character-replacement/",
+              "tag": "30 days"
             },
             {
-              "name": "Max Consecutive Ones III",
-              "url": "https://leetcode.com/problems/max-consecutive-ones-iii/"
+              "name": "Maximum Frequency of an Element After Performing Operations I",
+              "url": "https://leetcode.com/problems/maximum-frequency-of-an-element-after-performing-operations-i/",
+              "tag": "30 days"
             },
             {
-              "name": "Subarrays with K Different Integers",
-              "url": "https://leetcode.com/problems/subarrays-with-k-different-integers/"
-            },
-            {
-              "name": "Maximum Points You Can Obtain from Cards",
-              "url": "https://leetcode.com/problems/maximum-points-you-can-obtain-from-cards/"
-            },
-            {
-              "name": "Longest Substring with At Most Two Distinct Characters",
-              "url": "https://leetcode.com/problems/longest-substring-with-at-most-two-distinct-characters/"
-            },
-            {
-              "name": "Count Number of Nice Subarrays",
-              "url": "https://leetcode.com/problems/count-number-of-nice-subarrays/"
-            },
-            {
-              "name": "Maximum Average Subarray I",
-              "url": "https://leetcode.com/problems/maximum-average-subarray-i/"
-            },
-            {
-              "name": "Maximum Average Subarray II",
-              "url": "https://leetcode.com/problems/maximum-average-subarray-ii/"
-            },
-            {
-              "name": "Find All Anagrams in a String",
-              "url": "https://leetcode.com/problems/find-all-anagrams-in-a-string/"
-            },
-            {
-              "name": "Longest Subarray of 1's After Deleting One Element",
-              "url": "https://leetcode.com/problems/longest-subarray-of-1s-after-deleting-one-element/"
-            },
-            {
-              "name": "Largest Sum of Averages",
-              "url": "https://leetcode.com/problems/largest-sum-of-averages/"
-            },
-            {
-              "name": "Longest Substring with At Most K Distinct Characters",
-              "url": "https://leetcode.com/problems/longest-substring-with-at-most-k-distinct-characters/"
-            },
-            {
-              "name": "Number of Subarrays with Bounded Maximum",
-              "url": "https://leetcode.com/problems/number-of-subarrays-with-bounded-maximum/"
-            },
-            {
-              "name": "Total Fruit",
-              "url": "https://leetcode.com/problems/total-fruit/"
+              "name": "Sliding Window Maximum",
+              "url": "https://leetcode.com/problems/sliding-window-maximum/",
+              "tag": "30 days"
             }
           ]
         },
