@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>76. Minimum Window Substring — Java + JS Explained</title>
+    <style>
+        body {
+          font-family: "Segoe UI", Arial, sans-serif;
+          line-height: 1.6;
+          margin: 20px;
+          background: #fdfdfd;
+          color: #333;
+        }
+        h2, h3 {
+          color: #007acc;
+        }
+        pre {
+          background: #f4f4f4;
+          padding: 12px;
+          border-radius: 6px;
+          overflow-x: auto;
+          border-left: 4px solid #007acc;
+        }
+        code {
+          font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+<h2>76. Minimum Window Substring — Java + JavaScript Explained</h2>
+
+<p>
+    <strong>Problem:</strong> Given two strings <code>s</code> and <code>t</code>, return the smallest substring of <code>s</code>
+    that contains all characters of <code>t</code>. If no such substring exists, return <code>""</code>.
+</p>
+
+<h3>Example</h3>
+<pre>
+Input: s = "ADOBECODEBANC", t = "ABC"
+Output: "BANC"
+  </pre>
+
+<h3>Approach (Sliding Window)</h3>
+<ol>
+    <li>Use two pointers (<code>left</code> and <code>right</code>) to track a moving window.</li>
+    <li>Expand the right pointer until all required characters from <code>t</code> are included.</li>
+    <li>Then, move the left pointer to shrink the window while keeping it valid.</li>
+    <li>Keep track of the smallest valid window found so far.</li>
+</ol>
+
+<h3>✅ JavaScript Implementation</h3>
+<pre><code>
+function minWindow(s, t) {
+  if (t.length === 0 || s.length === 0) return "";
+
+  const need = new Map();
+  for (let ch of t) {
+    need.set(ch, (need.get(ch) || 0) + 1);
+  }
+
+  let have = 0;
+  const windowCountsObj = new Map();
+  const required = need.size;
+
+  let res = [-1, -1];
+  let resLen = Infinity;
+  let l = 0;
+
+  for (let r = 0; r < s.length; r++) {
+    const ch = s[r];
+    windowCountsObj.set(ch, (windowCountsObj.get(ch) || 0) + 1);
+
+    if (need.has(ch) && windowCountsObj.get(ch) === need.get(ch)) {
+      have++;
+    }
+
+    while (have === required) {
+      if ((r - l + 1) < resLen) {
+        res = [l, r];
+        resLen = r - l + 1;
+      }
+
+      const leftChar = s[l];
+      windowCountsObj.set(leftChar, windowCountsObj.get(leftChar) - 1);
+      if (need.has(leftChar) && windowCountsObj.get(leftChar) < need.get(leftChar)) {
+        have--;
+      }
+      l++;
+    }
+  }
+
+  const [start, end] = res;
+  return resLen === Infinity ? "" : s.slice(start, end + 1);
+}
+
+// Test
+console.log(minWindow("ADOBECODEBANC", "ABC")); // BANC
+  </code></pre>
+
+<h3>🧠 Java Implementation</h3>
+<pre><code class="language-java">
+import java.util.*;
+
+public class MinimumWindowSubstring {
+    public static String minWindow(String s, String t) {
+        if (s.length() == 0 || t.length() == 0) return "";
+
+        Map&lt;Character, Integer&gt; need = new HashMap<>();
+        for (char c : t.toCharArray()) {
+            need.put(c, need.getOrDefault(c, 0) + 1);
+        }
+
+        Map&lt;Character, Integer&gt; windowCounts = new HashMap<>();
+        int have = 0, required = need.size();
+        int left = 0, minLen = Integer.MAX_VALUE;
+        int start = 0;
+
+        for (int right = 0; right &lt; s.length(); right++) {
+            char c = s.charAt(right);
+            windowCounts.put(c, windowCounts.getOrDefault(c, 0) + 1);
+
+            if (need.containsKey(c) && windowCounts.get(c).intValue() == need.get(c).intValue()) {
+                have++;
+            }
+
+            while (have == required) {
+                if ((right - left + 1) &lt; minLen) {
+                    start = left;
+                    minLen = right - left + 1;
+                }
+
+                char leftChar = s.charAt(left);
+                windowCounts.put(leftChar, windowCounts.get(leftChar) - 1);
+                if (need.containsKey(leftChar) && windowCounts.get(leftChar) &lt; need.get(leftChar)) {
+                    have--;
+                }
+                left++;
+            }
+        }
+
+        return minLen == Integer.MAX_VALUE ? "" : s.substring(start, start + minLen);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(minWindow("ADOBECODEBANC", "ABC")); // BANC
+        System.out.println(minWindow("a", "a")); // a
+        System.out.println(minWindow("a", "aa")); // ""
+    }
+}
+  </code></pre>
+
+<h3>Quick Visualization</h3>
+<p>
+    For <code>s = "ADOBECODEBANC"</code> and <code>t = "ABC"</code>:
+    <br>- Expand window until it includes A, B, C → <code>"ADOBEC"</code> ✅
+    <br>- Shrink until invalid → <code>"DOBEC"</code> ❌
+    <br>- Continue sliding → eventually <code>"BANC"</code> ✅ (smallest)
+</p>
+
+<h3>JavaScript Result:</h3>
+<pre id="result"></pre>
+
+<script>
+    document.getElementById("result").textContent =
+      'Result for s = "ADOBECODEBANC", t = "ABC" → ' + minWindow("ADOBECODEBANC", "ABC");
+</script>
+</body>
+</html>

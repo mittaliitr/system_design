@@ -109,7 +109,7 @@
           "children": [
             {
               "name": "Minimum Window Substring",
-              "url": "https://leetcode.com/problems/minimum-window-substring/",
+              "url": "/system_design/meta/maxSubstringSW.html",
               "tag": "30 days"
             },
             {
