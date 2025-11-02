@@ -148,62 +148,75 @@
           "name": "Prefix Sum",
           "children": [
             {
-              "name": "Prefix Sum of Array",
-              "url": "https://leetcode.com/problems/prefix-sum-of-array/"
+              "name": "Subarray Sum Equals K",
+              "url": "https://leetcode.com/problems/subarray-sum-equals-k/",
+              "difficulty": "Medium",
+              "acceptance": "46.2%",
+              "tag": "30 days"
             },
             {
-              "name": "Subarray Sum Equals K",
-              "url": "https://leetcode.com/problems/subarray-sum-equals-k/"
+              "name": "Random Pick with Weight",
+              "url": "https://leetcode.com/problems/random-pick-with-weight/",
+              "difficulty": "Medium",
+              "acceptance": "48.7%",
+              "tag": "30 days"
+            },
+            {
+              "name": "Max Consecutive Ones III",
+              "url": "https://leetcode.com/problems/max-consecutive-ones-iii/",
+              "difficulty": "Medium",
+              "acceptance": "66.8%",
+              "tag": "30 days"
             },
             {
               "name": "Range Sum Query - Immutable",
-              "url": "https://leetcode.com/problems/range-sum-query-immutable/"
+              "url": "https://leetcode.com/problems/range-sum-query-immutable/",
+              "difficulty": "Easy",
+              "acceptance": "70.2%",
+              "tag": "30 days"
             },
             {
-              "name": "Range Sum Query 2D - Immutable",
-              "url": "https://leetcode.com/problems/range-sum-query-2d-immutable/"
+              "name": "Best Time to Buy and Sell Stock using Strategy",
+              "url": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/",
+              "difficulty": "Medium",
+              "acceptance": "43.9%",
+              "tag": "30 days"
             },
             {
-              "name": "Sum of Subarray Minimums",
-              "url": "https://leetcode.com/problems/sum-of-subarray-minimums/"
+              "name": "Car Pooling",
+              "url": "https://leetcode.com/problems/car-pooling/",
+              "difficulty": "Medium",
+              "acceptance": "56.1%",
+              "tag": "30 days"
             },
             {
-              "name": "Maximum Sum of 3 Non-Overlapping Subarrays",
-              "url": "https://leetcode.com/problems/maximum-sum-of-3-non-overlapping-subarrays/"
+              "name": "Maximum Frequency of an Element After Performing Operations I",
+              "url": "https://leetcode.com/problems/maximum-frequency-of-an-element-after-performing-operations-i/",
+              "difficulty": "Medium",
+              "acceptance": "39.9%",
+              "tag": "30 days"
             },
             {
-              "name": "Count of Range Sum",
-              "url": "https://leetcode.com/problems/count-of-range-sum/"
+              "name": "Continuous Subarray Sum",
+              "url": "https://leetcode.com/problems/continuous-subarray-sum/",
+              "difficulty": "Medium",
+              "acceptance": "31.1%",
+              "tag": "30 days"
             },
             {
-              "name": "Find the Largest Divisible Subset",
-              "url": "https://leetcode.com/problems/find-the-largest-divisible-subset/"
+              "name": "Make Array Elements Equal to Zero",
+              "url": "https://leetcode.com/problems/make-array-elements-equal-to-zero/",
+              "difficulty": "Easy",
+              "acceptance": "68.4%",
+              "tag": "30 days"
             },
             {
-              "name": "Subarray Product Less Than K",
-              "url": "https://leetcode.com/problems/subarray-product-less-than-k/"
-            },
-            {
-              "name": "Kth Smallest Sum of a Matrix With Sorted Rows",
-              "url": "https://leetcode.com/problems/kth-smallest-sum-of-a-matrix-with-sorted-rows/"
-            },
-            {
-              "name": "Number of Subarrays with Sum 1",
-              "url": "https://leetcode.com/problems/number-of-subarrays-with-sum-1/"
-            },
-            {
-              "name": "Subarray Sum Divisible by K",
-              "url": "https://leetcode.com/problems/subarray-sum-divisible-by-k/"
-            },
-            {
-              "name": "Product of Array Except Self",
-              "url": "https://leetcode.com/problems/product-of-array-except-self/"
-            },
-            {
-              "name": "Maximum Subarray Sum with One Deletion",
-              "url": "https://leetcode.com/problems/maximum-subarray-sum-with-one-deletion/"
+              "name": "Find Pivot Index",
+              "url": "https://leetcode.com/problems/find-pivot-index/",
+              "tag": "30 days"
             }
           ]
+
         },
         {
           "name": "Hash Maps / Sets",
