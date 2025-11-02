@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Longest Repeating Character Replacement - Explained</title>
+    <style>
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          max-width: 800px;
+          margin: 30px auto;
+          color: #222;
+          line-height: 1.6;
+        }
+        h1, h2 {
+          color: #0073e6;
+        }
+        pre {
+          background: #f4f4f4;
+          padding: 15px;
+          border-radius: 6px;
+          overflow-x: auto;
+          border: 1px solid #ddd;
+        }
+        code {
+          font-family: Consolas, monospace;
+        }
+        ul {
+          margin-top: 0;
+        }
+        .example {
+          background: #e8f0fe;
+          padding: 15px;
+          border-left: 5px solid #0073e6;
+          margin: 20px 0;
+          border-radius: 5px;
+        }
+        .highlight {
+          font-weight: bold;
+          color: #d9534f;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Longest Repeating Character Replacement - Simple Explanation</h1>
+
+<section>
+    <h2>Problem Statement</h2>
+    <p>You are given a string <code>s</code> consisting of uppercase letters, and an integer <code>k</code>.</p>
+    <p>You can replace at most <code>k</code> characters in the string to make all characters in some substring the same.</p>
+    <p>Your task is to find the <strong>length of the longest substring</strong> that can be obtained by performing at most <code>k</code> replacements.</p>
+</section>
+
+<section>
+    <h2>What does this mean?</h2>
+    <p>Imagine you want a substring where all letters are identical, but you are allowed to change (replace) up to <code>k</code> letters to achieve that.</p>
+    <p>For example:</p>
+
+    <div class="example">
+        <p><strong>String:</strong> <code>"AABABBA"</code></p>
+        <p><strong>k:</strong> 1 (You can replace 1 character)</p>
+        <p>One longest substring you can get is <code>"ABABBA"</code> (from index 1 to 6).<br/>
+            By replacing just one <code>'A'</code> with <code>'B'</code>, you make the whole substring all <code>'B'</code>s.<br/>
+            So the answer is <span class="highlight">6</span>.</p>
+    </div>
+</section>
+
+<section>
+    <h2>How to solve it? (Sliding Window Intuition)</h2>
+    <ul>
+        <li>Use two pointers to represent a <em>window</em> (a substring).</li>
+        <li>Expand the window by moving the right pointer.</li>
+        <li>Keep track of the count of the <strong>most frequent character</strong> in the current window.</li>
+        <li>If the number of characters to replace (window size minus max frequency) exceeds <code>k</code>, move the left pointer to shrink the window.</li>
+        <li>Track the maximum valid window size during this process.</li>
+    </ul>
+</section>
+
+<section>
+    <h2>Why does this work?</h2>
+    <p>The most frequent character count tells us how many letters <em>don't</em> need to be changed.</p>
+    <p>The difference between the window size and this count is how many characters we <em>need</em> to replace.</p>
+    <p>If that number is more than <code>k</code>, the window is invalid and needs to be shrunk.</p>
+</section>
+
+<section>
+    <h2>Step-by-step Example</h2>
+    <p>Given <code>s = "AABABBA"</code> and <code>k = 1</code>:</p>
+    <ul>
+        <li>Window: "A" — max frequency = 1, replacements needed = 0 (valid)</li>
+        <li>Window: "AA" — max frequency = 2, replacements needed = 0 (valid)</li>
+        <li>Window: "AAB" — max frequency = 2, replacements needed = 1 (valid)</li>
+        <li>Window: "AABA" — max frequency = 3, replacements needed = 1 (valid)</li>
+        <li>Window: "AABAB" — max frequency = 3, replacements needed = 2 (> k, invalid)</li>
+        <li>Shrink window by moving left pointer...</li>
+    </ul>
+    <p>Continue this process and find the longest valid window size, which is 4, 5, or 6 depending on replacements.</p>
+</section>
+
+<section>
+    <h2>Java Code Implementation</h2>
+    <pre><code>class Solution {
+    public int characterReplacement(String s, int k) {
+        int left = 0;
+        int maxCount = 0;  // max frequency of a char in current window
+        int[] count = new int[26];
+        int maxLength = 0;
+
+        for (int right = 0; right &lt; s.length(); right++) {
+            count[s.charAt(right) - 'A']++;
+            maxCount = Math.max(maxCount, count[s.charAt(right) - 'A']);
+
+            // If replacements needed exceed k, shrink window
+            while ((right - left + 1) - maxCount &gt; k) {
+                count[s.charAt(left) - 'A']--;
+                left++;
+            }
+
+            maxLength = Math.max(maxLength, right - left + 1);
+        }
+
+        return maxLength;
+    }
+}
+  </code></pre>
+</section>
+
+<section>
+    <h2>Summary</h2>
+    <ul>
+        <li>Use a sliding window to scan through the string.</li>
+        <li>Keep track of the count of characters in the window.</li>
+        <li>Maintain the count of the most frequent character.</li>
+        <li>Adjust the window size to keep replacements ≤ <code>k</code>.</li>
+        <li>The longest window size found is the answer.</li>
+    </ul>
+</section>
+
+</body>
+</html>

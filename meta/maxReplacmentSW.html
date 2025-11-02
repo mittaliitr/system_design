@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>3346. Maximum Frequency of an Element - Explanation</title>
+    <style>
+        body {
+          font-family: Arial, sans-serif;
+          line-height: 1.6;
+          margin: 20px;
+          max-width: 800px;
+        }
+        h1, h2 {
+          color: #2c3e50;
+        }
+        pre {
+          background: #f4f4f4;
+          padding: 10px;
+          border-radius: 5px;
+          overflow-x: auto;
+          font-size: 14px;
+        }
+        code {
+          font-family: monospace;
+        }
+        .example {
+          background: #e8f0fe;
+          padding: 10px;
+          margin: 10px 0;
+          border-left: 4px solid #4285f4;
+        }
+    </style>
+</head>
+<body>
+<h1>3346. Maximum Frequency of an Element After Performing Operations I</h1>
+
+<h2>Problem Summary</h2>
+<p>
+    Given an array of numbers and a number <code>k</code> representing how many increments you can do,
+    you want to find the maximum frequency of any element after performing at most <code>k</code> operations.
+</p>
+<p>Operation allowed: increase any element by 1 per operation.</p>
+
+<h2>Goal</h2>
+<p>
+    Find the maximum count of equal elements possible by increasing elements at most <code>k</code> times.
+</p>
+
+<h2>Example</h2>
+<div class="example">
+    <strong>Input:</strong> nums = [1, 2, 4], k = 5<br />
+    <strong>Explanation:</strong> Increase 1 to 4 (3 increments), increase 2 to 4 (2 increments), total 5 increments.<br />
+    Resulting array: [4, 4, 4]<br />
+    Maximum frequency = 3
+</div>
+
+<h2>Approach</h2>
+<ol>
+    <li>Sort the array to work in ascending order.</li>
+    <li>Use a sliding window with two pointers (<code>left</code> and <code>right</code>).</li>
+    <li>Calculate total increments needed to make all elements in the window equal to <code>nums[right]</code>.</li>
+    <li>If increments needed > <code>k</code>, shrink the window from the left.</li>
+    <li>Keep track of the maximum window size where increments needed ≤ <code>k</code>.</li>
+</ol>
+
+<h2>Why it works</h2>
+<p>
+    By sorting, you ensure increments only move values up to the right (higher) element.
+    The sliding window tries to find the largest group where all elements can be made equal within <code>k</code> increments.
+</p>
+<p>
+    Increments needed for a window of size <code>n</code> with largest element <code>nums[right]</code> is:<br />
+    <code>nums[right] * n - sum_of_elements_in_window</code>
+</p>
+
+<h2>Java Code Example</h2>
+<pre><code>import java.util.Arrays;
+
+public class MaxFrequency {
+    public int maxFrequency(int[] nums, int k) {
+        Arrays.sort(nums);
+        long total = 0;  // sum of elements in current window
+        int left = 0;
+        int maxFreq = 1;
+
+        for (int right = 0; right &lt; nums.length; right++) {
+            total += nums[right];
+
+            // While increments needed exceed k, shrink window
+            while ((long)nums[right] * (right - left + 1) - total &gt; k) {
+                total -= nums[left];
+                left++;
+            }
+
+            maxFreq = Math.max(maxFreq, right - left + 1);
+        }
+
+        return maxFreq;
+    }
+
+    public static void main(String[] args) {
+        MaxFrequency mf = new MaxFrequency();
+        int[] nums = {1, 2, 4};
+        int k = 5;
+        System.out.println(mf.maxFrequency(nums, k));  // Output: 3
+    }
+}</code></pre>
+
+</body>
+</html>

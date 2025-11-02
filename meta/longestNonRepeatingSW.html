@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3. Longest Substring Without Repeating Characters (Optimized)</title>
+    <style>
+        body {
+          font-family: Arial, sans-serif;
+          background-color: #f9fafb;
+          color: #222;
+          line-height: 1.6;
+          margin: 40px;
+        }
+        h1, h2 {
+          color: #1e40af;
+        }
+        pre {
+          background-color: #1e293b;
+          color: #e2e8f0;
+          padding: 16px;
+          border-radius: 8px;
+          overflow-x: auto;
+        }
+        code {
+          color: #facc15;
+        }
+        .section {
+          background: #ffffff;
+          padding: 20px;
+          border-radius: 10px;
+          margin-bottom: 20px;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .highlight {
+          color: #16a34a;
+          font-weight: bold;
+        }
+        table {
+          border-collapse: collapse;
+          width: 100%;
+          margin-top: 10px;
+        }
+        th, td {
+          border: 1px solid #ddd;
+          padding: 8px;
+          text-align: center;
+        }
+        th {
+          background-color: #3b82f6;
+          color: white;
+        }
+    </style>
+</head>
+<body>
+
+<h1>3. Longest Substring Without Repeating Characters (Optimized)</h1>
+
+<div class="section">
+    <h2>🧠 Problem</h2>
+    <p>Given a string <code>s</code>, find the length of the <span class="highlight">longest substring</span> without repeating characters.</p>
+</div>
+
+<div class="section">
+    <h2>💡 Example</h2>
+    <pre>
+Input: "abcabcbb"
+Output: 3
+Explanation: The answer is "abc", with the length of 3.
+    </pre>
+</div>
+
+<div class="section">
+    <h2>🚀 Optimized Idea</h2>
+    <p>Use the <span class="highlight">sliding window</span> technique with a <span class="highlight">HashMap</span> to jump directly to the next position after a repeating character.</p>
+    <p>This avoids removing characters one by one, improving efficiency to <strong>O(n)</strong>.</p>
+</div>
+
+<div class="section">
+    <h2>🧩 Algorithm Steps</h2>
+    <ol>
+        <li>Use two pointers <code>start</code> and <code>end</code> to define the current window.</li>
+        <li>Keep a HashMap that stores each character's last seen index.</li>
+        <li>If a character repeats and is within the current window, move <code>start</code> to <code>map.get(c) + 1</code>.</li>
+        <li>Update the max window size on each step.</li>
+    </ol>
+</div>
+
+<div class="section">
+    <h2>💻 Java Code (Optimized O(n))</h2>
+    <pre><code>class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        Map&lt;Character, Integer&gt; map = new HashMap&lt;&gt;();
+        int maxLen = 0;
+        int start = 0;
+
+        for (int end = 0; end &lt; s.length(); end++) {
+            char c = s.charAt(end);
+
+            // If character is seen before, move start pointer
+            if (map.containsKey(c)) {
+                start = Math.max(start, map.get(c) + 1);
+            }
+
+            // Update character's latest index
+            map.put(c, end);
+
+            // Update max length
+            maxLen = Math.max(maxLen, end - start + 1);
+        }
+
+        return maxLen;
+    }
+}</code></pre>
+</div>
+
+<div class="section">
+    <h2>🧾 Example Walkthrough</h2>
+    <pre>Input: "abba"</pre>
+    <table>
+        <tr>
+            <th>Step</th>
+            <th>end</th>
+            <th>char</th>
+            <th>start</th>
+            <th>map</th>
+            <th>Action</th>
+            <th>maxLen</th>
+        </tr>
+        <tr><td>1</td><td>0</td><td>'a'</td><td>0</td><td>{a:0}</td><td>new char</td><td>1</td></tr>
+        <tr><td>2</td><td>1</td><td>'b'</td><td>0</td><td>{a:0,b:1}</td><td>new char</td><td>2</td></tr>
+        <tr><td>3</td><td>2</td><td>'b'</td><td>2</td><td>{a:0,b:2}</td><td>repeat 'b' → move start</td><td>2</td></tr>
+        <tr><td>4</td><td>3</td><td>'a'</td><td>2</td><td>{a:3,b:2}</td><td>repeat 'a' → move start</td><td>2</td></tr>
+    </table>
+    <p>✅ Final Answer: <strong>2</strong></p>
+</div>
+
+<div class="section">
+    <h2>✨ Summary</h2>
+    <table>
+        <tr><th>Approach</th><th>Time</th><th>Space</th><th>Description</th></tr>
+        <tr><td>Basic Sliding Window</td><td>O(2n)</td><td>O(n)</td><td>Removes chars one-by-one</td></tr>
+        <tr><td><strong>Optimized Sliding Window</strong></td><td><strong>O(n)</strong></td><td><strong>O(n)</strong></td><td>Jumps directly after repeats</td></tr>
+    </table>
+</div>
+
+</body>
+</html>

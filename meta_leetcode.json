@@ -119,27 +119,27 @@
             },
             {
               "name": "Longest Substring Without Repeating Characters",
-              "url": "https://leetcode.com/problems/longest-substring-without-repeating-characters/",
+              "url": "/system_design/meta/longestNonRepeatingSW.html",
               "tag": "30 days"
             },
             {
               "name": "Best Time to Buy and Sell Stock using Strategy",
-              "url": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/",
+              "url": "/system_design/meta/stockBuyAndSellSW.html",
               "tag": "30 days"
             },
             {
               "name": "Longest Repeating Character Replacement",
-              "url": "https://leetcode.com/problems/longest-repeating-character-replacement/",
+              "url": "/system_design/meta/maxFrequestReplacementSW.html",
               "tag": "30 days"
             },
             {
               "name": "Maximum Frequency of an Element After Performing Operations I",
-              "url": "https://leetcode.com/problems/maximum-frequency-of-an-element-after-performing-operations-i/",
+              "url": "/system_design/meta/maxReplacmentSW.html",
               "tag": "30 days"
             },
             {
               "name": "Sliding Window Maximum",
-              "url": "https://leetcode.com/problems/sliding-window-maximum/",
+              "url": "/system_design/meta/slidingWindowMax.html",
               "tag": "30 days"
             }
           ]

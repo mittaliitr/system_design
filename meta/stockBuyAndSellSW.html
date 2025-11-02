@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Best Time to Buy and Sell Stock - Sliding Window Variations</title>
+    <style>
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          max-width: 900px;
+          margin: 20px auto;
+          line-height: 1.6;
+          color: #333;
+        }
+        h1, h2 {
+          color: #0056b3;
+        }
+        pre {
+          background: #f7f7f7;
+          padding: 15px;
+          border-radius: 6px;
+          overflow-x: auto;
+        }
+        code {
+          font-family: Consolas, monospace;
+        }
+        section {
+          margin-bottom: 40px;
+        }
+        a {
+          color: #0056b3;
+          text-decoration: none;
+        }
+        a:hover {
+          text-decoration: underline;
+        }
+        table {
+          border-collapse: collapse;
+          width: 100%;
+          margin-top: 10px;
+        }
+        th, td {
+          border: 1px solid #ddd;
+          padding: 8px;
+        }
+        th {
+          background-color: #e0e7ff;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Best Time to Buy and Sell Stock - Sliding Window Variations</h1>
+
+<p>This page summarizes multiple LeetCode stock trading problems that can be solved using <strong>Sliding Window / Two Pointer</strong> techniques or their conceptual extensions.</p>
+
+<hr/>
+
+<section>
+    <h2>1. Best Time to Buy and Sell Stock (One Transaction)</h2>
+    <p><strong>LeetCode #121</strong> - You can only make one buy and one sell.</p>
+    <p><strong>Approach:</strong> Use two pointers - <code>left</code> as buy day, <code>right</code> as sell day. Move <code>right</code> forward, update minimum price (buy day), track max profit.</p>
+
+    <pre><code>// Java code
+class Solution {
+    public int maxProfit(int[] prices) {
+        int left = 0, right = 1, maxProfit = 0;
+        while (right < prices.length) {
+            if (prices[right] > prices[left]) {
+                maxProfit = Math.max(maxProfit, prices[right] - prices[left]);
+            } else {
+                left = right;
+            }
+            right++;
+        }
+        return maxProfit;
+    }
+}
+  </code></pre>
+</section>
+
+<section>
+    <h2>2. Best Time to Buy and Sell Stock II (Multiple Transactions)</h2>
+    <p><strong>LeetCode #122</strong> - You can complete unlimited transactions (buy/sell multiple times).</p>
+    <p><strong>Approach:</strong> Add all positive differences between consecutive days. Each rising edge counts as profit.</p>
+
+    <pre><code>// Java code
+class Solution {
+    public int maxProfit(int[] prices) {
+        int profit = 0;
+        for (int i = 1; i &lt; prices.length; i++) {
+            if (prices[i] &gt; prices[i - 1]) {
+                profit += prices[i] - prices[i - 1];
+            }
+        }
+        return profit;
+    }
+}
+  </code></pre>
+</section>
+
+<section>
+    <h2>3. Best Time to Buy and Sell Stock III (At Most Two Transactions)</h2>
+    <p><strong>LeetCode #123</strong> - You can complete at most two transactions.</p>
+    <p><strong>Approach:</strong> Use two passes:
+        - Forward pass to track max profit until day <code>i</code>.
+        - Backward pass to track max profit from day <code>i</code> to end.
+        Combine results for maximum total profit. This extends sliding window to two overlapping windows.</p>
+
+    <pre><code>// Java code snippet (core idea)
+public int maxProfit(int[] prices) {
+    int n = prices.length;
+    int[] leftProfit = new int[n];
+    int[] rightProfit = new int[n + 1];
+
+    // Forward pass
+    int minPrice = Integer.MAX_VALUE;
+    for (int i = 0; i &lt; n; i++) {
+        minPrice = Math.min(minPrice, prices[i]);
+        leftProfit[i] = i == 0 ? 0 : Math.max(leftProfit[i - 1], prices[i] - minPrice);
+    }
+
+    // Backward pass
+    int maxPrice = Integer.MIN_VALUE;
+    for (int i = n - 1; i &gt;= 0; i--) {
+        maxPrice = Math.max(maxPrice, prices[i]);
+        rightProfit[i] = Math.max(rightProfit[i + 1], maxPrice - prices[i]);
+    }
+
+    int maxTotal = 0;
+    for (int i = 0; i &lt; n; i++) {
+        maxTotal = Math.max(maxTotal, leftProfit[i] + rightProfit[i + 1]);
+    }
+
+    return maxTotal;
+}
+  </code></pre>
+</section>
+
+<section>
+    <h2>4. Best Time to Buy and Sell Stock IV (At Most K Transactions)</h2>
+    <p><strong>LeetCode #188</strong> - You can complete at most <code>k</code> transactions.</p>
+    <p><strong>Approach:</strong> Generalizes the two-transaction case using dynamic programming over <code>k</code> transaction windows. Conceptually multiple sliding windows track profits for each transaction number.</p>
+
+    <p><em>Code is more complex and usually solved with DP arrays rather than simple sliding window, but idea extends the two-window approach.</em></p>
+</section>
+
+<section>
+    <h2>5. Best Time to Buy and Sell Stock with Cooldown</h2>
+    <p><strong>LeetCode #309</strong> - After selling, you must wait 1 day before buying again.</p>
+    <p><strong>Approach:</strong> Sliding window here skips a day (cooldown). Use states to track buy/sell with cooldown constraints.</p>
+
+    <pre><code>// Java code using DP states
+public int maxProfit(int[] prices) {
+    int n = prices.length;
+    int[] sell = new int[n];
+    int[] buy = new int[n];
+    buy[0] = -prices[0];
+    sell[0] = 0;
+
+    for (int i = 1; i &lt; n; i++) {
+        buy[i] = Math.max(buy[i - 1], (i - 2 &gt;= 0 ? sell[i - 2] : 0) - prices[i]);
+        sell[i] = Math.max(sell[i - 1], buy[i - 1] + prices[i]);
+    }
+    return sell[n - 1];
+}
+  </code></pre>
+</section>
+
+<section>
+    <h2>6. Best Time to Buy and Sell Stock with Transaction Fee</h2>
+    <p><strong>LeetCode #714</strong> - Each transaction pays a fixed fee.</p>
+    <p><strong>Approach:</strong> Track holding state and cash state, subtract fee at selling time. Sliding window analogy applies with adjusted buy prices.</p>
+
+    <pre><code>// Java code
+class Solution {
+    public int maxProfit(int[] prices, int fee) {
+        int hold = -prices[0];
+        int cash = 0;
+        for (int i = 1; i &lt; prices.length; i++) {
+            cash = Math.max(cash, hold + prices[i] - fee);
+            hold = Math.max(hold, cash - prices[i]);
+        }
+        return cash;
+    }
+}
+  </code></pre>
+</section>
+
+<section>
+    <h2>7. Custom Variation: Restrict Transactions within a Window Size k</h2>
+    <p>You can only buy and sell within any subarray/window of length <code>k</code>.</p>
+    <p><strong>Approach:</strong> Use a fixed-size sliding window to find maximum profit inside each window.</p>
+</section>
+
+<hr/>
+
+<h2>Summary Table</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Problem</th>
+        <th>Constraint</th>
+        <th>Sliding Window / Two Pointer View</th>
+        <th>LeetCode #</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>One Transaction</td>
+        <td>Buy once, sell once</td>
+        <td>Shrinking window with minimum price pointer</td>
+        <td>121</td>
+    </tr>
+    <tr>
+        <td>Unlimited Transactions</td>
+        <td>Buy &amp; sell multiple times</td>
+        <td>Sum of all positive price differences</td>
+        <td>122</td>
+    </tr>
+    <tr>
+        <td>At Most Two Transactions</td>
+        <td>Max two buy-sell pairs</td>
+        <td>Two overlapping sliding windows (forward-backward)</td>
+        <td>123</td>
+    </tr>
+    <tr>
+        <td>At Most K Transactions</td>
+        <td>Max k buy-sell pairs</td>
+        <td>DP over k sliding windows (extension)</td>
+        <td>188</td>
+    </tr>
+    <tr>
+        <td>Cooldown</td>
+        <td>1 day wait after sell</td>
+        <td>Sliding window with day skip (cooldown)</td>
+        <td>309</td>
+    </tr>
+    <tr>
+        <td>Transaction Fee</td>
+        <td>Fee per transaction</td>
+        <td>Adjust buy price with fee in sliding window</td>
+        <td>714</td>
+    </tr>
+    <tr>
+        <td>Window Size k Restriction</td>
+        <td>Transactions inside fixed window k</td>
+        <td>Fixed-size sliding window max profit</td>
+        <td>Custom</td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
