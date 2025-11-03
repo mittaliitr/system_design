@@ -195,56 +195,49 @@
           "children": [
             {
               "name": "LRU Cache",
-              "url": "https://leetcode.com/problems/lru-cache/",
+              "url": "https://leetcode.com/problems/lru-cache/solutions/45911/java-hashtable-double-linked-list-with-a-mihw",
               "difficulty": "Medium",
               "acceptance": "46.2%",
               "tag": "30 days"
             },
             {
               "name": "Binary Tree Vertical Order Traversal",
-              "url": "https://leetcode.com/problems/binary-tree-vertical-order-traversal/",
+              "url": "https://leetcode.com/problems/binary-tree-vertical-order-traversal/solutions/76401/5ms-java-clean-solution-by-yavinci-bfs5",
               "difficulty": "Medium",
               "acceptance": "57.6%",
               "tag": "30 days"
             },
             {
               "name": "Top K Frequent Elements",
-              "url": "https://leetcode.com/problems/top-k-frequent-elements/",
+              "url": "/system_design/meta/top_kfrequent_top_kfrequent_elements.html",
               "difficulty": "Medium",
               "acceptance": "65.1%",
               "tag": "30 days"
             },
             {
               "name": "Custom Sort String",
-              "url": "https://leetcode.com/problems/custom-sort-string/",
+              "url": "https://leetcode.com/problems/custom-sort-string/solutions/1336780/java-2-ms-solution-using-hashmap-by-adar-ijq4",
               "difficulty": "Medium",
               "acceptance": "72.2%",
               "tag": "30 days"
             },
             {
               "name": "Copy List with Random Pointer",
-              "url": "https://leetcode.com/problems/copy-list-with-random-pointer/",
+              "url": "/system_design/meta/copy_list_with_random_pointer.html",
               "difficulty": "Medium",
               "acceptance": "61.7%",
               "tag": "30 days"
             },
             {
-              "name": "Minimum Window Substring",
-              "url": "https://leetcode.com/problems/minimum-window-substring/",
-              "difficulty": "Hard",
-              "acceptance": "46.3%",
-              "tag": "30 days"
-            },
-            {
               "name": "Two Sum",
-              "url": "https://leetcode.com/problems/two-sum/",
+              "url": "https://leetcode.com/problems/two-sum/solutions/2671539/java-100-runtime-easy-to-understand-by-v-bpc8",
               "difficulty": "Easy",
               "acceptance": "56.5%",
               "tag": "30 days"
             },
             {
               "name": "All Nodes Distance K in Binary Tree",
-              "url": "https://leetcode.com/problems/all-nodes-distance-k-in-binary-tree/",
+              "url": "https://leetcode.com/problems/all-nodes-distance-k-in-binary-tree/solutions/7320655/distance-k-nodes-from-target-clean-bfs-p-l8h2",
               "difficulty": "Medium",
               "acceptance": "67.1%",
               "tag": "30 days"

@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Top K Frequent Elements — Solution (Java)</title>
+  <style>
+    body{font-family:Inter,Segoe UI,Arial,sans-serif;margin:24px;background:#f7f9fb;color:#0b1220}
+    .container{max-width:900px;margin:0 auto;background:white;padding:24px;border-radius:12px;box-shadow:0 8px 30px rgba(6,22,39,0.08)}
+    h1{font-size:20px;margin-bottom:8px}
+    pre{background:#0b1220;color:#dbeafe;padding:16px;border-radius:8px;overflow:auto}
+    code{font-family:SFMono-Regular,Menlo,Monaco,Consolas,'Liberation Mono','Courier New',monospace}
+    .row{display:flex;gap:12px;align-items:flex-start}
+    .col{flex:1}
+    .btn{display:inline-block;padding:8px 12px;border-radius:8px;border:0;background:#2563eb;color:white;cursor:pointer}
+    label{font-weight:600}
+    input[type=text]{width:100%;padding:8px;border-radius:8px;border:1px solid #e6eef8}
+    .meta{font-size:13px;color:#475569;margin-top:8px}
+    .result{background:#f1f5f9;padding:12px;border-radius:8px;margin-top:12px}
+    .foot{font-size:13px;color:#64748b;margin-top:18px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Top K Frequent Elements — Solution (Java)</h1>
+    <p>This page explains the <strong>min-heap</strong>-based solution for <em>Top K Frequent Elements</em> (LeetCode 347) and shows the exact Java implementation you provided, plus a small interactive demo (JavaScript) to try inputs in the browser.</p>
+
+    <h2>Key idea</h2>
+    <p>Use a <strong>min-heap</strong> (PriorityQueue in Java with a comparator) that stores at most <code>k</code> numbers keyed by their frequency. Whenever the heap size exceeds <code>k</code>, remove the element with the smallest frequency. At the end the heap contains the <code>k</code> most frequent elements.</p>
+
+    <div class="row">
+      <div class="col">
+        <label>Time complexity</label>
+        <div class="meta">O(N + N log k) when k &lt; N. Special case: if k == N, return input — O(1) extra work.<br/>Space complexity: O(N + k) for the frequency map + heap.</div>
+      </div>
+    </div>
+
+    <h2>Java implementation</h2>
+    <pre><code class="language-java">class Solution {
+    public int[] topKFrequent(int[] nums, int k) {
+        if (k == nums.length) {
+            return nums;
+        }
+        HashMap<Integer, Integer> countHashMap = new HashMap<>();
+        for (int n : nums) {
+            countHashMap.put(n, countHashMap.getOrDefault(n, 0) + 1);
+        }
+
+        Queue<Integer> heap = new PriorityQueue<>((n1, n2) -> countHashMap.get(n1) - countHashMap.get(n2));
+        for (int n : countHashMap.keySet()) {
+            heap.add(n);
+            if (heap.size() > k) {
+                heap.poll();
+            }
+        }
+
+        int[] top = new int[k];
+        for (int i = k - 1; i >= 0; i--) {
+            top[i] = heap.poll();
+        }
+        return top;
+    }
+}
+</code></pre>
+
+    <h2>Interactive demo (browser)</h2>
+    <p>Enter a list of integers (comma-separated) and a value for <code>k</code>. This demo uses a simple approach that mirrors the algorithm's result so you can test inputs quickly.</p>
+
+    <label>nums (comma separated)</label>
+    <input id="nums" type="text" value="1,1,1,2,2,3" />
+
+    <label style="margin-top:8px">k</label>
+    <input id="k" type="text" value="2" />
+
+    <div style="margin-top:8px">
+      <button class="btn" onclick="runDemo()">Run</button>
+    </div>
+
+    <div class="result" id="out">Result will appear here.</div>
+
+    <script>
+      function topKFrequentJS(nums, k) {
+        // Build frequency map
+        const freq = new Map();
+        for (const n of nums) freq.set(n, (freq.get(n) || 0) + 1);
+        // Use an array of entries and partial sort to simulate top-k (for demo convenience)
+        const entries = Array.from(freq.entries());
+        entries.sort((a,b) => a[1] - b[1]); // ascending by frequency
+        const res = [];
+        for (let i = entries.length - 1; i >= Math.max(0, entries.length - k); i--) res.push(parseInt(entries[i][0]));
+        return res;
+      }
+
+      function runDemo(){
+        const numsText = document.getElementById('nums').value.trim();
+        const kText = document.getElementById('k').value.trim();
+        if (!numsText) return document.getElementById('out').innerText = 'Provide nums';
+        const nums = numsText.split(',').map(s => parseInt(s.trim())).filter(x => !Number.isNaN(x));
+        const k = parseInt(kText);
+        if (Number.isNaN(k) || k <= 0) return document.getElementById('out').innerText = 'Provide valid k';
+        const result = topKFrequentJS(nums, k);
+        document.getElementById('out').innerHTML = '<strong>Top ' + k + ' frequent:</strong> [' + result.join(', ') + ']';
+      }
+    </script>
+
+    <div class="foot">
+      <strong>Notes</strong>: The Java solution uses a <em>min-heap</em> comparator <code>(n1,n2) -&gt; count.get(n1) - count.get(n2)</code>, so the smallest-frequency element sits at the root and is removed when size &gt; k. If you'd like, I can also provide:
+      <ul>
+        <li>a fully working Java project (Maven) with unit tests;</li>
+        <li>a version that uses a custom heap implementation in JS for a byte-for-byte algorithm match; or</li>
+        <li>an explanation with diagrams showing the heap evolution while inserting elements.</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>

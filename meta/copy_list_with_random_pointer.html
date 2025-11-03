@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Copy List with Random Pointer — Simple Explanation</title>
+  <style>
+    body { font-family: Inter, Arial, sans-serif; background: #f7f9fc; color: #111827; margin: 20px; }
+    .container { max-width: 900px; margin: auto; background: #fff; padding: 24px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
+    h1 { color: #1e3a8a; }
+    h2 { color: #2563eb; margin-top: 20px; }
+    pre { background: #0f172a; color: #e2e8f0; padding: 16px; border-radius: 8px; overflow-x: auto; }
+    code { font-family: Consolas, monospace; }
+    .highlight { background: #eff6ff; padding: 8px 12px; border-left: 4px solid #2563eb; margin: 8px 0; }
+    .table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    .table th, .table td { border: 1px solid #e2e8f0; padding: 8px; text-align: left; }
+    .table th { background: #f1f5f9; }
+    .diagram { font-family: monospace; background: #f9fafb; padding: 10px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Copy List with Random Pointer — Explained Simply</h1>
+    <p>This problem asks us to <strong>deep copy</strong> a special linked list where each node has two pointers:</p>
+    <ul>
+      <li><code>next</code> → points to the next node</li>
+      <li><code>random</code> → points to any node (or null)</li>
+    </ul>
+
+    <h2>🎯 Goal</h2>
+    <p>Create a <strong>new list</strong> where:</p>
+    <ul>
+      <li>Each new node has the same value as the original.</li>
+      <li>The <code>next</code> and <code>random</code> pointers follow the same pattern.</li>
+      <li>No pointer in the new list should point to the old nodes.</li>
+    </ul>
+
+    <hr>
+
+    <h2>✅ Solution 1: Using HashMap (O(n) Space)</h2>
+
+    <div class="highlight">
+      <strong>Idea:</strong> Keep a map to remember which new node corresponds to each old node.
+    </div>
+
+    <ol>
+      <li>Copy all nodes one by one and store: <code>map[original] = copy</code></li>
+      <li>Then, using the map, set the <code>next</code> and <code>random</code> pointers.</li>
+    </ol>
+
+    <pre><code class="language-java">class Solution {
+    public Node copyRandomList(Node head) {
+        if (head == null) return null;
+
+        Map&lt;Node, Node&gt; map = new HashMap<>();
+
+        // Step 1: Copy all nodes
+        Node curr = head;
+        while (curr != null) {
+            map.put(curr, new Node(curr.val));
+            curr = curr.next;
+        }
+
+        // Step 2: Set next and random pointers
+        curr = head;
+        while (curr != null) {
+            Node copy = map.get(curr);
+            copy.next = map.get(curr.next);
+            copy.random = map.get(curr.random);
+            curr = curr.next;
+        }
+
+        return map.get(head);
+    }
+}</code></pre>
+
+    <table class="table">
+      <tr><th>Complexity</th><th>Value</th></tr>
+      <tr><td>Time</td><td>O(n)</td></tr>
+      <tr><td>Space</td><td>O(n) (for the map)</td></tr>
+    </table>
+
+    <hr>
+
+    <h2>🚀 Solution 2: O(1) Space (In-place Trick)</h2>
+
+    <div class="highlight">
+      <strong>Trick:</strong> Create the copied nodes right after their originals — no extra map needed!
+    </div>
+
+    <h3>Steps:</h3>
+    <ol>
+      <li><strong>Insert</strong> each copy node right after its original.</li>
+      <li><strong>Set random</strong> for each copy using: <code>copy.random = original.random.next</code>.</li>
+      <li><strong>Separate</strong> both lists (original and copy).</li>
+    </ol>
+
+    <pre><code class="language-java">class Solution {
+    public Node copyRandomList(Node head) {
+        if (head == null) return null;
+
+        Node curr = head;
+
+        // Step 1: Insert copied nodes after originals
+        while (curr != null) {
+            Node copy = new Node(curr.val);
+            copy.next = curr.next;
+            curr.next = copy;
+            curr = copy.next;
+        }
+
+        // Step 2: Assign random pointers to copies
+        curr = head;
+        while (curr != null) {
+            if (curr.random != null) {
+                curr.next.random = curr.random.next;
+            }
+            curr = curr.next.next;
+        }
+
+        // Step 3: Separate original and copied lists
+        curr = head;
+        Node copyHead = head.next;
+        Node copyCurr = copyHead;
+
+        while (curr != null) {
+            curr.next = curr.next.next;
+            if (copyCurr.next != null)
+                copyCurr.next = copyCurr.next.next;
+            curr = curr.next;
+            copyCurr = copyCurr.next;
+        }
+
+        return copyHead;
+    }
+}</code></pre>
+
+    <h3>🧮 Complexity</h3>
+    <table class="table">
+      <tr><th>Type</th><th>Complexity</th></tr>
+      <tr><td>Time</td><td>O(n)</td></tr>
+      <tr><td>Space</td><td>O(1)</td></tr>
+    </table>
+
+    <h3>🔍 Visual Example</h3>
+    <div class="diagram">
+A → B → C → null
+A.random → C
+B.random → A
+C.random → B
+    </div>
+
+    <p><strong>After inserting copies:</strong></p>
+    <div class="diagram">
+A → A' → B → B' → C → C'
+    </div>
+
+    <p><strong>After setting randoms:</strong></p>
+    <div class="diagram">
+A'.random → C'
+B'.random → A'
+C'.random → B'
+    </div>
+
+    <p><strong>After separating:</strong></p>
+    <div class="diagram">
+Original: A → B → C
+Copied:   A' → B' → C'
+    </div>
+
+    <h2>📋 Summary</h2>
+    <table class="table">
+      <tr><th>Approach</th><th>Extra Space</th><th>Technique</th><th>Difficulty</th></tr>
+      <tr><td>HashMap</td><td>O(n)</td><td>Store mapping (original → copy)</td><td>Easy</td></tr>
+      <tr><td>In-place</td><td>O(1)</td><td>Interleave + Detach copies</td><td>Medium</td></tr>
+    </table>
+  </div>
+</body>
+</html>
