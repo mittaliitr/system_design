@@ -34,12 +34,12 @@
           "children": [
             {
               "name": "Locks (Mutex): Atomic Test-and-Set, Critical Section",
-              "url": "https://en.wikipedia.org/wiki/Test-and-set",
+              "url": "concurrency /chapter6.html",
               "tag": "primitive"
             },
             {
               "name": "Semaphores: Binary & Counting, P/V Operations",
-              "url": "https://www.geeksforgeeks.org/semaphores-in-process-synchronization/",
+              "url": "concurrency /chapter6.2.html",
               "tag": "primitive"
             },
             {

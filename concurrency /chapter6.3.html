@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>0.6 Concurrency Primitives: Monitors, Spinlocks, Futexes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #4834d4;
+          --secondary: #706fd3;
+          --accent: #34e7e4;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container {
+          max-width: 1000px;
+          margin: 0 auto;
+          background: white;
+          border-radius: 20px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+          overflow: hidden;
+        }
+
+        header {
+          background: linear-gradient(120deg, var(--primary), var(--secondary));
+          color: white;
+          padding: 3rem 2rem;
+          text-align: center;
+        }
+
+        header h1 {
+          font-size: 2.5rem;
+          margin-bottom: 0.5rem;
+          font-weight: 700;
+        }
+
+        header h2 {
+          font-size: 1.5rem;
+          margin-bottom: 0.5rem;
+          opacity: 0.9;
+        }
+
+        header p {
+          font-size: 1.2rem;
+          opacity: 0.9;
+        }
+
+        .badge {
+          display: inline-block;
+          background: rgba(255,255,255,0.2);
+          padding: 0.3rem 0.8rem;
+          border-radius: 50px;
+          font-size: 0.9rem;
+          margin-top: 1rem;
+        }
+
+        main {
+          padding: 3rem 2.5rem;
+        }
+
+        section {
+          margin-bottom: 3.5rem;
+        }
+
+        h2 {
+          font-size: 1.8rem;
+          color: var(--primary);
+          margin-bottom: 1rem;
+          position: relative;
+          padding-left: 1rem;
+        }
+
+        h2::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 5px;
+          background: var(--primary);
+          border-radius: 3px;
+        }
+
+        h3 {
+          font-size: 1.4rem;
+          color: var(--dark);
+          margin: 1.5rem 0 1rem;
+        }
+
+        p {
+          margin-bottom: 1.2rem;
+          color: #444;
+        }
+
+        .highlight {
+          background: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
+          padding: 1.2rem;
+          border-left: 5px solid var(--accent);
+          border-radius: 0 8px 8px 0;
+          margin: 1.5rem 0;
+          font-style: italic;
+        }
+
+        .analogy {
+          background: #e6f7ff;
+          border: 1px solid var(--accent);
+          color: #006d77;
+        }
+
+        .code-block {
+          background: #2d2d2d;
+          color: #f8f8f2;
+          padding: 1.2rem;
+          border-radius: 12px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 1.5rem 0;
+          position: relative;
+        }
+
+        .code-block::before {
+          content: 'Java / C / Linux';
+          position: absolute;
+          top: 0.5rem;
+          right: 1rem;
+          font-size: 0.8rem;
+          color: #666;
+          font-family: 'Inter', sans-serif;
+        }
+
+        .primitive-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+          gap: 1.5rem;
+          margin: 2rem 0;
+        }
+
+        .primitive-card {
+          background: #f8f9fa;
+          border: 2px solid #e9ecef;
+          border-radius: 16px;
+          padding: 1.5rem;
+          transition: all 0.3s;
+          cursor: pointer;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .primitive-card::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: linear-gradient(135deg, transparent, rgba(72,52,212,0.1));
+          opacity: 0;
+          transition: opacity 0.3s;
+        }
+
+        .primitive-card:hover::before {
+          opacity: 1;
+        }
+
+        .primitive-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 12px 24px rgba(72,52,212,0.2);
+        }
+
+        .primitive-icon {
+          font-size: 2.5rem;
+          text-align: center;
+          margin-bottom: 0.8rem;
+        }
+
+        .primitive-title {
+          font-weight: 700;
+          color: var(--primary);
+          text-align: center;
+          margin-bottom: 0.5rem;
+        }
+
+        .futex-flow {
+          display: flex;
+          justify-content: center;
+          gap: 1.5rem;
+          flex-wrap: wrap;
+          margin: 2rem 0;
+          padding: 1.5rem;
+          background: #f0f4f8;
+          border-radius: 16px;
+        }
+
+        .futex-step {
+          text-align: center;
+          flex: 1;
+          min-width: 160px;
+          padding: 1rem;
+          border-radius: 12px;
+          background: white;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .futex-label {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 1.2rem;
+          font-weight: 600;
+          color: var(--primary);
+        }
+
+        .mermaid {
+          background: white;
+          padding: 1.5rem;
+          border-radius: 12px;
+          border: 1px solid #eee;
+          margin: 2rem 0;
+          text-align: center;
+        }
+
+        .comparison-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 2rem 0;
+          font-size: 0.95rem;
+        }
+
+        .comparison-table th {
+          background: var(--primary);
+          color: white;
+          padding: 1rem;
+          text-align: left;
+        }
+
+        .comparison-table td {
+          padding: 1rem;
+          border-bottom: 1px solid #eee;
+        }
+
+        .comparison-table tr:hover {
+          background: #f8f9fa;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2rem; }
+          .primitive-grid { grid-template-columns: 1fr; }
+          .futex-flow { flex-direction: column; }
+          .comparison-table { font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>0.6 Concurrency Primitives</h1>
+        <h2>Monitors, Spinlocks, Futexes</h2>
+        <p>From High-Level Safety to Kernel-Level Speed</p>
+        <div class="badge">Chapter 0 – Computer Architecture & Concurrency Foundations</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>Three Tools for Three Jobs</h2>
+            <p>
+                You need a <strong>lock</strong>, but which one?
+            </p>
+            <div class="highlight analogy">
+                <strong>Analogy:</strong>
+                <em>Monitor</em> = smart home with auto-locks<br>
+                <em>Spinlock</em> = busy-waiting guard<br>
+                <em>Futex</em> = hybrid: sleep when needed
+            </div>
+        </section>
+
+        <!-- Overview Grid -->
+        <section>
+            <h2>Monitors, Spinlocks, Futexes</h2>
+
+            <div class="primitive-grid">
+                <div class="primitive-card">
+                    <div class="primitive-icon">Monitor</div>
+                    <div class="primitive-title">Monitor</div>
+                    <p>High-level, object-based lock<br>
+                        <code>synchronized</code> + <code>wait/notify</code></p>
+                </div>
+                <div class="primitive-card">
+                    <div class="primitive-icon">Spinlock</div>
+                    <div class="primitive-title">Spinlock</div>
+                    <p>Busy-wait with TAS<br>
+                        Fast for <strong>short waits</strong></p>
+                </div>
+                <div class="primitive-card">
+                    <div class="primitive-icon">Futex</div>
+                    <div class="primitive-title">Futex</div>
+                    <p>Fast Userspace Lock<br>
+                        Spin → sleep hybrid</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Monitors -->
+        <section>
+            <h2>Monitors: Java’s Built-in Safety</h2>
+            <p>
+                A <strong>monitor</strong> is a lock + condition variables. Every Java object is a monitor!
+            </p>
+
+            <div class="code-block">
+          <pre>
+// Java: synchronized = monitor enter/exit
+synchronized(obj) {
+    while (!condition) {
+        obj.wait();  // Release lock, sleep
+    }
+    // critical section
+    obj.notify();   // Wake one waiter
+}
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Under the hood:</strong>
+                JVM uses OS mutex + condition variable<br>
+                <code>wait()</code> → parks thread, <code>notify()</code> → unparks
+            </div>
+
+            <div class="mermaid">
+                sequenceDiagram
+                participant T1 as Thread 1
+                participant M as Monitor
+                participant T2 as Thread 2
+                T1->>M: enter()
+                T1->>M: wait() → sleep
+                T2->>M: enter()
+                T2->>M: notify()
+                T1->>M: wake up → re-acquire
+            </div>
+        </section>
+
+        <!-- Spinlocks -->
+        <section>
+            <h2>Spinlocks: Busy-Waiting for Speed</h2>
+            <p>
+                A <strong>spinlock</strong> uses <code>test-and-set</code> in a loop. No sleeping!
+            </p>
+
+            <div class="code-block">
+          <pre>
+// C: Simple spinlock
+volatile int lock = 0;
+
+void acquire() {
+    while (__sync_lock_test_and_set(&lock, 1)) {
+        // spin!
+    }
+}
+
+void release() {
+    __sync_lock_release(&lock);
+}
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Best for:</strong>
+                Lock held < 100 cycles<br>
+                <strong>Worst for:</strong> Long waits → wastes CPU
+            </div>
+        </section>
+
+        <!-- Futexes -->
+        <section>
+            <h2>Futex: The Linux Magic (Fast Userspace Lock)</h2>
+            <p>
+                <strong>Futex</strong> = spin in user space, sleep in kernel only when needed.
+            </p>
+
+            <div class="futex-flow">
+                <div class="futex-step">
+                    <div class="futex-label">1. Check</div>
+                    <p>Read lock word</p>
+                </div>
+                <div class="futex-step">
+                    <div class="futex-label">2. TAS</div>
+                    <p>Try atomic set</p>
+                </div>
+                <div class="futex-step">
+                    <div class="futex-label">3. Success</div>
+                    <p>Enter critical section</p>
+                </div>
+                <div class="futex-step">
+                    <div class="futex-label">4. Contended</div>
+                    <p><code>futex(WAIT)</code> → kernel sleep</p>
+                </div>
+                <div class="futex-step">
+                    <div class="futex-label">5. Wake</div>
+                    <p><code>futex(WAKE)</code></p>
+                </div>
+            </div>
+
+            <div class="code-block">
+          <pre>
+// Linux syscall
+futex(uaddr, FUTEX_WAIT, val, timeout);
+futex(uaddr, FUTEX_WAKE, 1);
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Used by:</strong>
+                Java <code>LockSupport.park/unpark</code>, Go, Rust<br>
+                <strong>Why?</strong> 99% fast path in user space
+            </div>
+        </section>
+
+        <!-- Comparison Table -->
+        <section>
+            <h2>Monitors vs Spinlocks vs Futexes</h2>
+
+            <table class="comparison-table">
+                <tr>
+                    <th>Feature</th>
+                    <th>Monitor</th>
+                    <th>Spinlock</th>
+                    <th>Futex</th>
+                </tr>
+                <tr>
+                    <td>Level</td>
+                    <td>Language (Java)</td>
+                    <td>Kernel / Library</td>
+                    <td>OS (Linux)</td>
+                </tr>
+                <tr>
+                    <td>Wait Strategy</td>
+                    <td>Block (sleep)</td>
+                    <td>Spin (busy-wait)</td>
+                    <td>Spin → Sleep</td>
+                </tr>
+                <tr>
+                    <td>Best For</td>
+                    <td>Long waits, safety</td>
+                    <td>Short critical sections</td>
+                    <td>High contention</td>
+                </tr>
+                <tr>
+                    <td>Java Usage</td>
+                    <td><code>synchronized</code>, <code>wait/notify</code></td>
+                    <td>JVM internals</td>
+                    <td><code>LockSupport</code>, ReentrantLock</td>
+                </tr>
+                <tr>
+                    <td>Overhead</td>
+                    <td>High</td>
+                    <td>Low (if short)</td>
+                    <td>Very low</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Java Connection -->
+        <section>
+            <h2>Java Uses All Three!</h2>
+
+            <div class="code-block">
+          <pre>
+// 1. Monitor
+synchronized(list) { list.add(x); }
+
+// 2. Futex (via LockSupport)
+LockSupport.park();   // → futex(WAIT)
+LockSupport.unpark(t); // → futex(WAKE)
+
+// 3. Spinlock (in JVM HotSpot)
+biased locking → lightweight sync → OS mutex
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>ReentrantLock:</strong>
+                Uses <strong>futex</strong> + <strong>spin</strong> on contention
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #e6f7ff; padding: 1.5rem; border-radius: 12px; border-left: 5px solid var(--primary);">
+                <p><strong>1.</strong> <strong>Monitor</strong>: Java object lock + wait/notify.</p>
+                <p><strong>2.</strong> <strong>Spinlock</strong>: Busy-wait with TAS → fast if short.</p>
+                <p><strong>3.</strong> <strong>Futex</strong>: Spin in user, sleep in kernel → best of both.</p>
+                <p><strong>4.</strong> Java: <code>synchronized</code> → monitor, <code>ReentrantLock</code> → futex.</p>
+                <p><strong>5.</strong> <code>LockSupport</code> = direct futex access.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-0.6-semaphores.html" style="color: var(--primary);">← 0.6 Semaphores</a> |
+            <a href="chapter-0.7-visuals.html" style="color: var(--primary);">0.7 Visuals & Diagrams →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#4834d4',
+        primaryTextColor: '#fff',
+        lineColor: '#706fd3'
+      }
+    });
+</script>
+</body>
+</html>

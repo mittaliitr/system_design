@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>0.6 Concurrency Primitives: Semaphores</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #e17055;
+          --secondary: #fab1a0;
+          --accent: #fdcb6e;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container {
+          max-width: 1000px;
+          margin: 0 auto;
+          background: white;
+          border-radius: 20px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+          overflow: hidden;
+        }
+
+        header {
+          background: linear-gradient(120deg, var(--primary), var(--secondary));
+          color: white;
+          padding: 3rem 2rem;
+          text-align: center;
+        }
+
+        header h1 {
+          font-size: 2.5rem;
+          margin-bottom: 0.5rem;
+          font-weight: 700;
+        }
+
+        header h2 {
+          font-size: 1.5rem;
+          margin-bottom: 0.5rem;
+          opacity: 0.9;
+        }
+
+        header p {
+          font-size: 1.2rem;
+          opacity: 0.9;
+        }
+
+        .badge {
+          display: inline-block;
+          background: rgba(255,255,255,0.2);
+          padding: 0.3rem 0.8rem;
+          border-radius: 50px;
+          font-size: 0.9rem;
+          margin-top: 1rem;
+        }
+
+        main {
+          padding: 3rem 2.5rem;
+        }
+
+        section {
+          margin-bottom: 3.5rem;
+        }
+
+        h2 {
+          font-size: 1.8rem;
+          color: var(--primary);
+          margin-bottom: 1rem;
+          position: relative;
+          padding-left: 1rem;
+        }
+
+        h2::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 5px;
+          background: var(--primary);
+          border-radius: 3px;
+        }
+
+        h3 {
+          font-size: 1.4rem;
+          color: var(--dark);
+          margin: 1.5rem 0 1rem;
+        }
+
+        p {
+          margin-bottom: 1.2rem;
+          color: #444;
+        }
+
+        .highlight {
+          background: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
+          padding: 1.2rem;
+          border-left: 5px solid var(--accent);
+          border-radius: 0 8px 8px 0;
+          margin: 1.5rem 0;
+          font-style: italic;
+        }
+
+        .analogy {
+          background: #fff4e6;
+          border: 1px solid var(--accent);
+          color: #d35400;
+        }
+
+        .code-block {
+          background: #2d2d2d;
+          color: #f8f8f2;
+          padding: 1.2rem;
+          border-radius: 12px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 1.5rem 0;
+          position: relative;
+        }
+
+        .code-block::before {
+          content: 'Java / Pseudocode';
+          position: absolute;
+          top: 0.5rem;
+          right: 1rem;
+          font-size: 0.8rem;
+          color: #666;
+          font-family: 'Inter', sans-serif;
+        }
+
+        .semaphore-types {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+          gap: 1.5rem;
+          margin: 2rem 0;
+        }
+
+        .sem-card {
+          background: #f8f9fa;
+          border: 2px solid #e9ecef;
+          border-radius: 16px;
+          padding: 1.5rem;
+          text-align: center;
+          transition: all 0.3s;
+          cursor: pointer;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .sem-card::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: linear-gradient(135deg, transparent, rgba(225,112,85,0.1));
+          opacity: 0;
+          transition: opacity 0.3s;
+        }
+
+        .sem-card:hover::before {
+          opacity: 1;
+        }
+
+        .sem-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 12px 24px rgba(225,112,85,0.2);
+        }
+
+        .sem-icon {
+          font-size: 2.5rem;
+          margin-bottom: 0.8rem;
+        }
+
+        .sem-title {
+          font-weight: 700;
+          color: var(--primary);
+          margin-bottom: 0.5rem;
+        }
+
+        .pv-flow {
+          display: flex;
+          justify-content: center;
+          gap: 2rem;
+          flex-wrap: wrap;
+          margin: 2rem 0;
+          padding: 1.5rem;
+          background: #f0f4f8;
+          border-radius: 16px;
+        }
+
+        .pv-step {
+          text-align: center;
+          flex: 1;
+          min-width: 160px;
+          padding: 1rem;
+          border-radius: 12px;
+          background: white;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .pv-op {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: var(--primary);
+          margin-bottom: 0.5rem;
+        }
+
+        .mermaid {
+          background: white;
+          padding: 1.5rem;
+          border-radius: 12px;
+          border: 1px solid #eee;
+          margin: 2rem 0;
+          text-align: center;
+        }
+
+        .producer-consumer {
+          display: flex;
+          justify-content: center;
+          gap: 2rem;
+          flex-wrap: wrap;
+          margin: 2rem 0;
+          padding: 1.5rem;
+          background: #f8f9fa;
+          border-radius: 16px;
+          text-align: center;
+        }
+
+        .pc-box {
+          flex: 1;
+          min-width: 200px;
+          padding: 1rem;
+          border-radius: 12px;
+          background: white;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .pc-title {
+          font-weight: 600;
+          color: var(--primary);
+          margin-bottom: 0.5rem;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2rem; }
+          .semaphore-types { grid-template-columns: 1fr; }
+          .pv-flow { flex-direction: column; }
+          .producer-consumer { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>0.6 Concurrency Primitives</h1>
+        <h2>Semaphores: Binary & Counting</h2>
+        <p>P/V Operations, Producer-Consumer, and More</p>
+        <div class="badge">Chapter 0 – Computer Architecture & Concurrency Foundations</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>Think of a Parking Lot</h2>
+            <p>
+                5 parking spots (shared resource). Cars (threads) arrive and leave. How to manage access?
+            </p>
+            <div class="highlight analogy">
+                <strong>Analogy:</strong>
+                A <em>semaphore</em> is a <strong>ticket counter</strong>.
+                It tracks available spots and makes cars wait when full.
+            </div>
+        </section>
+
+        <!-- What is a Semaphore? -->
+        <section>
+            <h2>Semaphore: A Counter with Superpowers</h2>
+            <p>
+                A <strong>semaphore</strong> is a synchronization primitive with:
+            </p>
+            <ul style="margin: 1.2rem 0; padding-left: 2rem;">
+                <li>An <strong>integer counter</strong></li>
+                <li>Two <strong>atomic operations</strong>: <code>P()</code> (wait) and <code>V()</code> (signal)</li>
+                <li>Blocking behavior when counter is 0</li>
+            </ul>
+
+            <div class="highlight">
+                <strong>Invented by:</strong> Edsger Dijkstra in 1965<br>
+                <strong>P</strong> = <em>Proberen</em> (Dutch: "to try")<br>
+                <strong>V</strong> = <em>Verhogen</em> ("to increment")
+            </div>
+        </section>
+
+        <!-- Binary vs Counting -->
+        <section>
+            <h2>Binary vs. Counting Semaphores</h2>
+
+            <div class="semaphore-types">
+                <div class="sem-card">
+                    <div class="sem-icon">Binary</div>
+                    <div class="sem-title">Binary Semaphore</div>
+                    <p>Initial value: <code>1</code><br>
+                        Acts like a <strong>mutex lock</strong><br>
+                        Only 0 or 1</p>
+                </div>
+                <div class="sem-card">
+                    <div class="sem-icon">Counting</div>
+                    <div class="sem-title">Counting Semaphore</div>
+                    <p>Initial value: <code>N</code><br>
+                        Allows up to <strong>N threads</strong><br>
+                        Resource pool control</p>
+                </div>
+            </div>
+
+            <div class="code-block">
+          <pre>
+// Java: java.util.concurrent.Semaphore
+Semaphore sem = new Semaphore(3);  // 3 permits
+
+sem.acquire();  // P() – wait for permit
+// critical section
+sem.release();  // V() – return permit
+          </pre>
+            </div>
+        </section>
+
+        <!-- P and V Operations -->
+        <section>
+            <h2>P() and V() in Action</h2>
+
+            <div class="pv-flow">
+                <div class="pv-step">
+                    <div class="pv-op">P()</div>
+                    <p><strong>Wait / Acquire</strong><br>
+                        Decrement counter<br>
+                        If < 0 → block thread</p>
+                </div>
+                <div class="pv-step">
+                    <div class="pv-op">→</div>
+                    <p>Critical Section<br>
+                        <small>Only if permit available</small></p>
+                </div>
+                <div class="pv-step">
+                    <div class="pv-op">V()</div>
+                    <p><strong>Signal / Release</strong><br>
+                        Increment counter<br>
+                        Wake one waiting thread</p>
+                </div>
+            </div>
+
+            <div class="mermaid">
+                sequenceDiagram
+                participant T1 as Thread 1
+                participant S as Semaphore
+                participant T2 as Thread 2
+                T1->>S: P() → counter=0
+                T1->>T1: Enter CS
+                T2->>S: P() → counter=-1 (wait)
+                T1->>S: V() → counter=0, wake T2
+                T2->>T2: Enter CS
+            </div>
+        </section>
+
+        <!-- Producer-Consumer Problem -->
+        <section>
+            <h2>Classic: Producer-Consumer</h2>
+            <p>
+                Use <strong>two semaphores</strong> to solve buffer overflow/underflow.
+            </p>
+
+            <div class="producer-consumer">
+                <div class="pc-box">
+                    <div class="pc-title">Producer</div>
+                    <pre>
+while (true) {
+    produce_item();
+    empty.P();     // Wait for space
+    buffer.add(item);
+    full.V();      // Signal item added
+}
+            </pre>
+                </div>
+                <div class="pc-box">
+                    <div class="pc-title">Consumer</div>
+                    <pre>
+while (true) {
+    full.P();      // Wait for item
+    item = buffer.remove();
+    empty.V();     // Signal space free
+    consume_item();
+}
+            </pre>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>Semaphores Used:</strong><br>
+                <code>empty = N</code> → available slots<br>
+                <code>full = 0</code> → items in buffer<br>
+                <code>mutex = 1</code> → protect buffer access
+            </div>
+        </section>
+
+        <!-- Java Semaphore -->
+        <section>
+            <h2>Java’s Semaphore: Real-World</h2>
+
+            <div class="code-block">
+          <pre>
+// Connection pool with 10 DB connections
+Semaphore pool = new Semaphore(10);
+
+public void query() throws InterruptedException {
+    pool.acquire();  // P()
+    try {
+        // Use DB connection
+    } finally {
+        pool.release();  // V()
+    }
+}
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Fairness:</strong>
+                <code>new Semaphore(1, true)</code> → FIFO order<br>
+                Prevents thread starvation
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #fff4e6; padding: 1.5rem; border-radius: 12px; border-left: 5px solid var(--primary);">
+                <p><strong>1.</strong> <strong>Semaphore</strong> = counter + P/V operations.</p>
+                <p><strong>2.</strong> <strong>Binary</strong> = mutex (0 or 1), <strong>Counting</strong> = resource pool.</p>
+                <p><strong>3.</strong> <code>P()</code> = wait/decrement, <code>V()</code> = signal/increment.</p>
+                <p><strong>4.</strong> Solves <strong>producer-consumer</strong>, <strong>bounded buffer</strong>.</p>
+                <p><strong>5.</strong> Java: <code>java.util.concurrent.Semaphore</code> → tryAcquire, fair mode.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-0.6-locks.html" style="color: var(--primary);">← 0.6 Locks (Mutex)</a> |
+            <a href="chapter-0.6-monitors-spinlocks.html" style="color: var(--primary);">0.6 Monitors, Spinlocks →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#e17055',
+        primaryTextColor: '#fff',
+        lineColor: '#fab1a0'
+      }
+    });
+</script>
+</body>
+</html>
