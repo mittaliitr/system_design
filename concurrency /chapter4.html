@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>0.4 Memory Model & Cache Coherence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #ff7675;
+          --secondary: #fab1a0;
+          --accent: #fdcb6e;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #e17055;
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #ff9ff3 0%, #ff9f43 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container {
+          max-width: 1000px;
+          margin: 0 auto;
+          background: white;
+          border-radius: 20px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+          overflow: hidden;
+        }
+
+        header {
+          background: linear-gradient(120deg, var(--primary), var(--secondary));
+          color: white;
+          padding: 3rem 2rem;
+          text-align: center;
+        }
+
+        header h1 {
+          font-size: 2.5rem;
+          margin-bottom: 0.5rem;
+          font-weight: 700;
+        }
+
+        header p {
+          font-size: 1.2rem;
+          opacity: 0.9;
+        }
+
+        .badge {
+          display: inline-block;
+          background: rgba(255,255,255,0.2);
+          padding: 0.3rem 0.8rem;
+          border-radius: 50px;
+          font-size: 0.9rem;
+          margin-top: 1rem;
+        }
+
+        main {
+          padding: 3rem 2.5rem;
+        }
+
+        section {
+          margin-bottom: 3.5rem;
+        }
+
+        h2 {
+          font-size: 1.8rem;
+          color: var(--primary);
+          margin-bottom: 1rem;
+          position: relative;
+          padding-left: 1rem;
+        }
+
+        h2::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 5px;
+          background: var(--primary);
+          border-radius: 3px;
+        }
+
+        h3 {
+          font-size: 1.4rem;
+          color: var(--dark);
+          margin: 1.5rem 0 1rem;
+        }
+
+        p {
+          margin-bottom: 1.2rem;
+          color: #444;
+        }
+
+        .highlight {
+          background: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
+          padding: 1.2rem;
+          border-left: 5px solid var(--accent);
+          border-radius: 0 8px 8px 0;
+          margin: 1.5rem 0;
+          font-style: italic;
+        }
+
+        .analogy {
+          background: #ffeaa7;
+          border: 1px solid var(--accent);
+          color: #d63031;
+        }
+
+        .code-block {
+          background: #2d2d2d;
+          color: #f8f8f2;
+          padding: 1.2rem;
+          border-radius: 12px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 1.5rem 0;
+          position: relative;
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.5rem;
+          right: 1rem;
+          font-size: 0.8rem;
+          color: #666;
+          font-family: 'Inter', sans-serif;
+        }
+
+        .coherence-steps {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 1.5rem;
+          margin: 2rem 0;
+        }
+
+        .step-card {
+          background: #f8f9fa;
+          border: 2px solid #e9ecef;
+          border-radius: 16px;
+          padding: 1.2rem;
+          text-align: center;
+          transition: all 0.3s;
+          cursor: pointer;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .step-card::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: linear-gradient(135deg, transparent, rgba(255,118,117,0.1));
+          opacity: 0;
+          transition: opacity 0.3s;
+        }
+
+        .step-card:hover::before {
+          opacity: 1;
+        }
+
+        .step-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 12px 24px rgba(255,118,117,0.2);
+        }
+
+        .step-num {
+          font-size: 1.8rem;
+          font-weight: 700;
+          color: var(--primary);
+          margin-bottom: 0.5rem;
+        }
+
+        .step-desc {
+          font-size: 0.95rem;
+          color: #636e72;
+        }
+
+        .memory-models {
+          display: flex;
+          justify-content: space-around;
+          flex-wrap: wrap;
+          gap: 1.5rem;
+          margin: 2rem 0;
+          padding: 1.5rem;
+          background: #f0f4f8;
+          border-radius: 16px;
+        }
+
+        .model-item {
+          text-align: center;
+          flex: 1;
+          min-width: 180px;
+          padding: 1rem;
+          border-radius: 12px;
+          background: white;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .model-title {
+          font-weight: 600;
+          color: var(--primary);
+          margin-bottom: 0.5rem;
+        }
+
+        .model-info {
+          font-size: 0.9rem;
+          color: #636e72;
+        }
+
+        .mermaid {
+          background: white;
+          padding: 1.5rem;
+          border-radius: 12px;
+          border: 1px solid #eee;
+          margin: 2rem 0;
+          text-align: center;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2rem; }
+          .coherence-steps { grid-template-columns: 1fr; }
+          .memory-models { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>0.4 Memory Model & Cache Coherence</h1>
+        <p>Ensuring Consistent Views in a Multi-Core World</p>
+        <div class="badge">Chapter 0 – Computer Architecture & Concurrency Foundations</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>Picture This: A Shared Kitchen</h2>
+            <p>
+                Multiple chefs (CPU cores) share one fridge (memory). Chef A updates the inventory (writes data), but Chef B sees the old list (stale cache). Chaos ensues!
+            </p>
+            <div class="highlight analogy">
+                <strong>Analogy:</strong>
+                The <em>memory model</em> is the "house rule" ensuring everyone sees the <strong>latest fridge contents</strong>. Cache coherence is the magic that syncs copies automatically.
+            </div>
+        </section>
+
+        <!-- What is Memory Model? -->
+        <section>
+            <h2>What is a Memory Model?</h2>
+            <p>
+                The <strong>memory model</strong> defines <strong>how</strong> and <strong>when</strong> changes to memory are visible to different parts of the system (cores, threads).
+            </p>
+
+            <div class="highlight">
+                <strong>Core Idea:</strong> In single-core, it's simple. Multi-core? Changes must propagate — or bugs happen!
+            </div>
+
+            <div class="mermaid">
+                graph LR
+                A[Core 1<br/>Cache] -->|Write| B[Shared Memory]
+                C[Core 2<br/>Cache] -->|Read| B
+                A -.->|Coherence Protocol| C
+                style A fill:#ff7675,stroke:#e74c3c,color:white
+                style C fill:#ff7675,stroke:#e74c3c,color:white
+                style B fill:#ffeaa7,stroke:#fdcb6e
+            </div>
+        </section>
+
+        <!-- Cache Coherence -->
+        <section>
+            <h2>Cache Coherence: The Sync Magic</h2>
+            <p>Each core has its own cache. <strong>Coherence</strong> ensures all caches reflect the same value for shared data.</p>
+
+            <div class="coherence-steps">
+                <div class="step-card">
+                    <div class="step-num">1</div>
+                    <div class="step-desc">Core 1 writes to X → Updates its cache & invalidates others</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">2</div>
+                    <div class="step-desc">Core 2 reads X → Cache miss! Fetches latest from memory</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">3</div>
+                    <div class="step-desc">Protocol (e.g., MESI) handles states: Modified, Exclusive, Shared, Invalid</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">4</div>
+                    <div class="step-desc">Snooping or Directory-based to monitor changes</div>
+                </div>
+            </div>
+
+            <div class="code-block">
+          <pre>
+// Java: Without coherence, this could fail!
+volatile int x = 0;  // Forces visibility
+
+Thread1: x = 42;     // Write to memory
+
+Thread2: System.out.println(x);  // Sees 42, thanks to model!
+          </pre>
+            </div>
+        </section>
+
+        <!-- Memory Consistency Models -->
+        <section>
+            <h2>Common Memory Models</h2>
+            <p>Different systems guarantee different levels of consistency:</p>
+
+            <div class="memory-models">
+                <div class="model-item">
+                    <div class="model-title">Sequential Consistency</div>
+                    <div class="model-info">All operations appear atomic & in program order</div>
+                </div>
+                <div class="model-item">
+                    <div class="model-title">Relaxed (Weak)</div>
+                    <div class="model-info">Allows reordering for speed (e.g., ARM)</div>
+                </div>
+                <div class="model-item">
+                    <div class="model-title">Release-Acquire</div>
+                    <div class="model-info">Writes before release visible after acquire</div>
+                </div>
+                <div class="model-item">
+                    <div class="model-title">Java Memory Model (JMM)</div>
+                    <div class="model-info">Happens-before guarantees via sync/volatile</div>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>Trade-off:</strong> Stronger models = safer but slower. Weaker = faster but need barriers.
+            </div>
+        </section>
+
+        <!-- Relevance to Java -->
+        <section>
+            <h2>Memory Model in Java Concurrency</h2>
+            <p>
+                Java's JMM ensures:
+            </p>
+            <ul style="margin: 1.5rem 0; padding-left: 2rem;">
+                <li><code>synchronized</code>: Full barrier, flushes caches</li>
+                <li><code>volatile</code>: Read/write visibility across threads</li>
+                <li>Final fields: Immutable after construction</li>
+                <li>Happens-before: Defines ordering (e.g., thread start before join)</li>
+            </ul>
+
+            <div class="code-block">
+          <pre>
+// Bug without volatile: Thread2 may see stale value
+volatile boolean ready = false;
+
+Thread1: ready = true;
+
+Thread2: if (ready) { ... }  // Guaranteed to see true!
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Pro Tip:</strong> JMM abstracts hardware — but understanding coherence prevents subtle bugs in high-concurrency apps.
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #ffeaa7; padding: 1.5rem; border-radius: 12px; border-left: 5px solid var(--primary);">
+                <p><strong>1.</strong> <strong>Memory Model</strong>: Rules for visibility & ordering.</p>
+                <p><strong>2.</strong> <strong>Cache Coherence</strong>: Syncs caches across cores (MESI protocol).</p>
+                <p><strong>3.</strong> Models vary: Sequential (safe) vs. Relaxed (fast).</p>
+                <p><strong>4.</strong> In Java: Use <code>volatile</code> & locks for coherence.</p>
+                <p><strong>5.</strong> Bugs? Stale reads, reordering — fixed by barriers.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-0.3-memory-hierarchy.html" style="color: var(--primary);">← 0.3 Memory Hierarchy</a> |
+            <a href="chapter-0.5-os-threading.html" style="color: var(--primary);">0.5 OS Threading →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({ 
+      startOnLoad: true, 
+      theme: 'base', 
+      themeVariables: { 
+        primaryColor: '#ff7675',
+        primaryTextColor: '#fff',
+        lineColor: '#fab1a0'
+      } 
+    });
+</script>
+</body>
+</html>

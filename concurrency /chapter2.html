@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>0.2 Registers: The CPU’s Ultra-Fast Scratchpad</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #6c5ce7;
+          --secondary: #a29bfe;
+          --accent: #fd79a8;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container {
+          max-width: 1000px;
+          margin: 0 auto;
+          background: white;
+          border-radius: 20px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+          overflow: hidden;
+        }
+
+        header {
+          background: linear-gradient(120deg, var(--primary), var(--secondary));
+          color: white;
+          padding: 3rem 2rem;
+          text-align: center;
+        }
+
+        header h1 {
+          font-size: 2.5rem;
+          margin-bottom: 0.5rem;
+          font-weight: 700;
+        }
+
+        header p {
+          font-size: 1.2rem;
+          opacity: 0.9;
+        }
+
+        .badge {
+          display: inline-block;
+          background: rgba(255,255,255,0.2);
+          padding: 0.3rem 0.8rem;
+          border-radius: 50px;
+          font-size: 0.9rem;
+          margin-top: 1rem;
+        }
+
+        main {
+          padding: 3rem 2.5rem;
+        }
+
+        section {
+          margin-bottom: 3.5rem;
+        }
+
+        h2 {
+          font-size: 1.8rem;
+          color: var(--primary);
+          margin-bottom: 1rem;
+          position: relative;
+          padding-left: 1rem;
+        }
+
+        h2::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 5px;
+          background: var(--primary);
+          border-radius: 3px;
+        }
+
+        h3 {
+          font-size: 1.4rem;
+          color: var(--dark);
+          margin: 1.5rem 0 1rem;
+        }
+
+        p {
+          margin-bottom: 1.2rem;
+          color: #444;
+        }
+
+        .highlight {
+          background: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
+          padding: 1.2rem;
+          border-left: 5px solid var(--accent);
+          border-radius: 0 8px 8px 0;
+          margin: 1.5rem 0;
+          font-style: italic;
+        }
+
+        .analogy {
+          background: #f0e6ff;
+          border: 1px solid var(--primary);
+          color: #4a2c8a;
+        }
+
+        .code-block {
+          background: #2d2d2d;
+          color: #f8f8f2;
+          padding: 1.2rem;
+          border-radius: 12px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 1.5rem 0;
+          position: relative;
+        }
+
+        .code-block::before {
+          content: 'x86-64 Assembly';
+          position: absolute;
+          top: 0.5rem;
+          right: 1rem;
+          font-size: 0.8rem;
+          color: #666;
+          font-family: 'Inter', sans-serif;
+        }
+
+        .register-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+          gap: 1.5rem;
+          margin: 2rem 0;
+        }
+
+        .register-card {
+          background: #f8f9fa;
+          border: 2px solid #e9ecef;
+          border-radius: 16px;
+          padding: 1.2rem;
+          text-align: center;
+          transition: all 0.3s;
+          cursor: pointer;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .register-card::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: linear-gradient(135deg, transparent, rgba(108,92,231,0.1));
+          opacity: 0;
+          transition: opacity 0.3s;
+        }
+
+        .register-card:hover::before {
+          opacity: 1;
+        }
+
+        .register-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 12px 24px rgba(108,92,231,0.2);
+        }
+
+        .reg-name {
+          font-family: 'JetBrains Mono', monospace;
+          font-weight: 600;
+          font-size: 1.1rem;
+          color: var(--primary);
+          margin-bottom: 0.5rem;
+        }
+
+        .reg-desc {
+          font-size: 0.9rem;
+          color: #636e72;
+        }
+
+        .speed-comparison {
+          display: flex;
+          justify-content: space-around;
+          flex-wrap: wrap;
+          gap: 1rem;
+          margin: 2rem 0;
+          padding: 1.5rem;
+          background: #f0f4f8;
+          border-radius: 16px;
+        }
+
+        .speed-item {
+          text-align: center;
+          flex: 1;
+          min-width: 120px;
+        }
+
+        .speed-value {
+          font-size: 1.8rem;
+          font-weight: 700;
+          color: var(--primary);
+        }
+
+        .speed-label {
+          font-size: 0.9rem;
+          color: #636e72;
+          margin-top: 0.3rem;
+        }
+
+        .mermaid {
+          background: white;
+          padding: 1.5rem;
+          border-radius: 12px;
+          border: 1px solid #eee;
+          margin: 2rem 0;
+          text-align: center;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2rem; }
+          .register-grid { grid-template-columns: 1fr; }
+          .speed-comparison { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>0.2 Registers: The CPU’s Ultra-Fast Scratchpad</h1>
+        <p>Why Registers Are the #1 Speed Secret in Computing</p>
+        <div class="badge">Chapter 0 – Computer Architecture & Concurrency Foundations</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>Imagine This: You're Cooking Dinner</h2>
+            <p>
+                You're making pasta. You need:
+            </p>
+            <ul style="margin: 1.2rem 0; padding-left: 2rem;">
+                <li>Sauce (in the fridge)</li>
+                <li>Pasta (in the pantry)</li>
+                <li>Olive oil (on the counter)</li>
+            </ul>
+            <div class="highlight analogy">
+                <strong>Analogy:</strong>
+                <em>Registers</em> are the ingredients you keep <strong>on your cutting board</strong> — ready to use <em>instantly</em>.
+                You don’t walk to the fridge every time you need salt!
+            </div>
+        </section>
+
+        <!-- What Are Registers? -->
+        <section>
+            <h2>What Are Registers?</h2>
+            <p>
+                <strong>Registers</strong> are the <strong>fastest memory</strong> in a computer — built directly into the CPU chip.
+                They hold data the CPU is actively working on during the Fetch-Decode-Execute cycle.
+            </p>
+
+            <div class="highlight">
+                <strong>Speed:</strong> <code>~0.5 nanoseconds</code> access time<br>
+                <strong>Size:</strong> Only <code>16–64 per core</code><br>
+                <strong>Cost:</strong> Most expensive per byte
+            </div>
+
+            <div class="mermaid">
+                graph TD
+                A[CPU Core] --> B[Registers<br/>16–64 × 64-bit]
+                A --> C[ALU]
+                A --> D[Control Unit]
+                B -->|ultra-fast| C
+                style B fill:#6c5ce7,stroke:#5a4fcf,color:white
+                style A fill:#dfe6e9
+            </div>
+        </section>
+
+        <!-- Types of Registers -->
+        <section>
+            <h2>Key Register Types (x86-64 Example)</h2>
+            <p>Modern CPUs have different registers for different jobs:</p>
+
+            <div class="register-grid">
+                <div class="register-card">
+                    <div class="reg-name">RAX</div>
+                    <div class="reg-desc">Accumulator<br>Return values, math</div>
+                </div>
+                <div class="register-card">
+                    <div class="reg-name">RBX</div>
+                    <div class="reg-desc">Base Register<br>Pointer to data</div>
+                </div>
+                <div class="register-card">
+                    <div class="reg-name">RCX</div>
+                    <div class="reg-desc">Counter<br>Loop control</div>
+                </div>
+                <div class="register-card">
+                    <div class="reg-name">RDX</div>
+                    <div class="reg-desc">Data Register<br>I/O, multiplication</div>
+                </div>
+                <div class="register-card">
+                    <div class="reg-name">RSP</div>
+                    <div class="reg-desc">Stack Pointer<br>Function calls</div>
+                </div>
+                <div class="register-card">
+                    <div class="reg-name">RIP</div>
+                    <div class="reg-desc">Instruction Pointer<br>Next instruction</div>
+                </div>
+            </div>
+
+            <div class="code-block">
+          <pre>
+; Example: Add two numbers
+MOV RAX, 42        ; Load 42 into RAX register
+MOV RBX, 58        ; Load 58 into RBX register
+ADD RAX, RBX       ; RAX = RAX + RBX (100)
+                   ; Result stays in register!
+          </pre>
+            </div>
+        </section>
+
+        <!-- Speed Comparison -->
+        <section>
+            <h2>How Fast Are Registers? (Real Numbers)</h2>
+            <div class="speed-comparison">
+                <div class="speed-item">
+                    <div class="speed-value">0.5 ns</div>
+                    <div class="speed-label">Register Access</div>
+                </div>
+                <div class="speed-item">
+                    <div class="speed-value">1–3 ns</div>
+                    <div class="speed-label">L1 Cache</div>
+                </div>
+                <div class="speed-item">
+                    <div class="speed-value">100 ns</div>
+                    <div class="speed-label">RAM</div>
+                </div>
+                <div class="speed-item">
+                    <div class="speed-value">10,000 ns</div>
+                    <div class="speed-label">SSD Read</div>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>Insight:</strong>
+                Going from register → RAM is like
+                <em>walking to your desk vs. driving to another city</em>.
+            </div>
+        </section>
+
+        <!-- Why Registers Matter in Java -->
+        <section>
+            <h2>Registers in Java Multithreading</h2>
+            <p>
+                When you write Java code like:
+            </p>
+            <div class="code-block">
+          <pre>
+int sum = a + b;  // a, b loaded into CPU registers!
+          </pre>
+            </div>
+            <p>
+                The JVM compiles this to assembly that uses <strong>registers</strong>. In multithreading:
+            </p>
+            <ul style="margin: 1.5rem 0; padding-left: 2rem;">
+                <li>Each thread gets its own <strong>register set</strong> (per core)</li>
+                <li>Shared variables live in <strong>RAM/cache</strong> → need synchronization</li>
+                <li><code>volatile</code> forces register → memory flush</li>
+            </ul>
+
+            <div class="highlight">
+                <strong>Critical Insight:</strong>
+                <code>Thread-local variables</code> often stay in registers → no synchronization needed!
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #f0e6ff; padding: 1.5rem; border-radius: 12px; border-left: 5px solid var(--primary);">
+                <p><strong>1.</strong> <strong>Registers</strong> = fastest memory, inside CPU.</p>
+                <p><strong>2.</strong> Only <strong>dozens per core</strong>, used in every FDE cycle.</p>
+                <p><strong>3.</strong> General-purpose (RAX, RBX), special (RIP, RSP).</p>
+                <p><strong>4.</strong> In Java: <code>local vars</code> → registers, <code>shared</code> → RAM.</p>
+                <p><strong>5.</strong> <code>volatile</code> = "don’t keep in register only"</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-0.1-cpu-fde.html" style="color: var(--primary);">← 0.1 CPU Cycle</a> |
+            <a href="chapter-0.3-memory-hierarchy.html" style="color: var(--primary);">0.3 Memory Hierarchy →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#6c5ce7',
+        primaryTextColor: '#fff',
+        lineColor: '#b2bec3'
+      }
+    });
+</script>
+</body>
+</html>

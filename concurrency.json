@@ -11,22 +11,22 @@
         },
         {
           "name": "0.2 Registers: CPU’s Fast Scratchpad",
-          "url": "https://en.wikipedia.org/wiki/Processor_register",
+          "url": "concurrency /chapter2.html",
           "tag": "hardware"
         },
         {
           "name": "0.3 Memory Hierarchy: Registers → Cache → RAM → Disk",
-          "url": "https://www.cs.umd.edu/~meesh/351/mips/memory-hierarchy.pdf",
+          "url": "concurrency /chapter3.html",
           "tag": "hardware"
         },
         {
           "name": "0.4 Memory Model & Cache Coherence",
-          "url": "https://en.wikipedia.org/wiki/Cache_coherence",
+          "url": "concurrency /chapter4.html",
           "tag": "hardware"
         },
         {
           "name": "0.5 OS Threading: Kernel vs. User Threads",
-          "url": "https://www.baeldung.com/java-kernel-vs-user-threads",
+          "url": "concurrency /chapter5.html",
           "tag": "os"
         },
         {

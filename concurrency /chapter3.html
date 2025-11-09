@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>0.3 Memory Hierarchy: Registers to Disk</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #00b894;
+          --secondary: #55efc4;
+          --accent: #ffeaa7;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --warning: #fdcb6e;
+          --danger: #e17055;
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #a7ffeb 0%, #d5f9d5 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container {
+          max-width: 1000px;
+          margin: 0 auto;
+          background: white;
+          border-radius: 20px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+          overflow: hidden;
+        }
+
+        header {
+          background: linear-gradient(120deg, var(--primary), var(--secondary));
+          color: white;
+          padding: 3rem 2rem;
+          text-align: center;
+        }
+
+        header h1 {
+          font-size: 2.5rem;
+          margin-bottom: 0.5rem;
+          font-weight: 700;
+        }
+
+        header p {
+          font-size: 1.2rem;
+          opacity: 0.9;
+        }
+
+        .badge {
+          display: inline-block;
+          background: rgba(255,255,255,0.2);
+          padding: 0.3rem 0.8rem;
+          border-radius: 50px;
+          font-size: 0.9rem;
+          margin-top: 1rem;
+        }
+
+        main {
+          padding: 3rem 2.5rem;
+        }
+
+        section {
+          margin-bottom: 3.5rem;
+        }
+
+        h2 {
+          font-size: 1.8rem;
+          color: var(--primary);
+          margin-bottom: 1rem;
+          position: relative;
+          padding-left: 1rem;
+        }
+
+        h2::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 5px;
+          background: var(--primary);
+          border-radius: 3px;
+        }
+
+        h3 {
+          font-size: 1.4rem;
+          color: var(--dark);
+          margin: 1.5rem 0 1rem;
+        }
+
+        p {
+          margin-bottom: 1.2rem;
+          color: #444;
+        }
+
+        .highlight {
+          background: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
+          padding: 1.2rem;
+          border-left: 5px solid var(--accent);
+          border-radius: 0 8px 8px 0;
+          margin: 1.5rem 0;
+          font-style: italic;
+        }
+
+        .analogy {
+          background: #e8f9e8;
+          border: 1px solid var(--primary);
+          color: #1e6b1e;
+        }
+
+        .code-block {
+          background: #2d2d2d;
+          color: #f8f8f2;
+          padding: 1.2rem;
+          border-radius: 12px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 1.5rem 0;
+          position: relative;
+        }
+
+        .code-block::before {
+          content: 'Java + JVM';
+          position: absolute;
+          top: 0.5rem;
+          right: 1rem;
+          font-size: 0.8rem;
+          color: #666;
+          font-family: 'Inter', sans-serif;
+        }
+
+        /* Interactive Memory Pyramid */
+        .pyramid {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.8rem;
+          margin: 2.5rem 0;
+          position: relative;
+        }
+
+        .level {
+          width: 100%;
+          text-align: center;
+          padding: 1.2rem;
+          color: white;
+          font-weight: 600;
+          border-radius: 12px;
+          position: relative;
+          transition: all 0.4s ease;
+          cursor: pointer;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .level:hover {
+          transform: scale(1.08) translateY(-4px);
+          z-index: 10;
+          box-shadow: 0 16px 32px rgba(0,0,0,0.25);
+        }
+
+        .level-1 { width: 18%; background: #e74c3c; }
+        .level-2 { width: 32%; background: #e67e22; }
+        .level-3 { width: 48%; background: #f39c12; }
+        .level-4 { width: 68%; background: #27ae60; }
+        .level-5 { width: 88%; background: #2980b9; }
+
+        .level::after {
+          content: attr(data-speed);
+          position: absolute;
+          bottom: -1.8rem;
+          font-size: 0.85rem;
+          color: #2d3436;
+          font-weight: 600;
+          white-space: nowrap;
+          opacity: 0.9;
+        }
+
+        .level-desc {
+          margin-top: 0.5rem;
+          font-size: 0.9rem;
+          opacity: 0.9;
+        }
+
+        /* Cache Miss Animation */
+        .cache-miss {
+          background: #fff5f5;
+          border: 2px dashed #e74c3c;
+          border-radius: 16px;
+          padding: 1.5rem;
+          margin: 2rem 0;
+          text-align: center;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .cache-miss::before {
+          content: 'CACHE MISS!';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          font-size: 2rem;
+          font-weight: 700;
+          color: #e74c3c;
+          opacity: 0;
+          animation: flash 2s infinite;
+        }
+
+        @keyframes flash {
+          0%, 100% { opacity: 0; }
+          50% { opacity: 1; }
+        }
+
+        /* Memory Access Table */
+        .memory-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 2rem 0;
+          font-size: 0.95rem;
+        }
+
+        .memory-table th {
+          background: var(--primary);
+          color: white;
+          padding: 1rem;
+          text-align: left;
+        }
+
+        .memory-table td {
+          padding: 1rem;
+          border-bottom: 1px solid #eee;
+        }
+
+        .memory-table tr:hover {
+          background: #f8fff8;
+        }
+
+        .mermaid {
+          background: white;
+          padding: 1.5rem;
+          border-radius: 12px;
+          border: 1px solid #eee;
+          margin: 2rem 0;
+          text-align: center;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2rem; }
+          .pyramid { gap: 1.2rem; }
+          .memory-table { font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>0.3 Memory Hierarchy: Registers to Disk</h1>
+        <p>Why Your CPU Waits 99% of the Time</p>
+        <div class="badge">Chapter 0 – Computer Architecture & Concurrency Foundations</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>The Speed vs. Capacity Trade-Off</h2>
+            <p>
+                The CPU is blazing fast — but memory isn't. To solve this, computers use a <strong>memory hierarchy</strong>:
+                small, fast, expensive at the top; large, slow, cheap at the bottom.
+            </p>
+            <div class="highlight analogy">
+                <strong>Analogy:</strong>
+                It's like a <em>student's desk</em>:
+                <ul style="margin-top: 0.5rem;">
+                    <li><strong>Hand:</strong> Holding pen (registers)</li>
+                    <li><strong>Desk:</strong> Open notebook (L1 cache)</li>
+                    <li><strong>Backpack:</strong> All books (RAM)</li>
+                    <li><strong>Library:</strong> Archives (SSD)</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- The Pyramid -->
+        <section>
+            <h2>The Memory Hierarchy Pyramid</h2>
+            <p>
+                From fastest to slowest, smallest to largest:
+            </p>
+
+            <div class="pyramid">
+                <div class="level level-1" data-speed="~0.5 ns">
+                    Registers
+                    <div class="level-desc">16–64 × 64-bit</div>
+                </div>
+                <div class="level level-2" data-speed="~1–3 ns">
+                    L1 Cache
+                    <div class="level-desc">32 KB per core</div>
+                </div>
+                <div class="level level-3" data-speed="~4–10 ns">
+                    L2 Cache
+                    <div class="level-desc">256 KB–1 MB</div>
+                </div>
+                <div class="level level-4" data-speed="~10–20 ns">
+                    L3 Cache
+                    <div class="level-desc">8–64 MB shared</div>
+                </div>
+                <div class="level level-5" data-speed="~100 ns">
+                    Main Memory (RAM)
+                    <div class="level-desc">16–128 GB</div>
+                </div>
+            </div>
+
+            <div class="mermaid">
+                graph TD
+                A[CPU Core] --> B[Registers]
+                A --> C[L1 Cache]
+                A --> D[L2 Cache]
+                subgraph "Shared"
+                E[L3 Cache] --> F[RAM]
+                E --> G[SSD/HDD]
+                end
+                A --> E
+                style B fill:#e74c3c,color:white
+                style C fill:#e67e22,color:white
+                style D fill:#f39c12,color:white
+                style E fill:#27ae60,color:white
+                style F fill:#2980b9,color:white
+            </div>
+        </section>
+
+        <!-- Real Numbers -->
+        <section>
+            <h2>Latency in Human Terms</h2>
+            <table class="memory-table">
+                <thead>
+                <tr>
+                    <th>Memory Level</th>
+                    <th>Latency (ns)</th>
+                    <th>Human Analogy (if 1 CPU cycle = 1 second)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Register</td>
+                    <td>0.5 ns</td>
+                    <td>1 second</td>
+                </tr>
+                <tr>
+                    <td>L1 Cache</td>
+                    <td>1–3 ns</td>
+                    <td>2–6 seconds</td>
+                </tr>
+                <tr>
+                    <td>L2 Cache</td>
+                    <td>4–10 ns</td>
+                    <td>8–20 seconds</td>
+                </tr>
+                <tr>
+                    <td>L3 Cache</td>
+                    <td>10–20 ns</td>
+                    <td>20–40 seconds</td>
+                </tr>
+                <tr>
+                    <td>RAM</td>
+                    <td>100 ns</td>
+                    <td>3.3 minutes</td>
+                </tr>
+                <tr>
+                    <td>SSD</td>
+                    <td>100,000 ns</td>
+                    <td>1.2 days</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="cache-miss">
+                <p><strong>Cache Miss = CPU Stall!</strong><br>
+                    When data isn't in cache, the CPU <em>waits</em> — like waiting for a package from another country.</p>
+            </div>
+        </section>
+
+        <!-- Virtual Memory -->
+        <section>
+            <h2>Virtual Memory: The Illusion of Infinite RAM</h2>
+            <p>
+                The OS creates a <strong>virtual address space</strong> for each process. It maps virtual pages to:
+            </p>
+            <ul style="margin: 1.5rem 0; padding-left: 2rem;">
+                <li>Physical RAM</li>
+                <li>Or disk (swap file)</li>
+            </ul>
+
+            <div class="code-block">
+          <pre>
+// Java sees 8 GB of "RAM"
+int[] array = new int[2_000_000_000];  // 8 GB
+
+// OS may swap inactive pages to SSD
+// → Page fault = 10,000× slower!
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Pro Tip:</strong>
+                Avoid <code>OutOfMemoryError</code> by understanding <code>-Xmx</code> and swap.
+            </div>
+        </section>
+
+        <!-- Java & Concurrency Connection -->
+        <section>
+            <h2>Why This Matters in Java Multithreading</h2>
+            <p>
+                In Java:
+            </p>
+            <div class="code-block">
+          <pre>
+volatile int counter = 0;
+
+void increment() {
+    counter++;  // 1. Load from RAM/cache
+                // 2. Increment in register
+                // 3. Store back to RAM
+}
+          </pre>
+            </div>
+            <p>
+                <strong>Without <code>volatile</code>:</strong> Thread might keep value in register → stale data!
+            </p>
+            <div class="highlight">
+                <strong>Key Insight:</strong>
+                <code>volatile</code> = "Flush register → RAM after write, reload before read"
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #e8f9e8; padding: 1.5rem; border-radius: 12px; border-left: 5px solid var(--primary);">
+                <p><strong>1.</strong> Memory is a <strong>pyramid</strong>: fast/small → slow/large.</p>
+                <p><strong>2.</strong> CPU spends <strong>99% of time waiting</strong> for memory.</p>
+                <p><strong>3.</strong> <strong>Cache misses</strong> = performance killer.</p>
+                <p><strong>4.</strong> <code>volatile</code> forces <strong>register ↔ RAM sync</strong>.</p>
+                <p><strong>5.</strong> Virtual memory uses <strong>SSD as backup RAM</strong>.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-0.2-registers.html" style="color: var(--primary);">← 0.2 Registers</a> |
+            <a href="chapter-0.4-memory-model.html" style="color: var(--primary);">0.4 Memory Model →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#00b894',
+        primaryTextColor: '#fff',
+        lineColor: '#b2bec3'
+      }
+    });
+</script>
+</body>
+</html>
