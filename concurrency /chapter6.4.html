@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>0.7 Visuals: CPU, Memory, Locks & Semaphores</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #1e90ff;
+          --secondary: #00d2ff;
+          --accent: #3fecff;
+          --dark: #2c3e50;
+          --light: #f8f9fa;
+          --gray: #95a5a6;
+          --success: #27ae60;
+          --warning: #f39c12;
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container {
+          max-width: 1100px;
+          margin: 0 auto;
+          background: white;
+          border-radius: 20px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+          overflow: hidden;
+        }
+
+        header {
+          background: linear-gradient(120deg, var(--primary), var(--secondary));
+          color: white;
+          padding: 3rem 2rem;
+          text-align: center;
+        }
+
+        header h1 {
+          font-size: 2.5rem;
+          margin-bottom: 0.5rem;
+          font-weight: 700;
+        }
+
+        header p {
+          font-size: 1.2rem;
+          opacity: 0.9;
+        }
+
+        .badge {
+          display: inline-block;
+          background: rgba(255,255,255,0.2);
+          padding: 0.3rem 0.8rem;
+          border-radius: 50px;
+          font-size: 0.9rem;
+          margin-top: 1rem;
+        }
+
+        main {
+          padding: 3rem 2.5rem;
+        }
+
+        section {
+          margin-bottom: 4rem;
+        }
+
+        h2 {
+          font-size: 1.8rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        h2::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 5px;
+          background: var(--primary);
+          border-radius: 3px;
+        }
+
+        .diagram-container {
+          background: #f8f9fa;
+          border-radius: 16px;
+          padding: 1.5rem;
+          margin: 1.5rem 0;
+          border: 1px solid #eee;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .diagram-title {
+          font-weight: 600;
+          color: var(--primary);
+          margin-bottom: 1rem;
+          font-size: 1.1rem;
+          text-align: center;
+        }
+
+        .mermaid {
+          background: white;
+          padding: 1.5rem;
+          border-radius: 12px;
+          border: 1px dashed #ddd;
+          text-align: center;
+        }
+
+        .pyramid {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.8rem;
+          margin: 2rem 0;
+        }
+
+        .pyramid-level {
+          width: 100%;
+          max-width: 600px;
+          background: linear-gradient(90deg, #3498db, #2980b9);
+          color: white;
+          padding: 1rem;
+          border-radius: 8px;
+          font-weight: 600;
+          text-align: center;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+          transition: all 0.3s;
+          position: relative;
+        }
+
+        .pyramid-level:hover {
+          transform: scale(1.05);
+          z-index: 10;
+          box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        .pyramid-level span {
+          font-size: 0.8rem;
+          display: block;
+          margin-top: 0.3rem;
+          opacity: 0.9;
+        }
+
+        .level-1 { width: 20%; background: linear-gradient(90deg, #e74c3c, #c0392b); }
+        .level-2 { width: 35%; background: linear-gradient(90deg, #e67e22, #d35400); }
+        .level-3 { width: 50%; background: linear-gradient(90deg, #f1c40f, #f39c12); }
+        .level-4 { width: 70%; background: linear-gradient(90deg, #27ae60, #1e8449); }
+        .level-5 { width: 90%; background: linear-gradient(90deg, #3498db, #2980b9); }
+
+        .lock-flow {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 1.5rem;
+          margin: 2rem 0;
+        }
+
+        .flow-step {
+          background: white;
+          border: 2px solid #ddd;
+          border-radius: 16px;
+          padding: 1.2rem;
+          text-align: center;
+          transition: all 0.3s;
+          position: relative;
+        }
+
+        .flow-step:hover {
+          border-color: var(--primary);
+          box-shadow: 0 8px 16px rgba(30,144,255,0.2);
+          transform: translateY(-4px);
+        }
+
+        .step-icon {
+          font-size: 2rem;
+          margin-bottom: 0.5rem;
+        }
+
+        .step-title {
+          font-weight: 600;
+          color: var(--primary);
+        }
+
+        .animation-container {
+          height: 300px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background: #f0f8ff;
+          border-radius: 16px;
+          margin: 2rem 0;
+          overflow: hidden;
+        }
+
+        .cpu-animation {
+          width: 100%;
+          height: 100%;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2rem; }
+          .pyramid-level { font-size: 0.9rem; }
+          .lock-flow { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>0.7 Visuals & Diagrams</h1>
+        <p>Interactive CPU, Memory, Locks & Semaphore Flows</p>
+        <div class="badge">Chapter 0 – Visual Summary</div>
+    </header>
+
+    <main>
+        <!-- CPU FDE Cycle -->
+        <section>
+            <h2>CPU: Fetch-Decode-Execute Cycle</h2>
+            <div class="diagram-container">
+                <div class="diagram-title">The Heartbeat of Every CPU</div>
+                <div class="mermaid">
+                    graph TD
+                    A[Memory] --> B[Fetch]
+                    B --> C[Decode]
+                    C --> D[Execute]
+                    D --> A
+                    D --> E[Update PC]
+                    style A fill:#e74c3c,stroke:#c0392b,color:white
+                    style B fill:#f1c40f,stroke:#f39c12,color:#2c3e50
+                    style C fill:#27ae60,stroke:#1e8449,color:white
+                    style D fill:#3498db,stroke:#2980b9,color:white
+                </div>
+            </div>
+
+            <div class="animation-container">
+                <svg class="cpu-animation" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="fetchGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#f1c40f"/>
+                            <stop offset="100%" stop-color="#f39c12"/>
+                        </linearGradient>
+                        <linearGradient id="decodeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#27ae60"/>
+                            <stop offset="100%" stop-color="#1e8449"/>
+                        </linearGradient>
+                        <linearGradient id="executeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#3498db"/>
+                            <stop offset="100%" stop-color="#2980b9"/>
+                        </linearGradient>
+                    </defs>
+
+                    <!-- Memory -->
+                    <rect x="50" y="100" width="80" height="100" fill="#e74c3c" rx="10"/>
+                    <text x="90" y="150" text-anchor="middle" fill="white" font-weight="bold">RAM</text>
+
+                    <!-- Fetch -->
+                    <rect x="180" y="100" width="80" height="100" fill="url(#fetchGrad)" rx="10">
+                        <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
+                    </rect>
+                    <text x="220" y="150" text-anchor="middle" fill="#2c3e50" font-weight="bold">FETCH</text>
+
+                    <!-- Decode -->
+                    <rect x="310" y="100" width="80" height="100" fill="url(#decodeGrad)" rx="10">
+                        <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" begin="0.66s" repeatCount="indefinite"/>
+                    </rect>
+                    <text x="350" y="150" text-anchor="middle" fill="white" font-weight="bold">DECODE</text>
+
+                    <!-- Execute -->
+                    <rect x="440" y="100" width="80" height="100" fill="url(#executeGrad)" rx="10">
+                        <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" begin="1.33s" repeatCount="indefinite"/>
+                    </rect>
+                    <text x="480" y="150" text-anchor="middle" fill="white" font-weight="bold">EXECUTE</text>
+
+                    <!-- Arrows -->
+                    <path d="M130 150 L180 150" stroke="#333" stroke-width="3" marker-end="url(#arrow)"/>
+                    <path d="M260 150 L310 150" stroke="#333" stroke-width="3" marker-end="url(#arrow)"/>
+                    <path d="M390 150 L440 150" stroke="#333" stroke-width="3" marker-end="url(#arrow)"/>
+                    <path d="M520 150 Q550 150 550 180 L550 220 Q550 250 520 250 L130 250 Q100 250 100 220 L100 180 Q100 150 130 150"
+                          stroke="#333" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+
+                    <defs>
+                        <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                            <path d="M0,0 L0,6 L9,3 z" fill="#333"/>
+                        </marker>
+                    </defs>
+                </svg>
+            </div>
+        </section>
+
+        <!-- Memory Pyramid -->
+        <section>
+            <h2>Memory Hierarchy Pyramid</h2>
+            <div class="diagram-container">
+                <div class="diagram-title">Speed vs. Size Trade-off</div>
+                <div class="pyramid">
+                    <div class="pyramid-level level-1">
+                        Registers
+                        <span>~0.5 ns • 16–64 × 64-bit</span>
+                    </div>
+                    <div class="pyramid-level level-2">
+                        L1 Cache
+                        <span>~1–3 ns • 32 KB per core</span>
+                    </div>
+                    <div class="pyramid-level level-3">
+                        L2 Cache
+                        <span>~4–10 ns • 256 KB</span>
+                    </div>
+                    <div class="pyramid-level level-4">
+                        L3 Cache
+                        <span>~10–20 ns • 8–64 MB shared</span>
+                    </div>
+                    <div class="pyramid-level level-5">
+                        Main Memory (RAM)
+                        <span>~100 ns • 16–128 GB</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Lock Flow -->
+        <section>
+            <h2>Lock (Mutex) Acquire/Release Flow</h2>
+            <div class="diagram-container">
+                <div class="diagram-title">Atomic Test-and-Set in Action</div>
+                <div class="lock-flow">
+                    <div class="flow-step">
+                        <div class="step-icon">Check</div>
+                        <div class="step-title">Check Flag</div>
+                        <p>Is lock = 0?</p>
+                    </div>
+                    <div class="flow-step">
+                        <div class="step-icon">TAS</div>
+                        <div class="step-title">Test-and-Set</div>
+                        <p>Atomically set to 1</p>
+                    </div>
+                    <div class="flow-step">
+                        <div class="step-icon">Success</div>
+                        <div class="step-title">Enter CS</div>
+                        <p>Critical Section</p>
+                    </div>
+                    <div class="flow-step">
+                        <div class="step-icon">Release</div>
+                        <div class="step-title">Release</div>
+                        <p>Set flag = 0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mermaid">
+                sequenceDiagram
+                participant T1 as Thread 1
+                participant L as Lock
+                participant T2 as Thread 2
+                T1->>L: TAS() → success
+                T1->>T1: Critical Section
+                T2->>L: TAS() → spin/wait
+                T1->>L: release()
+                T2->>L: TAS() → success
+            </div>
+        </section>
+
+        <!-- Semaphore P/V -->
+        <section>
+            <h2>Semaphore: P() and V() Operations</h2>
+            <div class="diagram-container">
+                <div class="diagram-title">Counting Semaphore with Buffer</div>
+                <div class="mermaid">
+                    graph TD
+                    subgraph Producer
+                    P1[Produce Item]
+                    P2[P(empty)]
+                    P3[Add to Buffer]
+                    P4[V(full)]
+                    end
+                    subgraph Buffer[Buffer (size N)]
+                    B[ ]
+                    end
+                    subgraph Consumer
+                    C1[V(full)]
+                    C2[Remove from Buffer]
+                    C3[P(empty)]
+                    C4[Consume Item]
+                    end
+                    P1 --> P2 --> P3 --> P4
+                    C1 --> C2 --> C3 --> C4
+                    P3 --> B
+                    C2 --> B
+                    style Buffer fill:#f1c40f,stroke:#f39c12,color:#2c3e50
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>All Diagrams in One View</h2>
+            <div style="background: #f0f8ff; padding: 1.5rem; border-radius: 16px; border-left: 5px solid var(--primary); text-align: center;">
+                <p><strong>Chapter 0 Complete!</strong> You've seen:</p>
+                <ul style="display: inline-block; text-align: left; margin: 1rem 0;">
+                    <li>CPU FDE Cycle (animated)</li>
+                    <li>Memory Pyramid (interactive)</li>
+                    <li>Lock TAS Flow</li>
+                    <li>Semaphore Producer-Consumer</li>
+                </ul>
+                <p>Ready for <strong>Chapter 1: Multithreading in Java</strong>!</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-0.6-monitors.html" style="color: var(--primary);">← 0.6 Primitives</a> |
+            <a href="chapter-1.1-intro.html" style="color: var(--primary);">Chapter 1: Intro →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#1e90ff',
+        primaryTextColor: '#fff',
+        lineColor: '#00d2ff'
+      }
+    });
+</script>
+</body>
+</html>

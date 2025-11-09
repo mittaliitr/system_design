@@ -44,14 +44,14 @@
             },
             {
               "name": "Monitors, Spinlocks, Futexes",
-              "url": "https://en.wikipedia.org/wiki/Futex",
+              "url": "concurrency /chapter6.3.html",
               "tag": "primitive"
             }
           ]
         },
         {
           "name": "0.7 Visuals: Diagrams of CPU, Memory Pyramid, Lock & Semaphore Flow",
-          "url": "https://www.cs.cmu.edu/~213/lectures/10-threads.pdf",
+          "url": "concurrency /chapter6.4.html",
           "tag": "visual"
         }
       ]
