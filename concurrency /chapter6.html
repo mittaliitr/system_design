@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>0.5 OS Threading: Kernel vs. User Threads</title>
+    <title>0.6 Concurrency Primitives: Locks (Mutex)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <style>
         :root {
-          --primary: #00b894;
-          --secondary: #55efc4;
-          --accent: #81ecec;
+          --primary: #6c5ce7;
+          --secondary: #a29bfe;
+          --accent: #fd79a8;
           --dark: #2d3436;
           --light: #f8f9fa;
           --gray: #b2bec3;
@@ -26,7 +26,7 @@
 
         body {
           font-family: 'Inter', sans-serif;
-          background: linear-gradient(135deg, #00cec9 0%, #00b894 100%);
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           color: var(--dark);
           line-height: 1.7;
           padding: 2rem;
@@ -116,9 +116,9 @@
         }
 
         .analogy {
-          background: #e8f9f4;
-          border: 1px solid var(--accent);
-          color: #00695c;
+          background: #f0e6ff;
+          border: 1px solid var(--primary);
+          color: #4a2c8a;
         }
 
         .code-block {
@@ -133,7 +133,7 @@
         }
 
         .code-block::before {
-          content: 'Java';
+          content: 'Assembly / Java';
           position: absolute;
           top: 0.5rem;
           right: 1rem;
@@ -142,91 +142,60 @@
           font-family: 'Inter', sans-serif;
         }
 
-        .thread-comparison {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 1.5rem;
+        .critical-section {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
           margin: 2rem 0;
-        }
-
-        .thread-card {
-          background: #f8f9fa;
-          border: 2px solid #e9ecef;
-          border-radius: 16px;
           padding: 1.5rem;
-          transition: all 0.3s;
-          cursor: pointer;
-          position: relative;
-          overflow: hidden;
+          background: #f8f9fa;
+          border-radius: 16px;
+          border: 2px dashed #ddd;
         }
 
-        .thread-card::before {
-          content: '';
-          position: absolute;
-          top: 0; left: 0; right: 0; bottom: 0;
-          background: linear-gradient(135deg, transparent, rgba(0,184,148,0.1));
-          opacity: 0;
-          transition: opacity 0.3s;
+        .critical-box {
+          background: #ff7675;
+          color: white;
+          padding: 1rem 2rem;
+          border-radius: 12px;
+          font-weight: 600;
+          box-shadow: 0 4px 12px rgba(255,118,117,0.3);
         }
 
-        .thread-card:hover::before {
-          opacity: 1;
-        }
-
-        .thread-card:hover {
-          transform: translateY(-8px);
-          border-color: var(--primary);
-          box-shadow: 0 12px 24px rgba(0,184,148,0.2);
-        }
-
-        .card-title {
-          font-size: 1.3rem;
-          font-weight: 700;
-          color: var(--primary);
-          margin-bottom: 0.8rem;
-          text-align: center;
-        }
-
-        .card-icon {
-          font-size: 2.5rem;
-          text-align: center;
-          margin-bottom: 0.8rem;
-        }
-
-        .pros-cons {
-          font-size: 0.9rem;
-          color: #636e72;
-        }
-
-        .pros-cons strong {
-          color: var(--primary);
-        }
-
-        .mapping-diagram {
+        .tas-animation {
           display: flex;
           justify-content: center;
-          gap: 2rem;
+          gap: 1.5rem;
           flex-wrap: wrap;
           margin: 2rem 0;
-          padding: 1.5rem;
-          background: #f0f9f7;
-          border-radius: 16px;
-          text-align: center;
         }
 
-        .mapping-box {
-          flex: 1;
-          min-width: 180px;
-          padding: 1rem;
-          border-radius: 12px;
+        .tas-step {
           background: white;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          border: 2px solid #e9ecef;
+          border-radius: 16px;
+          padding: 1.2rem;
+          text-align: center;
+          width: 180px;
+          transition: all 0.3s;
+          cursor: pointer;
         }
 
-        .mapping-title {
+        .tas-step:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 12px 24px rgba(108,92,231,0.2);
+        }
+
+        .step-icon {
+          font-size: 2rem;
+          margin-bottom: 0.5rem;
+        }
+
+        .step-title {
           font-weight: 600;
           color: var(--primary);
-          margin-bottom: 0.5rem;
         }
 
         .mermaid {
@@ -236,6 +205,45 @@
           border: 1px solid #eee;
           margin: 2rem 0;
           text-align: center;
+        }
+
+        .race-demo {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1.5rem;
+          margin: 2rem 0;
+          padding: 1.5rem;
+          background: #f0f4f8;
+          border-radius: 16px;
+        }
+
+        .race-thread {
+          background: white;
+          padding: 1rem;
+          border-radius: 12px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .race-thread h4 {
+          color: #e74c3c;
+          margin-bottom: 0.5rem;
+        }
+
+        table {
+          border-collapse: collapse;
+          width: 100%;
+          margin: 1.5rem 0;
+        }
+
+        th, td {
+          border: 1px solid #ddd;
+          padding: 0.75rem 1rem;
+          text-align: left;
+        }
+
+        th {
+          background-color: var(--primary);
+          color: white;
         }
 
         footer {
@@ -248,202 +256,281 @@
 
         @media (max-width: 768px) {
           header h1 { font-size: 2rem; }
-          .thread-comparison { grid-template-columns: 1fr; }
-          .mapping-diagram { flex-direction: column; }
+          .tas-animation { flex-direction: column; align-items: center; }
+          .race-demo { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 <div class="container">
     <header>
-        <h1>0.5 OS Threading: Kernel vs. User Threads</h1>
-        <p>Who Really Manages Your Threads?</p>
+        <h1>0.6 Concurrency Primitives</h1>
+        <h2>Locks (Mutex): Atomic Test-and-Set, Critical Section</h2>
+        <p>The Foundation of Thread Safety</p>
         <div class="badge">Chapter 0 – Computer Architecture & Concurrency Foundations</div>
     </header>
 
     <main>
         <!-- Introduction -->
         <section>
-            <h2>Think of a Busy Restaurant</h2>
+            <h2>Imagine a Shared Bathroom</h2>
             <p>
-                Waiters (threads) take orders, serve food, and clean tables. But who manages them?
+                Two people (threads) want to use the same bathroom (shared resource). Without a lock, chaos ensues!
             </p>
             <div class="highlight analogy">
                 <strong>Analogy:</strong>
-                <em>Kernel threads</em> are like <strong>official staff</strong> managed by the restaurant owner (OS kernel).
-                <em>User threads</em> are like <strong>self-organized volunteers</strong> managed by the head waiter (your program).
+                A <em>lock</em> is the <strong>bathroom door bolt</strong>. Only one person can enter at a time.
+                The <em>critical section</em> is the time inside the bathroom.
             </div>
         </section>
 
-        <!-- What Are Threads in OS? -->
+        <!-- What is a Critical Section? -->
         <section>
-            <h2>Threads at the OS Level</h2>
+            <h2>Critical Section: The Danger Zone</h2>
             <p>
-                A <strong>thread</strong> is the smallest unit of execution. The OS decides:
+                A <strong>critical section</strong> is code that accesses <strong>shared mutable state</strong> and must not be executed by more than one thread at a time.
             </p>
-            <ul style="margin: 1.2rem 0; padding-left: 2rem;">
-                <li>When a thread runs (scheduling)</li>
-                <li>Which CPU core it uses</li>
-                <li>How long it runs (time slicing)</li>
-            </ul>
+
+            <div class="critical-section">
+                <div class="critical-box">
+                    Critical Section<br>
+                    <small>Only 1 thread allowed!</small>
+                </div>
+            </div>
 
             <div class="highlight">
-                <strong>Key Question:</strong> Who creates and schedules threads — the <em>OS kernel</em> or <em>your program</em>?
+                <strong>Race Condition Example:</strong> Two threads increment <code>counter++</code> → final value may be wrong!
+            </div>
+
+            <div class="race-demo">
+                <div class="race-thread">
+                    <h4>Thread 1</h4>
+                    <pre>
+read counter → 100
+increment → 101
+write counter → 101
+            </pre>
+                </div>
+                <div class="race-thread">
+                    <h4>Thread 2</h4>
+                    <pre>
+read counter → 100
+increment → 101
+write counter → 101  ← Lost update!
+            </pre>
+                </div>
             </div>
         </section>
 
-        <!-- Kernel vs User Threads -->
+        <!-- What is a Lock (Mutex)? -->
         <section>
-            <h2>Kernel Threads vs. User Threads</h2>
-
-            <div class="thread-comparison">
-                <div class="thread-card">
-                    <div class="card-icon">Kernel</div>
-                    <div class="card-title">Kernel-Level Threads</div>
-                    <div class="pros-cons">
-                        <strong>Pros:</strong><br>
-                        - True parallelism (multi-core)<br>
-                        - Blocking calls don't freeze app<br>
-                        - OS schedules efficiently<br><br>
-                        <strong>Cons:</strong><br>
-                        - Expensive to create/switch<br>
-                        - Limited (thousands max)
-                    </div>
-                </div>
-                <div class="thread-card">
-                    <div class="card-icon">User</div>
-                    <div class="card-title">User-Level Threads</div>
-                    <div class="pros-cons">
-                        <strong>Pros:</strong><br>
-                        - Lightweight (100K+ possible)<br>
-                        - Fast context switch<br>
-                        - Portable<br><br>
-                        <strong>Cons:</strong><br>
-                        - One block → all blocked<br>
-                        - No true parallelism
-                    </div>
-                </div>
-            </div>
+            <h2>Lock (Mutex): Mutual Exclusion</h2>
+            <p>
+                A <strong>mutex</strong> (mutual exclusion) is a synchronization primitive that ensures only <strong>one thread</strong> enters a critical section at a time.
+            </p>
 
             <div class="code-block">
           <pre>
-// Java uses KERNEL threads!
-Thread t = new Thread(() -> {
-    System.out.println("Hello from kernel thread!");
-});
-t.start();  // OS schedules on real CPU core
+// Java: Simple lock
+synchronized(this) {
+    counter++;  // Critical section protected!
+}
           </pre>
-            </div>
-        </section>
-
-        <!-- Thread Mapping Models -->
-        <section>
-            <h2>Thread Mapping: 1:1, M:1, M:N</h2>
-            <p>How do user threads map to kernel threads?</p>
-
-            <div class="mapping-diagram">
-                <div class="mapping-box">
-                    <div class="mapping-title">1:1 (Java, Windows, Linux)</div>
-                    <p>Each user thread → one kernel thread<br>
-                        <strong>Best for performance</strong></p>
-                </div>
-                <div class="mapping-box">
-                    <div class="mapping-title">M:1 (Old Green Threads)</div>
-                    <p>Many user threads → one kernel thread<br>
-                        <strong>Lightweight but no parallelism</strong></p>
-                </div>
-                <div class="mapping-box">
-                    <div class="mapping-title">M:N (Hybrid – Go, Erlang)</div>
-                    <p>Many user → few kernel threads<br>
-                        <strong>Best of both worlds</strong></p>
-                </div>
             </div>
 
             <div class="mermaid">
-                graph TD
-                subgraph User_Space["User Space (Your App)"]
-                U1[User Thread 1]
-                U2[User Thread 2]
-                U3[User Thread 3]
-                end
-                subgraph Kernel_Space["Kernel Space (OS)"]
-                K1[Kernel Thread 1]
-                K2[Kernel Thread 2]
-                end
-                U1 --> K1
-                U2 --> K1
-                U3 --> K2
-                style User_Space fill:#f0f9f7,stroke:#00b894
-                style Kernel_Space fill:#e8f9f4,stroke:#55efc4
+                sequenceDiagram
+                participant T1 as Thread 1
+                participant L as Lock
+                participant T2 as Thread 2
+                T1->>L: acquire()
+                Note right of L: Locked
+                T1->>T1: Enter critical section
+                T2->>L: acquire() → wait
+                T1->>L: release()
+                Note right of L: Unlocked
+                T2->>L: acquire() → success
             </div>
         </section>
 
-        <!-- Java's Thread Model -->
+        <!-- Atomic Test-and-Set (TAS) -->
         <section>
-            <h2>Java Uses 1:1 Kernel Threads</h2>
+            <h2>Atomic Test-and-Set: The Hardware Magic</h2>
             <p>
-                Since Java 1.2, <code>java.lang.Thread</code> maps <strong>1:1 to kernel threads</strong>.
+                How does a lock work at the CPU level? With <strong>atomic instructions</strong> like <code>test-and-set (TAS)</code>.
             </p>
 
-            <div class="highlight">
-                <strong>Why?</strong>
-                - True parallelism on multi-core<br>
-                - Blocking I/O doesn't freeze JVM<br>
-                - OS handles scheduling fairly
+            <div class="tas-animation">
+                <div class="tas-step">
+                    <div class="step-icon">Test</div>
+                    <div class="step-title">Test</div>
+                    <p>Read lock flag</p>
+                </div>
+                <div class="tas-step">
+                    <div class="step-icon">Compare</div>
+                    <div class="step-title">Compare</div>
+                    <p>Is it 0 (free)?</p>
+                </div>
+                <div class="tas-step">
+                    <div class="step-icon">Set</div>
+                    <div class="step-title">Set</div>
+                    <p>Set to 1 (locked)</p>
+                </div>
+                <div class="tas-step">
+                    <div class="step-icon">Atomic</div>
+                    <div class="step-title">Atomic!</div>
+                    <p>All in one CPU cycle</p>
+                </div>
             </div>
 
             <div class="code-block">
           <pre>
-// Each Thread = OS kernel thread
-ExecutorService exec = Executors.newFixedThreadPool(4);
-exec.submit(() -> heavyTask());  // Runs on real CPU core!
+// Pseudocode: Spinlock using TAS
+boolean lock = false;
+
+acquire():
+    while (test_and_set(lock)) { }  // Spin
+
+release():
+    lock = false
           </pre>
             </div>
 
-            <p>
-                <strong>But...</strong> Creating 10,000+ threads is expensive → enter <strong>Project Loom</strong> (virtual threads)!
-            </p>
+            <div class="highlight">
+                <strong>Key:</strong>
+                <code>test_and_set</code> is <strong>atomic</strong> — CPU guarantees no interleaving.
+                This is the foundation of all locks!
+            </div>
         </section>
 
-        <!-- Project Loom Preview -->
+        <!-- From Hardware to Java -->
         <section>
-            <h2>Future: Virtual Threads (M:N)</h2>
+            <h2>From TAS to Java synchronized</h2>
             <p>
-                Java 21+ introduces <strong>virtual threads</strong> — lightweight, user-managed threads that run on a small pool of kernel threads.
+                Java’s <code>synchronized</code> uses:
             </p>
-
-            <div class="highlight">
-                <strong>Revolutionary:</strong>
-                <code>Thread.startVirtualThread()</code> → millions of threads, no overhead!
-            </div>
+            <ul style="margin: 1.5rem 0; padding-left: 2rem;">
+                <li><strong>MonitorEnter/MonitorExit</strong> bytecode</li>
+                <li>JVM → OS mutex (pthread_mutex on Linux)</li>
+                <li>Under the hood: <strong>TAS or CAS</strong></li>
+            </ul>
 
             <div class="code-block">
           <pre>
-// Project Loom: M:N model
-try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-    executor.submit(() -> System.out.println("Virtual!"));
-}  // Millions possible!
+// Java → JVM → OS → CPU
+public synchronized void increment() {
+    counter++;
+}
+// → Uses atomic TAS/CAS + memory barriers
           </pre>
+            </div>
+        </section>
+
+        <!-- Spinlocks vs Blocking Locks -->
+        <section>
+            <h2>Spinlock vs Blocking Lock</h2>
+
+            <p><strong>Spinlock</strong> and <strong>Blocking Lock</strong> are two fundamental approaches to managing access to shared resources.</p>
+
+            <h3>Spinlock (TAS)</h3>
+            <pre style="background: #f8f9fa; border-left: 5px solid var(--accent); padding: 1rem; border-radius: 8px;">
+while (TAS(lock)) { }  // Busy-wait
+// Critical section
+lock = 0
+            </pre>
+            <p>
+                - The thread <strong>busy-waits (spins)</strong>, continuously checking the lock until it becomes available.<br/>
+                - Fast if the lock is held <strong>briefly</strong>, avoiding overhead of putting thread to sleep and waking it.<br/>
+                - Wastes CPU cycles if the lock is held for longer.
+            </p>
+
+            <h3>Blocking Lock</h3>
+            <pre style="background: #f8f9fa; border-left: 5px solid var(--accent); padding: 1rem; border-radius: 8px;">
+acquire() → sleep if locked
+// Wake up when free
+release() → wake waiter
+            </pre>
+            <p>
+                - The thread <strong>goes to sleep</strong> if the lock is held, freeing the CPU.<br/>
+                - Efficient for longer wait times.<br/>
+                - Involves context switches and scheduler overhead.
+            </p>
+
+            <h3>Comparison Table</h3>
+            <table>
+                <thead>
+                <tr>
+                    <th>Aspect</th>
+                    <th>Spinlock</th>
+                    <th>Blocking Lock</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Waiting Style</td>
+                    <td>Busy-waiting (CPU spinning)</td>
+                    <td>Thread sleeps (blocks)</td>
+                </tr>
+                <tr>
+                    <td>CPU Usage</td>
+                    <td>High when waiting</td>
+                    <td>Low</td>
+                </tr>
+                <tr>
+                    <td>Overhead</td>
+                    <td>Low (no context switch)</td>
+                    <td>Higher (context switches)</td>
+                </tr>
+                <tr>
+                    <td>Lock Hold Time</td>
+                    <td>Best for very short durations</td>
+                    <td>Best for longer durations</td>
+                </tr>
+                <tr>
+                    <td>Suitable Usage</td>
+                    <td>OS kernels, low contention</td>
+                    <td>User applications, high contention</td>
+                </tr>
+                <tr>
+                    <td>Fairness</td>
+                    <td>Usually unfair (no guaranteed order)</td>
+                    <td>Fairer (based on scheduler)</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <h3>Modern JVM Locking</h3>
+            <p>
+                The JVM optimizes locking using a multi-stage approach:
+            </p>
+            <ul style="margin: 1rem 0 1.5rem 1.5rem;">
+                <li><strong>Biased Locking:</strong> Initially biases a lock towards a single thread to avoid synchronization overhead when uncontended.</li>
+                <li><strong>Lightweight Locking:</strong> Uses spinlock-like behavior for short waits without going to OS-level blocking.</li>
+                <li><strong>OS Mutex Escalation:</strong> For longer contention or waits, escalates to OS mutexes where threads block and get scheduled efficiently.</li>
+            </ul>
+
+            <div class="highlight">
+                <strong>Summary:</strong> JVM tries to keep locking cheap for the common case (no or low contention) and only pays OS overhead when really needed.
             </div>
         </section>
 
         <!-- Summary -->
         <section>
             <h2>Key Takeaways</h2>
-            <div style="background: #e8f9f4; padding: 1.5rem; border-radius: 12px; border-left: 5px solid var(--primary);">
-                <p><strong>1.</strong> <strong>Kernel threads</strong>: Managed by OS → true parallelism.</p>
-                <p><strong>2.</strong> <strong>User threads</strong>: Managed by app → lightweight but no parallelism.</p>
-                <p><strong>3.</strong> Java uses <strong>1:1 kernel threads</strong> (since 1.2).</p>
-                <p><strong>4.</strong> <strong>Project Loom</strong>: Virtual threads → M:N, millions of threads.</p>
-                <p><strong>5.</strong> Blocking call in kernel thread? Only that thread waits.</p>
+            <div style="background: #f0e6ff; padding: 1.5rem; border-radius: 12px; border-left: 5px solid var(--primary);">
+                <p><strong>1.</strong> <strong>Critical Section</strong>: Code accessing shared data → must be protected.</p>
+                <p><strong>2.</strong> <strong>Mutex (Lock)</strong>: Ensures only one thread enters.</p>
+                <p><strong>3.</strong> <strong>Test-and-Set (TAS)</strong>: Atomic CPU instruction → core of all locks.</p>
+                <p><strong>4.</strong> Java <code>synchronized</code> → built on TAS + OS mutex.</p>
+                <p><strong>5.</strong> <code>volatile</code> ≠ lock — only visibility, not atomicity!</p>
             </div>
         </section>
     </main>
 
     <footer>
         <p>© 2025 Mastering Multithreading in Java |
-            <a href="chapter-0.4-memory-model.html" style="color: var(--primary);">← 0.4 Memory Model</a> |
-            <a href="chapter-0.6-concurrency-primitives.html" style="color: var(--primary);">0.6 Concurrency Primitives →</a>
+            <a href="chapter-0.5-os-threading.html" style="color: var(--primary);">← 0.5 OS Threading</a> |
+            <a href="chapter-0.6-semaphores.html" style="color: var(--primary);">0.6 Semaphores →</a>
         </p>
     </footer>
 </div>
@@ -453,9 +540,9 @@ try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
       startOnLoad: true,
       theme: 'base',
       themeVariables: {
-        primaryColor: '#00b894',
+        primaryColor: '#6c5ce7',
         primaryTextColor: '#fff',
-        lineColor: '#55efc4'
+        lineColor: '#a29bfe'
       }
     });
 </script>
