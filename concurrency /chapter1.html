@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>0.1 The CPU: Fetch-Decode-Execute Cycle</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: #f9f9fb;
+        }
+        h1 {
+            color: #1a5fb4;
+            border-bottom: 3px solid #1a5fb4;
+            padding-bottom: 0.5rem;
+            font-size: 2.2rem;
+        }
+        h2 {
+            color: #1a5fb4;
+            margin-top: 2rem;
+            font-size: 1.8rem;
+            border-left: 5px solid #1a5fb4;
+            padding-left: 0.8rem;
+        }
+        h3 {
+            color: #2d3748;
+            margin-top: 1.5rem;
+            font-size: 1.4rem;
+        }
+        p {
+            margin-bottom: 1rem;
+        }
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+        li {
+            margin-bottom: 0.5rem;
+        }
+        strong {
+            color: #1a5fb4;
+        }
+        .analogy {
+            background-color: #e6f0fa;
+            border-left: 4px solid #1a5fb4;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            font-style: italic;
+            border-radius: 0 8px 8px 0;
+        }
+        .diagram {
+            text-align: center;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background-color: #f0f4f8;
+            border-radius: 12px;
+            font-style: italic;
+            color: #555;
+        }
+        .pyramid {
+            display: block;
+            margin: 2rem auto;
+            max-width: 100%;
+            height: auto;
+        }
+        .note {
+            background-color: #fff8e6;
+            border: 1px solid #ffd700;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            font-size: 0.95rem;
+        }
+        code {
+            background-color: #f1f1f1;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+
+<h1>0.1 The CPU: Fetch-Decode-Execute Cycle</h1>
+
+<p>Welcome to the foundational chapter of our journey into computer architecture and concurrency. In this section, we'll dive deep into the <strong>Central Processing Unit (CPU)</strong>, often called the "brain" of the computer. We'll start from the absolute basics—assuming no prior knowledge—and build up to the intricacies of the <strong>Fetch-Decode-Execute (FDE) cycle</strong>. Along the way, we'll integrate explanations of the memory model, as it plays a crucial role in how the CPU operates. This knowledge is essential for understanding multithreading in Java, as it underpins how threads interact with hardware resources.</p>
+
+<p>By the end, you'll have a clear picture of how instructions are processed at the hardware level, why memory access matters, and how these concepts tie into higher-level programming.</p>
+
+<h2>The Basics: What is the CPU?</h2>
+
+<p>Let's begin with the fundamentals. A computer is essentially a machine that processes data according to instructions. At its core is the <strong>Central Processing Unit (CPU)</strong>, which performs the actual computations and controls the flow of data.</p>
+
+<div class="analogy">
+    <strong>Analogy for Beginners:</strong> Imagine the CPU as a chef in a kitchen. The chef (CPU) reads recipes (instructions), gathers ingredients (data) from the pantry (memory), and uses tools (registers and ALU) to prepare the meal (output results).
+</div>
+
+<ul>
+    <li><strong>Key Role:</strong> The CPU executes programs by repeatedly performing operations like addition, subtraction, logic comparisons, and data movement. Modern CPUs can handle billions of these operations per second (measured in GHz, or gigahertz).</li>
+</ul>
+
+<p>The CPU isn't a single entity; it's composed of several key components:</p>
+<ul>
+    <li><strong>Arithmetic Logic Unit (ALU):</strong> Performs mathematical and logical operations (e.g., adding two numbers or checking if one is greater than another).</li>
+    <li><strong>Registers:</strong> Ultra-fast, temporary storage locations inside the CPU for holding data that's being actively used. (We'll revisit these in the memory model.)</li>
+    <li><strong>Control Unit (CU):</strong> Directs the operations of the ALU, registers, and other parts by interpreting instructions.</li>
+    <li><strong>Cache:</strong> Small, high-speed memory inside or near the CPU for frequently accessed data (part of the memory hierarchy).</li>
+</ul>
+
+<p>Without the CPU, your computer couldn't run software, process inputs, or output results. Now, let's explore how it actually works through the Fetch-Decode-Execute cycle.</p>
+
+<h2>The Fetch-Decode-Execute Cycle: Step-by-Step</h2>
+
+<p>The <strong>Fetch-Decode-Execute (FDE) cycle</strong>, also known as the instruction cycle, is the heartbeat of the CPU. It's a repeating loop where the CPU processes one instruction at a time from a program stored in memory. This cycle happens millions to billions of times per second, making your programs run smoothly.</p>
+
+<h3>Why Does This Matter?</h3>
+<p>Understanding the FDE cycle is crucial because it reveals the sequential nature of computation at the hardware level. In multithreading (which we'll cover later in the book), multiple threads compete for CPU time, and issues like race conditions arise from how instructions interleave during these cycles.</p>
+
+<h3>The Cycle Breakdown</h3>
+<p>The FDE cycle consists of three main stages: <strong>Fetch</strong>, <strong>Decode</strong>, and <strong>Execute</strong>. Some architectures include a fourth stage (Write-back), but we'll focus on the core three for simplicity.</p>
+
+<ol>
+    <li>
+        <strong>Fetch Stage:</strong>
+        <ul>
+            <li><strong>What Happens:</strong> The CPU retrieves the next instruction from main memory (RAM). Instructions are stored as binary code (machine language) at specific memory addresses.</li>
+            <li><strong>How It Works:</strong> The Program Counter (PC) register holds the address of the next instruction. The CPU sends this address to memory via the address bus, and the instruction is loaded into the Instruction Register (IR).</li>
+            <li><strong>From Basics:</strong> Think of memory as a giant bookshelf with numbered shelves (addresses). The PC is like a bookmark pointing to the next "page" (instruction). Fetching is grabbing that page.</li>
+            <li><strong>Time Consideration:</strong> This stage involves memory access, which can be slow compared to CPU speed—hence the importance of caches (more on this in the memory model).</li>
+        </ul>
+    </li>
+    <li>
+        <strong>Decode Stage:</strong>
+        <ul>
+            <li><strong>What Happens:</strong> The CPU interprets the fetched instruction. It breaks down the binary code into understandable parts, like the operation (opcode) and operands (data or addresses involved).</li>
+            <li><strong>How It Works:</strong> The Control Unit analyzes the IR. It generates control signals to activate the appropriate circuits (e.g., telling the ALU to add two numbers). If needed, it fetches additional data from registers or memory.</li>
+            <li><strong>From Basics:</strong> Decoding is like translating a foreign recipe into your language. The opcode might say "ADD," and operands specify "ingredient A + ingredient B."</li>
+            <li><strong>Potential Bottlenecks:</strong> Complex instructions might require micro-operations (μops), adding sub-steps.</li>
+        </ul>
+    </li>
+    <li>
+        <strong>Execute Stage:</strong>
+        <ul>
+            <li><strong>What Happens:</strong> The CPU performs the actual operation. This could be arithmetic (via ALU), data transfer, branching (jumping to another instruction), or I/O operations.</li>
+            <li><strong>How It Works:</strong> Results are computed and temporarily stored in registers. The PC is updated to point to the next instruction (usually incremented, or changed for branches).</li>
+            <li><strong>From Basics:</strong> This is the "cooking" part—mixing ingredients and producing the dish. If the instruction is <code>ADD R1, R2</code>, the ALU adds values from registers R1 and R2, storing the sum back in a register.</li>
+            <li><strong>Write-Back (Optional Extension):</strong> In pipelined CPUs (advanced topic), results are written back to memory or registers here to avoid overlaps.</li>
+        </ul>
+    </li>
+</ol>
+
+<p>After Execute, the cycle repeats: Fetch the next instruction, and so on. This loop continues until the program ends (e.g., a HALT instruction).</p>
+
+<h3>Visualizing the Cycle</h3>
+<div class="diagram">
+    <p><em>Memory → Fetch → Decode → Execute → Back to Memory/Registers</em></p>
+    <p><small>(Diagram sourced from Ada Computer Science)</small></p>
+</div>
+
+<h3>Real-World Implications</h3>
+<ul>
+    <li><strong>Clock Speed:</strong> Each cycle is synced to the CPU's clock (e.g., 3 GHz means 3 billion cycles/second). Faster clocks mean quicker execution, but heat and power limit this.</li>
+    <li><strong>Pipelining:</strong> Modern CPUs overlap stages (e.g., fetching the next instruction while decoding the current one) for efficiency, like an assembly line.</li>
+    <li><strong>Multi-Core CPUs:</strong> Today's processors have multiple cores, each running independent FDE cycles—enabling true parallelism, which is key for multithreading.</li>
+</ul>
+
+<h2>Integrating the Memory Model: How Memory Fits In</h2>
+
+<p>The FDE cycle doesn't happen in isolation; it heavily relies on the <strong>memory model</strong>, which describes how data and instructions are stored, accessed, and managed. Without understanding memory, the cycle's "Fetch" stage would be a mystery—why is it sometimes slow?</p>
+
+<h3>Basics of the Memory Model</h3>
+<p>The memory model is a conceptual framework for how a computer handles storage. It's hierarchical because not all memory is equal: faster memory is smaller and more expensive, while slower memory is larger and cheaper.</p>
+
+<div class="note">
+    <strong>Why a Hierarchy?</strong> The CPU needs data quickly, but storing everything in ultra-fast memory (like registers) would be impractical due to cost and size. So, we layer it.
+</div>
+
+<h3>The Memory Hierarchy Pyramid</h3>
+<p>From fastest (top) to slowest (bottom):</p>
+<ol>
+    <li><strong>Registers:</strong> Inside the CPU, hold data for immediate use during the FDE cycle. (E.g., PC and IR are registers.) Extremely fast (picoseconds), but limited (e.g., 16–32 per core).</li>
+    <li><strong>Cache (L1, L2, L3):</strong> Small memory pools on/near the CPU. L1 is per-core, L2/L3 shared. They store copies of frequently fetched data to reduce RAM trips during Fetch/Execute.</li>
+    <li><strong>Main Memory (RAM):</strong> Volatile storage for running programs and data. Accessed via buses; slower (nanoseconds).</li>
+    <li><strong>Secondary Storage (SSD/HDD):</strong> Non-volatile for long-term data. Much slower (milliseconds), used for swapping when RAM is full.</li>
+    <li><strong>Tertiary (e.g., Cloud/Tape):</strong> Even slower, for archives.</li>
+</ol>
+
+<div class="analogy">
+    <strong>Analogy:</strong> Registers are your pocket (instant access), cache is your backpack, RAM is your home fridge, SSD is the grocery store, and cloud is a distant warehouse.
+</div>
+
+<div class="diagram">
+    <p><em>[Pyramid diagram of memory hierarchy: Registers at the top, widening down to Cache, RAM, SSD/HDD, and Cloud/Tertiary at the base]</em></p>
+</div>
+
+<h3>How the FDE Cycle Interacts with Memory</h3>
+<ul>
+    <li><strong>Fetch:</strong> Pulls instructions from RAM (or cache if cached). If not in cache, a "cache miss" occurs, stalling the cycle while data is fetched from slower memory.</li>
+    <li><strong>Decode/Execute:</strong> Often loads operands from registers (fast) or memory (slower). Results might write back to memory.</li>
+    <li><strong>Cache Coherence:</strong> In multi-core systems, ensures all cores see consistent data (e.g., if one core updates a value, others' caches update).</li>
+    <li><strong>Virtual Memory:</strong> OS trickery maps program addresses to physical RAM, using paging to swap data to disk if needed—impacting cycle speed.</li>
+</ul>
+
+<h3>Relevance to Concurrency</h3>
+<p>In multithreading, threads share memory. The <strong>Java Memory Model (JMM, covered in Chapter 5)</strong> abstracts this hardware model, ensuring visibility of changes across threads (e.g., via <code>volatile</code> or locks). Mismatches can cause bugs like stale data reads during concurrent FDE cycles.</p>
+
+<h2>Wrapping Up</h2>
+<p>The Fetch-Decode-Execute cycle is the rhythmic process that powers all computation, tightly intertwined with the memory model for efficient data handling. From basics: It's a loop of grabbing, understanding, and doing instructions. In advanced contexts, it scales with pipelining and multi-cores, setting the stage for Java's concurrency tools.</p>
+
+<p>If this sparks questions or you want code examples (e.g., simulating the cycle in Java), dive into the next subsection or ask away! For further reading, check resources in Chapter 9.</p>
+
+</body>
+</html>
