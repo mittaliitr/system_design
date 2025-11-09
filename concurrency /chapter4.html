@@ -130,8 +130,6 @@
           overflow-x: auto;
           margin: 1.5rem 0;
           position: relative;
-          white-space: pre-wrap;
-          word-wrap: break-word;
         }
 
         .code-block::before {
@@ -358,126 +356,55 @@ Thread2: System.out.println(x);  // Sees 42, thanks to model!
             </div>
         </section>
 
-        <!-- Java Memory Model in detail -->
+        <!-- Relevance to Java -->
         <section>
             <h2>Memory Model in Java Concurrency</h2>
             <p>
                 Java's JMM ensures:
             </p>
             <ul style="margin: 1.5rem 0; padding-left: 2rem;">
-                <li><code>synchronized</code>: Full barrier, flushes caches</li>
+                <li><code>synchronized</code>: Full barrier, flushes caches of modified data to main memory on exit, and invalidates caches on entry</li>
                 <li><code>volatile</code>: Read/write visibility across threads</li>
                 <li>Final fields: Immutable after construction</li>
                 <li>Happens-before: Defines ordering (e.g., thread start before join)</li>
             </ul>
 
+            <div class="highlight">
+                <strong>Clarification on Synchronized Flush:</strong> When a thread exits a synchronized block, it flushes <em>only</em> the data modified inside that block from its core’s cache/store buffer to main memory — not the entire cache. This targeted flushing ensures efficient synchronization and visibility without impacting unrelated cached data.
+            </div>
+
             <div class="code-block">
 <pre>
 // Bug without volatile: Thread2 may see stale value
 volatile boolean ready = false;
+int data = 0;
 
-Thread1: ready = true;
+Thread 1:
+    data = 42;      // (1)
+    ready = true;   // (2) volatile write, flushes 'data' to memory
 
-Thread2: if (ready) { ... }  // Guaranteed to see true!
+Thread 2:
+    if (ready) {    // volatile read, sees true
+        // guaranteed to see data == 42 here
+    }
 </pre>
             </div>
 
             <div class="highlight">
-                <strong>Pro Tip:</strong> JMM abstracts hardware — but understanding coherence prevents subtle bugs in high-concurrency apps.
+                <strong>Pro Tip:</strong> JMM abstracts hardware — but understanding cache coherence and memory barriers prevents subtle bugs in high-concurrency apps.
             </div>
         </section>
 
-        <!-- New section: Volatile, Memory Barriers, Synchronized Blocks -->
+        <!-- Monitor Lock -->
         <section>
-            <h2>Volatile, Memory Barriers, and Synchronized Blocks: Clarifications</h2>
-
-            <h3>Volatile and Data Visibility</h3>
+            <h2>Monitor Locks (Synchronized) Under the Hood</h2>
             <p>
-                Consider this example:
+                The JVM implements <code>synchronized</code> blocks using <em>monitor locks</em>, which provide mutual exclusion and memory visibility guarantees.
             </p>
-            <pre class="code-block">
-volatile boolean ready = false;
-int data = 0;
-
-Thread 1:
-    data = 42;       // (1) Write data
-    ready = true;    // (2) Set ready flag
-
-Thread 2:
-    if (ready) {
-        // Can safely read 'data' here, guaranteed to see 42
-    }
-            </pre>
-            <p>
-                <strong>Explanation:</strong> The <code>volatile</code> keyword on <code>ready</code> ensures that when Thread 2 sees <code>ready == true</code>, it also sees the updated <code>data</code> value written before it in Thread 1. This is because <code>volatile</code> variables create <em>memory barriers</em> that enforce ordering and visibility guarantees.
-            </p>
-
-            <h3>What Are Memory Barriers?</h3>
-            <p>
-                A <strong>memory barrier</strong> (or fence) is a CPU instruction that prevents certain types of reordering of read and write operations by the compiler or CPU. They ensure that:
-            </p>
-            <ul>
-                <li>Writes before the barrier become visible to other threads before writes after the barrier.</li>
-                <li>Reads after the barrier see the effects of writes that happened before it.</li>
-            </ul>
-            <p>
-                In Java, operations on <code>volatile</code> variables insert these barriers, making changes visible and ordered across threads.
-            </p>
-
-            <h3>Are Memory Barriers Per Thread?</h3>
-            <p>
-                Yes, memory barriers affect the executing thread's view of memory and ensure that its operations are properly ordered and visible to other threads. Each CPU core (and the thread running on it) respects these barriers to maintain coherence and visibility.
-            </p>
-
-            <h3>Synchronized Blocks and CPU Core Scheduling</h3>
-            <p>
-                When <code>Thread 1</code> enters a <code>synchronized</code> block (acquiring a monitor lock) on <code>Core 1</code>, it prevents other threads from entering the same synchronized block <strong>at the same time</strong>, regardless of which core they run on.
-            </p>
-            <p>
-                However, <strong>Thread 2</strong> can still be scheduled on <em>any</em> core, including Core 1. It just won't be able to enter that synchronized block until Thread 1 releases the lock.
-            </p>
-            <p>
-                So, synchronized locks are about mutual exclusion on the <em>monitor object</em>, not about restricting thread scheduling on cores.
-            </p>
-
-            <h3>Summary:</h3>
-            <ul>
-                <li><code>volatile</code> guarantees visibility and ordering of variables through memory barriers.</li>
-                <li>Memory barriers prevent CPU/compiler reordering and ensure proper cross-thread visibility.</li>
-                <li>Memory barriers are effective per thread/core to maintain a consistent memory view.</li>
-                <li><code>synchronized</code> blocks enforce exclusive access to a monitor, but threads can still run on any CPU core; they just wait for the lock to be free.</li>
-            </ul>
-        </section>
-
-        <!-- Monitor Locks -->
-        <section>
-            <h2>Monitor Locks: What Are They and How Are They Implemented?</h2>
-            <p>
-                In Java, every object has an associated <strong>monitor</strong> which is a mutual exclusion lock used to synchronize access to critical sections.
-            </p>
-
-            <h3>Key Components of a Monitor</h3>
-            <ul>
-                <li><strong>Lock Owner:</strong> The thread currently holding the lock.</li>
-                <li><strong>Entry Queue:</strong> Threads waiting to acquire the lock.</li>
-                <li><strong>Wait Queue:</strong> Threads waiting inside the monitor (after calling <code>wait()</code>).</li>
-            </ul>
-
-            <h3>Low-Level Implementation Details</h3>
-            <p>
-                The JVM uses object headers to store lock information. These headers include:
-            </p>
-            <ul>
-                <li><strong>Mark Word:</strong> Contains lock state and owner thread info.</li>
-                <li><strong>Lock States:</strong> <em>Unlocked, Biased, Lightweight, Heavyweight</em> locks.</li>
-            </ul>
-
-            <p>
-                JVM employs a lock escalation strategy:
-            </p>
+            <p>Implementation details:</p>
             <ul>
                 <li><strong>Biased Locking:</strong> Optimizes for uncontended locks by biasing towards a thread.</li>
-                <li><strong>Lightweight Locking:</strong> Uses atomic instructions to avoid blocking.</li>
+                <li><strong>Lightweight Locking:</strong> Uses atomic instructions (like CAS) to avoid blocking.</li>
                 <li><strong>Heavyweight Locking:</strong> Falls back to OS mutex when contention is high.</li>
             </ul>
 
@@ -496,6 +423,7 @@ Thread 2:
                 <p><strong>4.</strong> In Java: Use <code>volatile</code> & locks for coherence.</p>
                 <p><strong>5.</strong> Bugs? Stale reads, reordering — fixed by barriers.</p>
                 <p><strong>6.</strong> Monitor locks provide synchronized mutual exclusion, implemented efficiently by JVM.</p>
+                <p><strong>7.</strong> Synchronized flushes only modified data on exit, keeping synchronization efficient.</p>
             </div>
         </section>
     </main>
