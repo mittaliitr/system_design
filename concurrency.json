@@ -96,31 +96,32 @@
       "children": [
         {
           "name": "2.1 extends Thread vs. implements Runnable",
-          "url": "https://www.baeldung.com/java-runnable-vs-extending-thread",
+          "url": "concurrency /chapter2.1.html",
           "tag": "creation"
         },
         {
           "name": "2.2 Thread Lifecycle & States",
-          "url": "https://docs.oracle.com/javase/8/docs/api/java/lang/Thread.State.html",
+          "url": "concurrency /chapter2.2.html",
           "tag": "lifecycle"
         },
         {
           "name": "2.3 start(), join(), sleep(), interrupt()",
-          "url": "https://www.javatpoint.com/java-thread-methods",
+          "url": "concurrency /chapter2.3.html",
           "tag": "control"
         },
         {
           "name": "2.4 Daemon Threads",
-          "url": "https://docs.oracle.com/javase/8/docs/api/java/lang/Thread.html#setDaemon(boolean)",
+          "url": "concurrency /chapter2.4.html",
           "tag": "daemon"
         },
         {
           "name": "2.5 Thread Priorities",
-          "url": "https://www.baeldung.com/java-thread-priority",
+          "url": "concurrency /chapter2.5.html",
           "tag": "scheduling"
         },
         {
           "name": "2.6 Real-World: Background Sync in a Mobile App",
+          "url": "concurrency /chapter2.6.html",
           "tag": "realworld"
         }
       ]

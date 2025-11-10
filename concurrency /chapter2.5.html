@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>2.5 Thread Priorities</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #3498db;
+          --secondary: #2980b9;
+          --accent: #e74c3c;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+          --info: #00cec9;
+          --code-bg: #2d2d2d;
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container {
+          max-width: 1300px;
+          margin: 0 auto;
+          background: white;
+          border-radius: 20px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+          overflow: hidden;
+        }
+
+        header {
+          background: linear-gradient(120deg, var(--primary), var(--secondary));
+          color: white;
+          padding: 3.5rem 2rem;
+          text-align: center;
+        }
+
+        header h1 {
+          font-size: 2.8rem;
+          margin-bottom: 0.5rem;
+          font-weight: 700;
+        }
+
+        header h2 {
+          font-size: 1.6rem;
+          margin-bottom: 0.5rem;
+          opacity: 0.95;
+        }
+
+        header p {
+          font-size: 1.2rem;
+          opacity: 0.9;
+          max-width: 900px;
+          margin: 0 auto;
+        }
+
+        .badge {
+          display: inline-block;
+          background: rgba(255,255,255,0.2);
+          padding: 0.4rem 1rem;
+          border-radius: 50px;
+          font-size: 0.95rem;
+          margin-top: 1.2rem;
+          font-weight: 600;
+        }
+
+        main {
+          padding: 3.5rem 2.5rem;
+        }
+
+        section {
+          margin-bottom: 4.5rem;
+        }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        h2::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 6px;
+          background: var(--primary);
+          border-radius: 3px;
+        }
+
+        h3 {
+          font-size: 1.5rem;
+          color: var(--dark);
+          margin: 2rem 0 1rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        p {
+          margin-bottom: 1.3rem;
+          color: #444;
+          font-size: 1.05rem;
+        }
+
+        .highlight {
+          background: linear-gradient(120deg, #ebf3fd 0%, #d6eaff 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(52,152,219,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #f8f8f2;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #666;
+          font-family: 'Inter', sans-serif;
+          font-weight: 600;
+        }
+
+        .priority-scale {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          background: #f8f9fa;
+          padding: 2rem;
+          border-radius: 18px;
+          margin: 3rem 0;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .priority-bar {
+          position: absolute;
+          top: 0; bottom: 0; left: 0;
+          width: 100%;
+          background: linear-gradient(90deg, #e74c3c 0%, #f39c12 50%, #2ecc71 100%);
+          opacity: 0.15;
+        }
+
+        .priority-level {
+          flex: 1;
+          text-align: center;
+          position: relative;
+          z-index: 1;
+        }
+
+        .level-value {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 2rem;
+          font-weight: 700;
+          color: var(--primary);
+        }
+
+        .level-name {
+          font-size: 0.9rem;
+          color: #555;
+          margin-top: 0.3rem;
+          font-weight: 600;
+        }
+
+        .level-desc {
+          font-size: 0.8rem;
+          color: #777;
+          margin-top: 0.5rem;
+          line-height: 1.4;
+        }
+
+        .demo-scenario {
+          background: #f8f9fa;
+          border-radius: 18px;
+          padding: 2.5rem;
+          margin: 3rem 0;
+          border-left: 6px solid var(--primary);
+        }
+
+        .scenario-title {
+          font-weight: 700;
+          color: var(--primary);
+          font-size: 1.4rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg {
+          width: 100% !important;
+          height: auto !important;
+          max-width: none !important;
+        }
+
+        .priority-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 2.5rem 0;
+          font-size: 0.95rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+          border-radius: 14px;
+          overflow: hidden;
+        }
+
+        .priority-table th {
+          background: var(--primary);
+          color: white;
+          padding: 1.2rem;
+          text-align: left;
+          font-weight: 600;
+        }
+
+        .priority-table td {
+          padding: 1.2rem;
+          border-bottom: 1px solid #eee;
+          background: #f8f9fa;
+        }
+
+        .priority-table tr:hover td {
+          background: #d6eaff;
+        }
+
+        .myth-buster {
+          background: #fff5f5;
+          padding: 1.5rem;
+          border-radius: 12px;
+          border-left: 6px solid var(--danger);
+          margin: 2rem 0;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .priority-scale { flex-direction: column; gap: 1.5rem; }
+          .priority-level { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>2.5 Thread Priorities</h1>
+        <h2>1 to 10 — But Should You Use It?</h2>
+        <p><strong>Warning:</strong> Priority is a hint, not a guarantee</p>
+        <div class="badge">Chapter 2 – Thread Creation & Management</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>Thread Priority: 1 to 10</h2>
+            <p>
+                Java threads have a priority from <code>1</code> (lowest) to <code>10</code> (highest).<br>
+                Default: <code>5</code> (<code>Thread.NORM_PRIORITY</code>).
+            </p>
+            <div class="highlight">
+                <strong>Reality Check:</strong><br>
+                <em>OS scheduler may <strong>ignore</strong> Java priority entirely.</em><br>
+                <em>Use for <strong>soft tuning</strong> — never for correctness.</em>
+            </div>
+        </section>
+
+        <!-- Priority Scale -->
+        <section>
+            <h2>The 1–10 Priority Scale</h2>
+
+            <div class="priority-scale">
+                <div class="priority-bar"></div>
+                <div class="priority-level">
+                    <div class="level-value">1</div>
+                    <div class="level-name">MIN_PRIORITY</div>
+                    <div class="level-desc">Background tasks</div>
+                </div>
+                <div class="priority-level">
+                    <div class="level-value">5</div>
+                    <div class="level-name">NORM_PRIORITY</div>
+                    <div class="level-desc">Default for all threads</div>
+                </div>
+                <div class="priority-level">
+                    <div class="level-value">10</div>
+                    <div class="level-name">MAX_PRIORITY</div>
+                    <div class="level-desc">Critical real-time</div>
+                </div>
+            </div>
+
+            <div class="code-block">
+          <pre>
+// Set priority (1–10)
+thread.setPriority(Thread.MIN_PRIORITY);   // 1
+thread.setPriority(Thread.NORM_PRIORITY);  // 5
+thread.setPriority(Thread.MAX_PRIORITY);   // 10
+
+// Get current
+int p = thread.getPriority();
+          </pre>
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section>
+            <h2>How OS Handles Java Priority</h2>
+
+            <div class="mermaid">
+                graph TD
+                A[Java Thread Priority<br>(1–10)] --> B[JVM Maps to OS Priority]
+                B --> C[Windows: 7 levels]
+                B --> D[Linux: Nice value (-20 to 19)]
+                B --> E[macOS: Limited mapping]
+                C & D & E --> F[OS Scheduler<br>Uses as Hint]
+                F --> G[May Ignore Completely]
+                style G fill:#d63031,stroke:#d63031,color:white
+            </div>
+
+            <div class="highlight">
+                <strong>Truth:</strong>
+                On Linux, Java 10 → nice -5, Java 1 → nice +6.<br>
+                But <code>nice</code> is just a <em>suggestion</em> to the scheduler.
+            </div>
+        </section>
+
+        <!-- Real Demo -->
+        <section>
+            <h2>Demo: Priority in Action (or Not)</h2>
+
+            <div class="demo-scenario">
+                <div class="scenario-title">High vs Low Priority CPU Burn</div>
+                <div class="code-block">
+            <pre>
+public class PriorityDemo {
+    public static void main(String[] args) throws Exception {
+        Thread low = new Thread(PriorityDemo::burnCPU, "LOW");
+        Thread high = new Thread(PriorityDemo::burnCPU, "HIGH");
+
+        low.setPriority(Thread.MIN_PRIORITY);  // 1
+        high.setPriority(Thread.MAX_PRIORITY); // 10
+
+        low.start();
+        high.start();
+
+        Thread.sleep(5000);
+        low.interrupt();
+        high.interrupt();
+    }
+
+    static void burnCPU() {
+        long count = 0;
+        while (!Thread.currentThread().isInterrupted()) {
+            count++;
+        }
+        System.out.println(Thread.currentThread().getName() + ": " + count);
+    }
+}
+            </pre>
+                </div>
+                <div class="highlight">
+                    <strong>Typical Output (Linux):</strong><br>
+                    <code>
+                        HIGH: 1,842,391,201<br>
+                        LOW:  1,201,847,102
+                    </code><br>
+                    <em>HIGH gets ~50% more CPU — but not guaranteed.</em>
+                </div>
+            </div>
+        </section>
+
+        <!-- API Table -->
+        <section>
+            <h2>Priority Constants & API</h2>
+
+            <table class="priority-table">
+                <tr>
+                    <th>Constant</th>
+                    <th>Value</th>
+                    <th>Use Case</th>
+                </tr>
+                <tr>
+                    <td><code>Thread.MIN_PRIORITY</code></td>
+                    <td>1</td>
+                    <td>Background cleanup, logging</td>
+                </tr>
+                <tr>
+                    <td><code>Thread.NORM_PRIORITY</code></td>
+                    <td>5</td>
+                    <td>Default — use for most threads</td>
+                </tr>
+                <tr>
+                    <td><code>Thread.MAX_PRIORITY</code></td>
+                    <td>10</td>
+                    <td>Real-time UI, critical sensors</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Myths & Pitfalls -->
+        <section>
+            <h2>Myths vs Reality</h2>
+
+            <div class="priority-scale" style="flex-direction: column; gap: 1.5rem;">
+                <div class="myth-buster">
+                    <strong>Myth:</strong> Thread with priority 10 runs 10× faster<br>
+                    <strong>Reality:</strong> No. It just gets <em>more chances</em> to run.
+                </div>
+                <div class="myth-buster">
+                    <strong>Myth:</strong> Priority solves starvation<br>
+                    <strong>Reality:</strong> No. Use <code>ReentrantLock(true)</code> for fairness.
+                </div>
+                <div class="myth-buster">
+                    <strong>Myth:</strong> All OS respect Java priority<br>
+                    <strong>Reality:</strong> macOS often ignores it completely.
+                </div>
+            </div>
+        </section>
+
+        <!-- Best Practices -->
+        <section>
+            <h2>When to Use Priority</h2>
+
+            <div class="demo-scenario">
+                <div class="scenario-title">Safe Use Cases</div>
+                <ul style="margin: 1.5rem 0; padding-left: 2rem; font-size: 1.1rem;">
+                    <li>UI threads: <code>MAX_PRIORITY</code> for responsiveness</li>
+                    <li>Background analytics: <code>MIN_PRIORITY</code></li>
+                    <li>Real-time data processing: <code>8–10</code></li>
+                </ul>
+                <div class="highlight">
+                    <strong>Never:</strong>
+                    Use priority to enforce <em>correctness</em> or <em>ordering</em>.<br>
+                    That’s what <code>synchronized</code>, <code>Locks</code>, and <code>Latches</code> are for.
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #ebf3fd; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> Priority: <code>1</code> (min) to <code>10</code> (max), default <code>5</code></p>
+                <p><strong>2.</strong> OS may <strong>ignore</strong> Java priority</p>
+                <p><strong>3.</strong> Use for <strong>soft performance tuning</strong> only</p>
+                <p><strong>4.</strong> Never rely on priority for <strong>correctness</strong></p>
+                <p><strong>5.</strong> <code>MIN_PRIORITY</code> for background, <code>MAX</code> for UI</p>
+                <p><strong>6.</strong> <strong>Priority inversion</strong> is real — avoid mixing high/low</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-2.4-daemon-threads.html" style="color: var(--primary);">← 2.4 Daemon Threads</a> |
+            <a href="chapter-2.6-thread-groups.html" style="color: var(--primary);">2.6 Thread Groups →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#3498db',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#3498db',
+        lineColor: '#3498db',
+        secondaryColor: '#2980b9',
+        tertiaryColor: '#e74c3c'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

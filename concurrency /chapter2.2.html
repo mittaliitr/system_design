@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>2.2 Thread Lifecycle & States</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #9b59b6;
+          --secondary: #8e44ad;
+          --accent: #3498db;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+          --info: #00cec9;
+          --code-bg: #2d2d2d;
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container {
+          max-width: 1300px;
+          margin: 0 auto;
+          background: white;
+          border-radius: 20px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+          overflow: hidden;
+        }
+
+        header {
+          background: linear-gradient(120deg, var(--primary), var(--secondary));
+          color: white;
+          padding: 3.5rem 2rem;
+          text-align: center;
+        }
+
+        header h1 {
+          font-size: 2.8rem;
+          margin-bottom: 0.5rem;
+          font-weight: 700;
+        }
+
+        header h2 {
+          font-size: 1.6rem;
+          margin-bottom: 0.5rem;
+          opacity: 0.95;
+        }
+
+        header p {
+          font-size: 1.2rem;
+          opacity: 0.9;
+          max-width: 900px;
+          margin: 0 auto;
+        }
+
+        .badge {
+          display: inline-block;
+          background: rgba(255,255,255,0.2);
+          padding: 0.4rem 1rem;
+          border-radius: 50px;
+          font-size: 0.95rem;
+          margin-top: 1.2rem;
+          font-weight: 600;
+        }
+
+        main {
+          padding: 3.5rem 2.5rem;
+        }
+
+        section {
+          margin-bottom: 4.5rem;
+        }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        h2::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 6px;
+          background: var(--primary);
+          border-radius: 3px;
+        }
+
+        h3 {
+          font-size: 1.5rem;
+          color: var(--dark);
+          margin: 2rem 0 1rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        p {
+          margin-bottom: 1.3rem;
+          color: #444;
+          font-size: 1.05rem;
+        }
+
+        .highlight {
+          background: linear-gradient(120deg, #f5f0ff 0%, #e8e0ff 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(155,89,182,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #f8f8f2;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #666;
+          font-family: 'Inter', sans-serif;
+          font-weight: 600;
+        }
+
+        .lifecycle-diagram {
+          background: white;
+          padding: 2.5rem;
+          border-radius: 18px;
+          border: 1px solid #eee;
+          margin: 3rem 0;
+          text-align: center;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+        }
+
+        .state-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 1.8rem;
+          margin: 3rem 0;
+        }
+
+        .state-card {
+          background: white;
+          border-radius: 16px;
+          padding: 1.8rem;
+          text-align: center;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .state-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(155,89,182,0.25);
+        }
+
+        .state-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 0.8rem;
+          color: var(--primary);
+        }
+
+        .state-desc {
+          color: #555;
+          font-size: 0.95rem;
+          line-height: 1.6;
+        }
+
+        .state-api {
+          background: #f8f9fa;
+          padding: 0.8rem;
+          border-radius: 10px;
+          margin-top: 1rem;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 0.85rem;
+          color: #2d3436;
+          border-left: 4px solid var(--primary);
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg {
+          width: 100% !important;
+          height: auto !important;
+          max-width: none !important;
+        }
+
+        .transition-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 2.5rem 0;
+          font-size: 0.95rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+          border-radius: 14px;
+          overflow: hidden;
+        }
+
+        .transition-table th {
+          background: var(--primary);
+          color: white;
+          padding: 1.2rem;
+          text-align: left;
+          font-weight: 600;
+        }
+
+        .transition-table td {
+          padding: 1.2rem;
+          border-bottom: 1px solid #eee;
+          background: #f8f9fa;
+        }
+
+        .transition-table tr:hover td {
+          background: #f0e8ff;
+        }
+
+        .live-demo {
+          background: #f8f9fa;
+          border-radius: 18px;
+          padding: 2.5rem;
+          margin: 3rem 0;
+          border-left: 6px solid var(--primary);
+        }
+
+        .demo-title {
+          font-weight: 700;
+          color: var(--primary);
+          font-size: 1.4rem;
+          margin-bottom: 1.5rem;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .state-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>2.2 Thread Lifecycle & States</h1>
+        <h2>From Birth to Death: The 6 States of a Java Thread</h2>
+        <p>Understand <code>Thread.getState()</code> — debug like a pro</p>
+        <div class="badge">Chapter 2 – Thread Creation & Management</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>Every Thread Has a Life</h2>
+            <p>
+                A Java thread goes through <strong>6 well-defined states</strong> from creation to termination.
+                Knowing these states is essential for:
+            </p>
+            <ul style="margin: 1.5rem 0; padding-left: 2rem; font-size: 1.1rem;">
+                <li>Debugging stuck threads</li>
+                <li>Monitoring thread pools</li>
+                <li>Writing correct shutdown logic</li>
+                <li>Passing Java certification exams</li>
+            </ul>
+            <div class="highlight">
+                <strong>Key API:</strong>
+                <code>Thread.currentThread().getState()</code> → returns <code>Thread.State</code> enum
+            </div>
+        </section>
+
+        <!-- The 6 States -->
+        <section>
+            <h2>The 6 Thread States (Visualized)</h2>
+
+            <div class="lifecycle-diagram">
+                <div class="mermaid">
+                    graph TD
+                    A["NEW"] -->|"start()"| B["RUNNABLE"]
+                    B -->|"Scheduled by OS"| C["RUNNING<br>(executing run())"]
+                    C -->|"sleep(), wait(), join(), I/O, lock"| D["BLOCKED / WAITING / TIMED_WAITING"]
+                    D -->|"notify(), timeout, I/O complete"| B
+                    C -->|"run() completes"| E["TERMINATED"]
+
+                    style A fill:#74b9ff,stroke:#74b9ff,color:white
+                    style B fill:#00b894,stroke:#00b894,color:white
+                    style C fill:#00b894,stroke:#00b894,color:white
+                    style D fill:#fdcb6e,stroke:#fdcb6e,color:#333
+                    style E fill:#b2bec3,stroke:#b2bec3,color:white
+                </div>
+            </div>
+
+            <div class="state-grid">
+                <div class="state-card">
+                    <div class="state-title">NEW</div>
+                    <div class="state-desc">
+                        Thread object created, but <code>start()</code> not called.
+                    </div>
+                    <div class="state-api">new Thread()</div>
+                </div>
+
+                <div class="state-card">
+                    <div class="state-title">RUNNABLE</div>
+                    <div class="state-desc">
+                        Thread is eligible to run. May be running or waiting for CPU.
+                    </div>
+                    <div class="state-api">after start(), before run() ends</div>
+                </div>
+
+                <div class="state-card">
+                    <div class="state-title">RUNNING</div>
+                    <div class="state-desc">
+                        <em>Not official</em> — subset of RUNNABLE when actually executing.
+                    </div>
+                    <div class="state-api">JVM doesn't distinguish</div>
+                </div>
+
+                <div class="state-card">
+                    <div class="state-title">BLOCKED</div>
+                    <div class="state-desc">
+                        Waiting to acquire a monitor lock (synchronized block/method).
+                    </div>
+                    <div class="state-api">entering synchronized</div>
+                </div>
+
+                <div class="state-card">
+                    <div class="state-title">WAITING</div>
+                    <div class="state-desc">
+                        Indefinitely waiting for another thread (Object.wait(), Thread.join()).
+                    </div>
+                    <div class="state-api">wait(), join()</div>
+                </div>
+
+                <div class="state-card">
+                    <div class="state-title">TIMED_WAITING</div>
+                    <div class="state-desc">
+                        Waiting with timeout (sleep(), wait(ms), join(ms)).
+                    </div>
+                    <div class="state-api">sleep(1000), wait(500)</div>
+                </div>
+
+                <div class="state-card">
+                    <div class="state-title">TERMINATED</div>
+                    <div class="state-desc">
+                        <code>run()</code> completed normally or with exception.
+                    </div>
+                    <div class="state-api">after run() exits</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- State Transitions Table -->
+        <section>
+            <h2>State Transition Triggers</h2>
+
+            <table class="transition-table">
+                <tr>
+                    <th>From → To</th>
+                    <th>Trigger Method / Event</th>
+                    <th>Example</th>
+                </tr>
+                <tr>
+                    <td>NEW → RUNNABLE</td>
+                    <td><code>start()</code></td>
+                    <td><code>thread.start()</code></td>
+                </tr>
+                <tr>
+                    <td>RUNNABLE → BLOCKED</td>
+                    <td>Entering <code>synchronized</code> (contended lock)</td>
+                    <td><code>synchronized(obj) {}</code></td>
+                </tr>
+                <tr>
+                    <td>RUNNABLE → WAITING</td>
+                    <td><code>Object.wait()</code>, <code>Thread.join()</code>, <code>LockSupport.park()</code></td>
+                    <td><code>obj.wait()</code></td>
+                </tr>
+                <tr>
+                    <td>RUNNABLE → TIMED_WAITING</td>
+                    <td><code>Thread.sleep(ms)</code>, <code>wait(ms)</code>, <code>join(ms)</code></td>
+                    <td><code>Thread.sleep(1000)</code></td>
+                </tr>
+                <tr>
+                    <td>BLOCKED → RUNNABLE</td>
+                    <td>Lock acquired</td>
+                    <td>Monitor entered</td>
+                </tr>
+                <tr>
+                    <td>WAITING → RUNNABLE</td>
+                    <td><code>notify()</code> or <code>notifyAll()</code></td>
+                    <td><code>obj.notify()</code></td>
+                </tr>
+                <tr>
+                    <td>TIMED_WAITING → RUNNABLE</td>
+                    <td>Timeout expires or notify</td>
+                    <td>After 1 second</td>
+                </tr>
+                <tr>
+                    <td>RUNNABLE → TERMINATED</td>
+                    <td><code>run()</code> returns or throws</td>
+                    <td>End of <code>run()</code></td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Live Demo -->
+        <section>
+            <h2>Live Demo: Watch States Change</h2>
+
+            <div class="live-demo">
+                <div class="demo-title">Thread State Observer</div>
+                <div class="code-block">
+            <pre>
+public class StateDemo {
+    public static void main(String[] args) throws Exception {
+        Thread thread = new Thread(() -> {
+            System.out.println("Thread running...");
+            try { Thread.sleep(2000); }
+            catch (InterruptedException e) { }
+            System.out.println("Thread done.");
+        });
+
+        printState(thread, "Created");
+        thread.start();
+        printState(thread, "Started");
+
+        Thread.sleep(500);
+        printState(thread, "Sleeping");
+
+        thread.join();
+        printState(thread, "Joined");
+    }
+
+    static void printState(Thread t, String event) {
+        System.out.printf("%s: %s%n", event, t.getState());
+    }
+}
+            </pre>
+                </div>
+                <div class="highlight">
+                    <strong>Expected Output:</strong><br>
+                    <code>
+                        Created: NEW<br>
+                        Started: RUNNABLE<br>
+                        Sleeping: TIMED_WAITING<br>
+                        Joined: TERMINATED
+                    </code>
+                </div>
+            </div>
+        </section>
+
+        <!-- Common Misconceptions -->
+        <section>
+            <h2>Myths vs. Reality</h2>
+
+            <div class="state-grid">
+                <div class="state-card">
+                    <div class="state-title">Myth: RUNNABLE = Running</div>
+                    <div class="state-desc">
+                        <strong>Reality:</strong> RUNNABLE means <em>eligible</em> to run. Could be waiting for CPU.
+                    </div>
+                </div>
+                <div class="state-card">
+                    <div class="state-title">Myth: BLOCKED = Deadlock</div>
+                    <div class="state-desc">
+                        <strong>Reality:</strong> BLOCKED is normal. Deadlock is a <em>pattern</em> of blocked threads.
+                    </div>
+                </div>
+                <div class="state-card">
+                    <div class="state-title">Myth: TERMINATED threads can restart</div>
+                    <div class="state-desc">
+                        <strong>Reality:</strong> Once TERMINATED, <code>start()</code> throws <code>IllegalThreadStateException</code>.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #f5f0ff; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> <strong>6 states</strong>: NEW, RUNNABLE, BLOCKED, WAITING, TIMED_WAITING, TERMINATED</p>
+                <p><strong>2.</strong> <code>RUNNABLE</code> ≠ actually running — it's <em>ready</em></p>
+                <p><strong>3.</strong> <code>BLOCKED</code> = waiting for lock, <code>WAITING</code> = waiting for signal</p>
+                <p><strong>4.</strong> Use <code>Thread.getState()</code> in logs and monitoring</p>
+                <p><strong>5.</strong> <code>TERMINATED</code> threads <strong>cannot</strong> be restarted</p>
+                <p><strong>6.</strong> Master states → master debugging</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-2.1-extends-vs-runnable.html" style="color: var(--primary);">← 2.1 extends vs Runnable</a> |
+            <a href="chapter-2.3-thread-pools-executors.html" style="color: var(--primary);">2.3 Thread Pools & Executors →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#9b59b6',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#9b59b6',
+        lineColor: '#9b59b6',
+        secondaryColor: '#8e44ad',
+        tertiaryColor: '#3498db'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

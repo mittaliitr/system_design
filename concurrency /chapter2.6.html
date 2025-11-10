@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>2.6 Real-World: Background Sync in a Mobile App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #9b59b6;
+          --secondary: #8e44ad;
+          --accent: #e74c3c;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+          --info: #00cec9;
+          --code-bg: #2d2d2d;
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container {
+          max-width: 1300px;
+          margin: 0 auto;
+          background: white;
+          border-radius: 20px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+          overflow: hidden;
+        }
+
+        header {
+          background: linear-gradient(120deg, var(--primary), var(--secondary));
+          color: white;
+          padding: 3.5rem 2rem;
+          text-align: center;
+        }
+
+        header h1 {
+          font-size: 2.8rem;
+          margin-bottom: 0.5rem;
+          font-weight: 700;
+        }
+
+        header h2 {
+          font-size: 1.6rem;
+          margin-bottom: 0.5rem;
+          opacity: 0.95;
+        }
+
+        header p {
+          font-size: 1.2rem;
+          opacity: 0.9;
+          max-width: 900px;
+          margin: 0 auto;
+        }
+
+        .badge {
+          display: inline-block;
+          background: rgba(255,255,255,0.2);
+          padding: 0.4rem 1rem;
+          border-radius: 50px;
+          font-size: 0.95rem;
+          margin-top: 1.2rem;
+          font-weight: 600;
+        }
+
+        main {
+          padding: 3.5rem 2.5rem;
+        }
+
+        section {
+          margin-bottom: 4.5rem;
+        }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        h2::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 6px;
+          background: var(--primary);
+          border-radius: 3px;
+        }
+
+        h3 {
+          font-size: 1.5rem;
+          color: var(--dark);
+          margin: 2rem 0 1rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        p {
+          margin-bottom: 1.3rem;
+          color: #444;
+          font-size: 1.05rem;
+        }
+
+        .highlight {
+          background: linear-gradient(120deg, #f5f0ff 0%, #e8e0ff 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(155,89,182,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #f8f8f2;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #666;
+          font-family: 'Inter', sans-serif;
+          font-weight: 600;
+        }
+
+        .scenario-box {
+          background: #f8f9fa;
+          border-radius: 18px;
+          padding: 2.5rem;
+          margin: 3rem 0;
+          border-left: 6px solid var(--primary);
+          position: relative;
+        }
+
+        .scenario-title {
+          font-weight: 700;
+          color: var(--primary);
+          font-size: 1.6rem;
+          margin-bottom: 1.5rem;
+          text-align: center;
+        }
+
+        .mobile-mockup {
+          background: #fff;
+          border-radius: 30px;
+          padding: 1.5rem;
+          max-width: 360px;
+          margin: 2rem auto;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+          border: 12px solid #222;
+          position: relative;
+        }
+
+        .mobile-screen {
+          background: #f1f2f6;
+          border-radius: 18px;
+          padding: 2rem 1rem;
+          text-align: center;
+          font-size: 0.9rem;
+          line-height: 1.6;
+          min-height: 500px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+        }
+
+        .status-bar {
+          font-size: 0.7rem;
+          color: #666;
+          text-align: left;
+          padding: 0.5rem 1rem;
+        }
+
+        .app-content {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          gap: 1rem;
+        }
+
+        .sync-status {
+          font-weight: 600;
+          color: var(--success);
+        }
+
+        .sync-error {
+          color: var(--danger);
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg {
+          width: 100% !important;
+          height: auto !important;
+          max-width: none !important;
+        }
+
+        .architecture-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 1.8rem;
+          margin: 3rem 0;
+        }
+
+        .arch-card {
+          background: white;
+          border-radius: 16px;
+          padding: 1.8rem;
+          text-align: center;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .arch-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(155,89,182,0.25);
+        }
+
+        .arch-icon {
+          font-size: 2.5rem;
+          margin-bottom: 1rem;
+        }
+
+        .arch-title {
+          font-weight: 700;
+          font-size: 1.3rem;
+          margin-bottom: 0.6rem;
+          color: var(--primary);
+        }
+
+        .arch-desc {
+          color: #555;
+          font-size: 0.95rem;
+          line-height: 1.6;
+        }
+
+        .code-comparison {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2rem;
+          margin: 3rem 0;
+        }
+
+        .bad-code {
+          border-left: 6px solid var(--danger);
+        }
+
+        .good-code {
+          border-left: 6px solid var(--success);
+        }
+
+        .takeaway {
+          background: #f0e8ff;
+          padding: 1.5rem;
+          border-radius: 12px;
+          margin: 2rem 0;
+          border-left: 6px solid var(--primary);
+          font-weight: 600;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .code-comparison { grid-template-columns: 1fr; }
+          .mobile-mockup { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>2.6 Real-World: Background Sync in a Mobile App</h1>
+        <h2>Apply Everything: Daemon + Interrupt + Priority + Lifecycle</h2>
+        <p>Production-grade offline-first sync engine</p>
+        <div class="badge">Chapter 2 – Thread Creation & Management</div>
+    </header>
+
+    <main>
+        <!-- Scenario -->
+        <section>
+            <h2>The Challenge: Offline-First Mobile App</h2>
+            <p>
+                Your app works offline. Users create notes, edit tasks, take photos.<br>
+                When network returns → <strong>sync everything to server</strong> in background.
+            </p>
+
+            <div class="scenario-box">
+                <div class="scenario-title">User Story</div>
+                <div class="mobile-mockup">
+                    <div class="mobile-screen">
+                        <div class="status-bar">9:41 AM  •  No Internet</div>
+                        <div class="app-content">
+                            <h3>Notes App</h3>
+                            <p><strong>New Note:</strong> "Buy milk"</p>
+                            <p><strong>Edited Task:</strong> "Call Mom"</p>
+                            <p class="sync-status">Saved locally • Will sync when online</p>
+                        </div>
+                        <div style="text-align: center; padding: 1rem;">
+                            <em>App closed → Sync continues in background</em>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Requirements -->
+        <section>
+            <h2>Non-Functional Requirements</h2>
+            <div class="architecture-grid">
+                <div class="arch-card">
+                    <div class="arch-icon">Battery</div>
+                    <div class="arch-title">Battery Efficient</div>
+                    <div class="arch-desc">Only sync when WiFi + charging</div>
+                </div>
+                <div class="arch-card">
+                    <div class="arch-icon">Daemon</div>
+                    <div class="arch-title">Survive App Close</div>
+                    <div class="arch-desc">Daemon thread → JVM doesn't wait</div>
+                </div>
+                <div class="arch-card">
+                    <div class="arch-icon">Graceful</div>
+                    <div class="arch-title">Graceful Shutdown</div>
+                    <div class="arch-desc">Finish current item, stop cleanly</div>
+                </div>
+                <div class="arch-card">
+                    <div class="arch-icon">Low Priority</div>
+                    <div class="arch-title">Low CPU Priority</div>
+                    <div class="arch-desc">Don't slow down UI</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture -->
+        <section>
+            <h2>System Architecture</h2>
+
+            <div class="mermaid">
+                graph TD
+                A[Main UI Thread] --> B[SyncManager]
+                B --> C[Daemon Sync Thread<br>(Priority 3)]
+                C --> D[Local DB<br>(Room/SQLite)]
+                C --> E[Network API<br>(Retrofit/OkHttp)]
+                F[Network Monitor] -->|WiFi + Charging| C
+                G[App Lifecycle] -->|onDestroy()| B
+                B -->|interrupt()| C
+                C -->|finally| H[Flush + Close]
+
+                style C fill:#d63031,stroke:#d63031,color:white
+                style H fill:#00b894,stroke:#00b894,color:white
+            </div>
+        </section>
+
+        <!-- The Code -->
+        <section>
+            <h2>Production-Grade Sync Engine</h2>
+
+            <div class="code-block">
+          <pre>
+public class BackgroundSyncManager {
+    private final Thread syncThread;
+    private final SyncQueue queue;
+    private volatile boolean running = true;
+
+    public BackgroundSyncManager(SyncQueue queue) {
+        this.queue = queue;
+        this.syncThread = new Thread(this::syncLoop, "Background-Sync");
+        syncThread.setDaemon(true);                    // Die when app exits
+        syncThread.setPriority(Thread.MIN_PRIORITY + 2); // Low CPU
+    }
+
+    public void start() {
+        syncThread.start();
+    }
+
+    private void syncLoop() {
+        while (running && !Thread.currentThread().isInterrupted()) {
+            try {
+                if (!shouldSync()) {
+                    Thread.sleep(5000);
+                    continue;
+                }
+
+                SyncItem item = queue.take();  // Blocking
+                uploadItem(item);
+                markAsSynced(item);
+
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            } catch (Exception e) {
+                // Log and continue
+            }
+        }
+        cleanup();  // finally block equivalent
+    }
+
+    private boolean shouldSync() {
+        return NetworkUtils.isWifiAvailable() &&
+               DeviceUtils.isCharging();
+    }
+
+    public void shutdown() {
+        running = false;
+        syncThread.interrupt();  // Wake from sleep/take
+        try { syncThread.join(3000); } catch (Exception ignore) {}
+    }
+
+    private void cleanup() {
+        queue.flush();
+        db.close();
+    }
+}
+          </pre>
+            </div>
+        </section>
+
+        <!-- Anti-Pattern vs Pattern -->
+        <section>
+            <h2>Common Mistake vs Correct Pattern</h2>
+
+            <div class="code-comparison">
+                <div class="code-block bad-code">
+            <pre>
+// DON'T: User thread + infinite loop
+new Thread(() -> {
+    while (true) {
+        sync();
+        Thread.sleep(1000);
+    }
+}).start();  // Keeps JVM alive!
+            </pre>
+                </div>
+                <div class="code-block good-code">
+            <pre>
+// DO: Daemon + interruptible
+syncThread.setDaemon(true);
+syncThread.setPriority(3);
+syncThread.start();
+            </pre>
+                </div>
+            </div>
+
+            <div class="takeaway">
+                <strong>Key:</strong>
+                <code>Daemon + Low Priority + Interruptible + Conditional Sync</code>
+            </div>
+        </section>
+
+        <!-- Lifecycle Integration -->
+        <section>
+            <h2>Android Lifecycle Integration</h2>
+
+            <div class="code-block">
+          <pre>
+public class MainActivity extends AppCompatActivity {
+    private BackgroundSyncManager syncManager;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        syncManager = new BackgroundSyncManager(...);
+        syncManager.start();
+    }
+
+    @Override
+    protected void onDestroy() {
+        syncManager.shutdown();  // Graceful
+        super.onDestroy();
+    }
+}
+          </pre>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Chapter 2 Applied</h2>
+            <div style="background: #f5f0ff; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>extends vs Runnable</strong> → Used <code>Runnable</code> lambda</p>
+                <p><strong>Lifecycle</strong> → <code>NEW → RUNNABLE → TERMINATED</code></p>
+                <p><strong>start/join/sleep/interrupt</strong> → All used correctly</p>
+                <p><strong>Daemon</strong> → <code>setDaemon(true)</code> before start</p>
+                <p><strong>Priority</strong> → <code>MIN + 2</code> for background</p>
+                <p><strong>Real App</strong> → Battery, network, lifecycle aware</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Final Takeaways</h2>
+            <div class="takeaway">
+                <p><strong>1.</strong> Background sync = <code>Daemon + Low Priority + Interruptible</code></p>
+                <p><strong>2.</strong> Never let background threads keep JVM alive</p>
+                <p><strong>3.</strong> Always respect battery & network</p>
+                <p><strong>4.</strong> Use <code>join(timeout)</code> in shutdown</p>
+                <p><strong>5.</strong> This pattern scales to logging, analytics, caching</p>
+                <p><strong>6.</strong> <strong>Chapter 2 Complete:</strong> You now build production threads</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-2.5-thread-priorities.html" style="color: var(--primary);">← 2.5 Thread Priorities</a> |
+            <a href="chapter-3.1-synchronized-keyword.html" style="color: var(--primary);">Chapter 3: Synchronization →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#9b59b6',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#9b59b6',
+        lineColor: '#9b59b6',
+        secondaryColor: '#8e44ad',
+        tertiaryColor: '#e74c3c'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

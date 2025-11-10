@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>2.4 Daemon Threads</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #f39c12;
+          --secondary: #e67e22;
+          --accent: #e74c3c;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+          --info: #00cec9;
+          --code-bg: #2d2d2d;
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container {
+          max-width: 1300px;
+          margin: 0 auto;
+          background: white;
+          border-radius: 20px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+          overflow: hidden;
+        }
+
+        header {
+          background: linear-gradient(120deg, var(--primary), var(--secondary));
+          color: white;
+          padding: 3.5rem 2rem;
+          text-align: center;
+        }
+
+        header h1 {
+          font-size: 2.8rem;
+          margin-bottom: 0.5rem;
+          font-weight: 700;
+        }
+
+        header h2 {
+          font-size: 1.6rem;
+          margin-bottom: 0.5rem;
+          opacity: 0.95;
+        }
+
+        header p {
+          font-size: 1.2rem;
+          opacity: 0.9;
+          max-width: 900px;
+          margin: 0 auto;
+        }
+
+        .badge {
+          display: inline-block;
+          background: rgba(255,255,255,0.2);
+          padding: 0.4rem 1rem;
+          border-radius: 50px;
+          font-size: 0.95rem;
+          margin-top: 1.2rem;
+          font-weight: 600;
+        }
+
+        main {
+          padding: 3.5rem 2.5rem;
+        }
+
+        section {
+          margin-bottom: 4.5rem;
+        }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        h2::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 6px;
+          background: var(--primary);
+          border-radius: 3px;
+        }
+
+        h3 {
+          font-size: 1.5rem;
+          color: var(--dark);
+          margin: 2rem 0 1rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        p {
+          margin-bottom: 1.3rem;
+          color: #444;
+          font-size: 1.05rem;
+        }
+
+        .highlight {
+          background: linear-gradient(120deg, #fffaf0 0%, #ffedd6 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(243,156,18,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #f8f8f2;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #666;
+          font-family: 'Inter', sans-serif;
+          font-weight: 600;
+        }
+
+        .daemon-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2rem;
+          margin: 3rem 0;
+          padding: 2rem;
+          background: #f8f9fa;
+          border-radius: 18px;
+        }
+
+        .thread-type {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .thread-type:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(243,156,18,0.25);
+        }
+
+        .type-title {
+          font-weight: 700;
+          font-size: 1.5rem;
+          margin-bottom: 1rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        .badge-user {
+          background: #00b894;
+          color: white;
+          padding: 0.2rem 0.8rem;
+          border-radius: 20px;
+          font-size: 0.75rem;
+          font-weight: 600;
+        }
+
+        .badge-daemon {
+          background: var(--danger);
+          color: white;
+          padding: 0.2rem 0.8rem;
+          border-radius: 20px;
+          font-size: 0.75rem;
+          font-weight: 600;
+        }
+
+        .type-desc {
+          color: #555;
+          margin-bottom: 1.2rem;
+          font-size: 0.95rem;
+        }
+
+        .type-examples {
+          background: #f8f9fa;
+          padding: 1rem;
+          border-radius: 10px;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 0.85rem;
+          border-left: 4px solid var(--primary);
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg {
+          width: 100% !important;
+          height: auto !important;
+          max-width: none !important;
+        }
+
+        .demo-scenario {
+          background: #f8f9fa;
+          border-radius: 18px;
+          padding: 2.5rem;
+          margin: 3rem 0;
+          border-left: 6px solid var(--primary);
+        }
+
+        .scenario-title {
+          font-weight: 700;
+          color: var(--primary);
+          font-size: 1.4rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .rule-box {
+          background: #fff5f5;
+          padding: 1.5rem;
+          border-radius: 12px;
+          border-left: 6px solid var(--danger);
+          margin: 2rem 0;
+          font-weight: 600;
+        }
+
+        .lifecycle-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 2.5rem 0;
+          font-size: 0.95rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+          border-radius: 14px;
+          overflow: hidden;
+        }
+
+        .lifecycle-table th {
+          background: var(--primary);
+          color: white;
+          padding: 1.2rem;
+          text-align: left;
+          font-weight: 600;
+        }
+
+        .lifecycle-table td {
+          padding: 1.2rem;
+          border-bottom: 1px solid #eee;
+          background: #f8f9fa;
+        }
+
+        .lifecycle-table tr:hover td {
+          background: #ffedd6;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .daemon-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>2.4 Daemon Threads</h1>
+        <h2>Background Workers That Die When the JVM Exits</h2>
+        <p>The silent helpers — GC, logging, timers</p>
+        <div class="badge">Chapter 2 – Thread Creation & Management</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>User Threads vs. Daemon Threads</h2>
+            <p>
+                Every thread is either <strong>User</strong> or <strong>Daemon</strong>. The JVM only exits when <em>all user threads finish</em>.
+            </p>
+            <div class="highlight">
+                <strong>Rule of JVM Shutdown:</strong><br>
+                <em>JVM exits to <strong>only</strong> if <strong>no user threads</strong> are alive.</em><br>
+                <em>Daemon threads are <strong>killed abruptly</strong> on exit.</em>
+            </div>
+        </section>
+
+        <!-- Side-by-Side Comparison -->
+        <section>
+            <h2>Head-to-Head: User vs Daemon</h2>
+
+            <div class="daemon-grid">
+                <!-- User Thread -->
+                <div class="thread-type">
+                    <div class="type-title">
+                        User Thread
+                        <span class="badge-user">Default</span>
+                    </div>
+                    <div class="type-desc">
+                        Keeps JVM alive. Must finish or be interrupted for clean shutdown.
+                    </div>
+                    <div class="type-examples">
+                        main thread<br>
+                        worker threads<br>
+                        Spring @Async tasks<br>
+                        your business logic
+                    </div>
+                </div>
+
+                <!-- Daemon Thread -->
+                <div class="thread-type">
+                    <div class="type-title">
+                        Daemon Thread
+                        <span class="badge-daemon">Background</span>
+                    </div>
+                    <div class="type-desc">
+                        Killed automatically when JVM exits. Ideal for non-critical background tasks.
+                    </div>
+                    <div class="type-examples">
+                        Garbage Collector<br>
+                        Finalizer thread<br>
+                        Timer/Scheduled tasks<br>
+                        Logging appenders
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How to Create -->
+        <section>
+            <h2>How to Create a Daemon Thread</h2>
+
+            <div class="code-block">
+          <pre>
+// Must set BEFORE start()
+Thread daemon = new Thread(() -> {
+    while (true) {
+        System.out.println("Background task...");
+        try { Thread.sleep(1000); }
+        catch (InterruptedException e) { break; }
+    }
+});
+
+daemon.setDaemon(true);  // Critical: before start()
+daemon.start();
+          </pre>
+            </div>
+
+            <div class="rule-box">
+                <strong>Golden Rule:</strong>
+                <code>setDaemon(true)</code> <strong>MUST</strong> be called <strong>before</strong> <code>start()</code>.<br>
+                After <code>start()</code> to <code>IllegalThreadStateException</code>
+            </div>
+        </section>
+
+        <!-- Real-World Demo -->
+        <section>
+            <h2>Demo: Daemon vs User — JVM Exit Behavior</h2>
+
+            <div class="demo-scenario">
+                <div class="scenario-title">What Happens on main() Exit?</div>
+                <div class="code-block">
+            <pre>
+public class DaemonDemo {
+    public static void main(String[] args) throws Exception {
+        Thread user = new Thread(() -> loopForever("User"));
+        Thread daemon = new Thread(() -> loopForever("Daemon"));
+
+        daemon.setDaemon(true);  // Only this one dies
+
+        user.start();
+        daemon.start();
+
+        Thread.sleep(3000);
+        System.out.println("main() exiting...");
+        // JVM waits for user, kills daemon
+    }
+
+    static void loopForever(String name) {
+        while (true) {
+            System.out.println(name + " running...");
+            try { Thread.sleep(500); }
+            catch (InterruptedException e) { break; }
+        }
+    }
+}
+            </pre>
+                </div>
+                <div class="highlight">
+                    <strong>Output:</strong><br>
+                    <code>
+                        User running...<br>
+                        Daemon running...<br>
+                        ... (3 seconds)<br>
+                        main() exiting...<br>
+                        to <strong>User keeps JVM alive</strong><br>
+                        to <strong>Daemon killed abruptly</strong>
+                    </code>
+                </div>
+            </div>
+        </section>
+
+        <!-- Lifecycle Table -->
+        <section>
+            <h2>Daemon Thread Lifecycle</h2>
+
+            <table class="lifecycle-table">
+                <tr>
+                    <th>Stage</th>
+                    <th>User Thread</th>
+                    <th>Daemon Thread</th>
+                </tr>
+                <tr>
+                    <td><strong>Creation</strong></td>
+                    <td>Default</td>
+                    <td><code>setDaemon(true)</code> before start</td>
+                </tr>
+                <tr>
+                    <td><strong>Execution</strong></td>
+                    <td>Normal</td>
+                    <td>Normal (but can be killed)</td>
+                </tr>
+                <tr>
+                    <td><strong>JVM Exit</strong></td>
+                    <td>Must finish or be stopped</td>
+                    <td><strong>Killed instantly</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>finally blocks</strong></td>
+                    <td>Always run</td>
+                    <td><strong>May NOT run</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>Shutdown hooks</strong></td>
+                    <td>Run</td>
+                    <td>Run (if hook is user thread)</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Flowchart -->
+        <section>
+            <h2>JVM Shutdown Decision Flow</h2>
+
+            <div class="mermaid">
+                graph TD
+                A[JVM Shutdown Requested] --> B{Any User Threads Alive?}
+                B -->|Yes| C[Wait for them to finish]
+                B -->|No| D[Kill all Daemon threads]
+                D --> E[JVM Exits]
+                C --> B
+
+                style B fill:#f39c12,stroke:#f39c12,color:white
+                style D fill:#d63031,stroke:#d63031,color:white
+                style E fill:#00b894,stroke:#00b894,color:white
+            </div>
+        </section>
+
+        <!-- Best Practices -->
+        <section>
+            <h2>Best Practices & Pitfalls</h2>
+
+            <div class="daemon-grid">
+                <div class="thread-type">
+                    <div class="type-title">Do Use Daemon For</div>
+                    <div class="type-desc">
+                        to Background logging<br>
+                        to Metrics collection<br>
+                        to Cache refresh<br>
+                        to Heartbeat monitors
+                    </div>
+                </div>
+                <div class="thread-type">
+                    <div class="type-title">Never Use Daemon For</div>
+                    <div class="type-desc">
+                        to Database transactions<br>
+                        to File writes<br>
+                        to Message processing<br>
+                        to Any state that must persist
+                    </div>
+                </div>
+            </div>
+
+            <div class="rule-box">
+                <strong>Critical:</strong>
+                Daemon threads <strong>do not run <code>finally</code> blocks</strong> on abrupt JVM exit.<br>
+                Never put cleanup (close DB, flush logs) in daemon <code>finally</code>.
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #fffaf0; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> <strong>User threads</strong> keep JVM alive</p>
+                <p><strong>2.</strong> <strong>Daemon threads</strong> are killed on JVM exit</p>
+                <p><strong>3.</strong> Set <code>setDaemon(true)</code> <strong>before</strong> <code>start()</code></p>
+                <p><strong>4.</strong> <code>finally</code> blocks <strong>may not run</strong> in daemons</p>
+                <p><strong>5.</strong> Use for <strong>non-critical background tasks only</strong></p>
+                <p><strong>6.</strong> GC, Timer, Logging = daemons by default</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-2.3-control-methods.html" style="color: var(--primary);">← 2.3 start(), join(), sleep(), interrupt()</a> |
+            <a href="chapter-2.5-thread-groups.html" style="color: var(--primary);">2.5 Thread Groups →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#f39c12',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#f39c12',
+        lineColor: '#f39c12',
+        secondaryColor: '#e67e22',
+        tertiaryColor: '#e74c3c'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>2.3 start(), join(), sleep(), interrupt()</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #2ecc71;
+          --secondary: #27ae60;
+          --accent: #3498db;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+          --info: #00cec9;
+          --code-bg: #2d2d2d;
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container {
+          max-width: 1300px;
+          margin: 0 auto;
+          background: white;
+          border-radius: 20px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+          overflow: hidden;
+        }
+
+        header {
+          background: linear-gradient(120deg, var(--primary), var(--secondary));
+          color: white;
+          padding: 3.5rem 2rem;
+          text-align: center;
+        }
+
+        header h1 {
+          font-size: 2.8rem;
+          margin-bottom: 0.5rem;
+          font-weight: 700;
+        }
+
+        header h2 {
+          font-size: 1.6rem;
+          margin-bottom: 0.5rem;
+          opacity: 0.95;
+        }
+
+        header p {
+          font-size: 1.2rem;
+          opacity: 0.9;
+          max-width: 900px;
+          margin: 0 auto;
+        }
+
+        .badge {
+          display: inline-block;
+          background: rgba(255,255,255,0.2);
+          padding: 0.4rem 1rem;
+          border-radius: 50px;
+          font-size: 0.95rem;
+          margin-top: 1.2rem;
+          font-weight: 600;
+        }
+
+        main {
+          padding: 3.5rem 2.5rem;
+        }
+
+        section {
+          margin-bottom: 4.5rem;
+        }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        h2::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 6px;
+          background: var(--primary);
+          border-radius: 3px;
+        }
+
+        h3 {
+          font-size: 1.5rem;
+          color: var(--dark);
+          margin: 2rem 0 1rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        p {
+          margin-bottom: 1.3rem;
+          color: #444;
+          font-size: 1.05rem;
+        }
+
+        .highlight {
+          background: linear-gradient(120deg, #f0fff4 0%, #e8fff0 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(46,204,113,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #f8f8f2;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #666;
+          font-family: 'Inter', sans-serif;
+          font-weight: 600;
+        }
+
+        .method-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 1.8rem;
+          margin: 3rem 0;
+        }
+
+        .method-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+          position: relative;
+        }
+
+        .method-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(46,204,113,0.25);
+        }
+
+        .method-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 0.8rem;
+          color: var(--primary);
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .method-signature {
+          background: #f8f9fa;
+          padding: 0.8rem;
+          border-radius: 10px;
+          margin: 1rem 0;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 0.9rem;
+          color: #2d3436;
+          border-left: 4px solid var(--primary);
+        }
+
+        .method-desc {
+          color: #555;
+          font-size: 0.95rem;
+          line-height: 1.6;
+        }
+
+        .method-pitfall {
+          background: #fff5f5;
+          padding: 1rem;
+          border-radius: 10px;
+          margin-top: 1rem;
+          border-left: 4px solid #e74c3c;
+          font-size: 0.9rem;
+          color: #c0392b;
+        }
+
+        .demo-scenario {
+          background: #f8f9fa;
+          border-radius: 18px;
+          padding: 2.5rem;
+          margin: 3rem 0;
+          border-left: 6px solid var(--primary);
+        }
+
+        .scenario-title {
+          font-weight: 700;
+          color: var(--primary);
+          font-size: 1.4rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg {
+          width: 100% !important;
+          height: auto !important;
+          max-width: none !important;
+        }
+
+        .api-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 2.5rem 0;
+          font-size: 0.95rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+          border-radius: 14px;
+          overflow: hidden;
+        }
+
+        .api-table th {
+          background: var(--primary);
+          color: white;
+          padding: 1.2rem;
+          text-align: left;
+          font-weight: 600;
+        }
+
+        .api-table td {
+          padding: 1.2rem;
+          border-bottom: 1px solid #eee;
+          background: #f8f9fa;
+        }
+
+        .api-table tr:hover td {
+          background: #e8fff0;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .method-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>2.3 start(), join(), sleep(), interrupt()</h1>
+        <h2>The Core Thread Control Methods</h2>
+        <p>Master the lifecycle — avoid deadlocks and race conditions</p>
+        <div class="badge">Chapter 2 – Thread Creation & Management</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>Four Methods Rule Thread Behavior</h2>
+            <p>
+                These <strong>four methods</strong> are the foundation of thread coordination:
+            </p>
+            <ul style="margin: 1.5rem 0; padding-left: 2rem; font-size: 1.1rem;">
+                <li><code>start()</code> → Begin execution</li>
+                <li><code>join()</code> → Wait for completion</li>
+                <li><code>sleep()</code> → Pause without releasing locks</li>
+                <li><code>interrupt()</code> → Gracefully stop or wake up</li>
+            </ul>
+            <div class="highlight">
+                <strong>Golden Rule:</strong>
+                <em>Never call <code>run()</code> directly. Always use <code>start()</code>.</em>
+            </div>
+        </section>
+
+        <!-- Method Cards -->
+        <section>
+            <h2>Method Deep Dive</h2>
+
+            <div class="method-grid">
+                <!-- start() -->
+                <div class="method-card">
+                    <div class="method-title">
+                        start()
+                    </div>
+                    <div class="method-signature">
+                        public void start()
+                    </div>
+                    <div class="method-desc">
+                        Schedules the thread for execution. Creates a new OS thread and calls <code>run()</code>.
+                    </div>
+                    <div class="method-pitfall">
+                        <strong>Pitfall:</strong> Calling <code>start()</code> twice → <code>IllegalThreadStateException</code>
+                    </div>
+                    <div class="code-block" style="margin: 1.5rem 0 0; box-shadow: none;">
+              <pre>
+Thread t = new Thread(() -> work());
+t.start(); // Correct
+t.run();   // Wrong! Runs in current thread
+              </pre>
+                    </div>
+                </div>
+
+                <!-- join() -->
+                <div class="method-card">
+                    <div class="method-title">
+                        join()
+                    </div>
+                    <div class="method-signature">
+                        public final void join() throws InterruptedException
+                    </div>
+                    <div class="method-desc">
+                        Current thread waits until this thread terminates. Useful for sequencing tasks.
+                    </div>
+                    <div class="method-pitfall">
+                        <strong>Pitfall:</strong> Can cause deadlock if not used carefully.
+                    </div>
+                    <div class="code-block" style="margin: 1.5rem 0 0; box-shadow: none;">
+              <pre>
+Thread worker = new Thread(task);
+worker.start();
+worker.join(); // Main waits for worker
+              </pre>
+                    </div>
+                </div>
+
+                <!-- sleep() -->
+                <div class="method-card">
+                    <div class="method-title">
+                        sleep()
+                    </div>
+                    <div class="method-signature">
+                        public static void sleep(long millis) throws InterruptedException
+                    </div>
+                    <div class="method-desc">
+                        Pauses current thread for specified time. <strong>Does NOT release locks</strong>.
+                    </div>
+                    <div class="method-pitfall">
+                        <strong>Pitfall:</strong> <code>sleep()</code> in synchronized block holds the lock.
+                    </div>
+                    <div class="code-block" style="margin: 1.5rem 0 0; box-shadow: none;">
+              <pre>
+synchronized(lock) {
+    Thread.sleep(1000); // Lock still held!
+}
+              </pre>
+                    </div>
+                </div>
+
+                <!-- interrupt() -->
+                <div class="method-card">
+                    <div class="method-title">
+                        interrupt()
+                    </div>
+                    <div class="method-signature">
+                        public void interrupt()
+                    </div>
+                    <div class="method-desc">
+                        Sets interrupt flag. Cooperating threads check <code>isInterrupted()</code> or catch <code>InterruptedException</code>.
+                    </div>
+                    <div class="method-pitfall">
+                        <strong>Pitfall:</strong> Does <em>not</em> force stop. Thread must cooperate.
+                    </div>
+                    <div class="code-block" style="margin: 1.5rem 0 0; box-shadow: none;">
+              <pre>
+while (!Thread.currentThread().isInterrupted()) {
+    // do work
+}
+              </pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Real-World Demo -->
+        <section>
+            <h2>Real-World Scenario: Graceful Shutdown</h2>
+
+            <div class="demo-scenario">
+                <div class="scenario-title">Background Worker with Clean Exit</div>
+                <div class="code-block">
+            <pre>
+public class Worker implements Runnable {
+    private volatile boolean running = true;
+
+    @Override
+    public void run() {
+        while (running) {
+            try {
+                System.out.println("Working...");
+                Thread.sleep(1000); // Responds to interrupt
+            } catch (InterruptedException e) {
+                System.out.println("Interrupted!");
+                Thread.currentThread().interrupt(); // Restore flag
+                break;
+            }
+        }
+        System.out.println("Clean shutdown.");
+    }
+
+    public void shutdown() {
+        running = false;
+    }
+}
+
+// Usage
+Worker task = new Worker();
+Thread thread = new Thread(task);
+thread.start();
+
+// Later...
+thread.interrupt(); // Graceful stop
+thread.join(2000);  // Wait up to 2s
+            </pre>
+                </div>
+                <div class="highlight">
+                    <strong>Best Practice:</strong>
+                    Check <code>isInterrupted()</code> + catch <code>InterruptedException</code> + restore flag
+                </div>
+            </div>
+        </section>
+
+        <!-- API Summary Table -->
+        <section>
+            <h2>Quick Reference Table</h2>
+
+            <table class="api-table">
+                <tr>
+                    <th>Method</th>
+                    <th>Purpose</th>
+                    <th>Throws</th>
+                    <th>Releases Lock?</th>
+                    <th>Cooperative?</th>
+                </tr>
+                <tr>
+                    <td><code>start()</code></td>
+                    <td>Begin execution</td>
+                    <td>No</td>
+                    <td>N/A</td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td><code>join()</code></td>
+                    <td>Wait for termination</td>
+                    <td>InterruptedException</td>
+                    <td>No</td>
+                    <td>Yes</td>
+                </tr>
+                <tr>
+                    <td><code>sleep(ms)</code></td>
+                    <td>Pause thread</td>
+                    <td>InterruptedException</td>
+                    <td>No</td>
+                    <td>Yes</td>
+                </tr>
+                <tr>
+                    <td><code>interrupt()</code></td>
+                    <td>Request stop</td>
+                    <td>No</td>
+                    <td>No</td>
+                    <td>Yes</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Sequence Diagram -->
+        <section>
+            <h2>Execution Flow: start() to join()</h2>
+
+            <div class="mermaid">
+                sequenceDiagram
+                participant Main
+                participant Thread
+                participant OS
+
+                Main->>Thread: new Thread(task)
+                Main->>Thread: start()
+                Thread->>OS: pthread_create()
+                OS-->>Thread: run() begins
+                Thread->>Thread: sleep(1000)
+                Main->>Thread: join()
+                Note over Main,Thread: Main waits
+                Thread-->>OS: sleep ends
+                Thread->>Thread: work completes
+                Thread-->>OS: exit
+                OS-->>Main: join() returns
+            </div>
+        </section>
+
+        <!-- Common Mistakes -->
+        <section>
+            <h2>Top 5 Mistakes (and Fixes)</h2>
+
+            <div class="method-grid">
+                <div class="method-card">
+                    <div class="method-title">Calling run() directly</div>
+                    <div class="method-desc">
+                        <strong>Fix:</strong> Always call <code>start()</code>
+                    </div>
+                </div>
+                <div class="method-card">
+                    <div class="method-title">Swallowing InterruptedException</div>
+                    <div class="method-desc">
+                        <strong>Fix:</strong> Re-interrupt: <code>Thread.currentThread().interrupt()</code>
+                    </div>
+                </div>
+                <div class="method-card">
+                    <div class="method-title">Using sleep() for synchronization</div>
+                    <div class="method-desc">
+                        <strong>Fix:</strong> Use <code>wait()/notify()</code> or <code>CountDownLatch</code>
+                    </div>
+                </div>
+                <div class="method-card">
+                    <div class="method-title">Infinite loops without interrupt check</div>
+                    <div class="method-desc">
+                        <strong>Fix:</strong> Check <code>isInterrupted()</code>
+                    </div>
+                </div>
+                <div class="method-card">
+                    <div class="method-title">join() without timeout</div>
+                    <div class="method-desc">
+                        <strong>Fix:</strong> Use <code>join(5000)</code> to avoid hangs
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #f0fff4; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> <code>start()</code> → creates OS thread; <code>run()</code> → same thread</p>
+                <p><strong>2.</strong> <code>join()</code> → wait for finish; use with timeout</p>
+                <p><strong>3.</strong> <code>sleep()</code> → pause, <strong>keeps locks</strong></p>
+                <p><strong>4.</strong> <code>interrupt()</code> → <strong>cooperative</strong> cancellation</p>
+                <p><strong>5.</strong> Always restore interrupt flag in catch block</p>
+                <p><strong>6.</strong> These 4 methods = 90% of thread coordination</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-2.2-thread-lifecycle.html" style="color: var(--primary);">← 2.2 Thread Lifecycle</a> |
+            <a href="chapter-2.4-thread-pools.html" style="color: var(--primary);">2.4 Thread Pools & Executors →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#2ecc71',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#2ecc71',
+        lineColor: '#2ecc71',
+        secondaryColor: '#27ae60',
+        tertiaryColor: '#3498db'
+      },
+      sequence: {
+        diagramMarginX: 50,
+        diagramMarginY: 30,
+        actorMargin: 80,
+        width: 160,
+        height: 70,
+        boxMargin: 15,
+        messageMargin: 50,
+        noteMargin: 15
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

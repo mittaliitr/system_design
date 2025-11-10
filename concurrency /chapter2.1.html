@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>2.1 extends Thread vs. implements Runnable</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #e74c3c;
+          --secondary: #f39c12;
+          --accent: #3498db;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+          --info: #00cec9;
+          --code-bg: #2d2d2d;
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #e74c3c 0%, #f39c12 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container {
+          max-width: 1300px;
+          margin: 0 auto;
+          background: white;
+          border-radius: 20px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+          overflow: hidden;
+        }
+
+        header {
+          background: linear-gradient(120deg, var(--primary), var(--secondary));
+          color: white;
+          padding: 3.5rem 2rem;
+          text-align: center;
+        }
+
+        header h1 {
+          font-size: 2.8rem;
+          margin-bottom: 0.5rem;
+          font-weight: 700;
+        }
+
+        header h2 {
+          font-size: 1.6rem;
+          margin-bottom: 0.5rem;
+          opacity: 0.95;
+        }
+
+        header p {
+          font-size: 1.2rem;
+          opacity: 0.9;
+          max-width: 900px;
+          margin: 0 auto;
+        }
+
+        .badge {
+          display: inline-block;
+          background: rgba(255,255,255,0.2);
+          padding: 0.4rem 1rem;
+          border-radius: 50px;
+          font-size: 0.95rem;
+          margin-top: 1.2rem;
+          font-weight: 600;
+        }
+
+        main {
+          padding: 3.5rem 2.5rem;
+        }
+
+        section {
+          margin-bottom: 4.5rem;
+        }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        h2::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 6px;
+          background: var(--primary);
+          border-radius: 3px;
+        }
+
+        h3 {
+          font-size: 1.5rem;
+          color: var(--dark);
+          margin: 2rem 0 1rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        p {
+          margin-bottom: 1.3rem;
+          color: #444;
+          font-size: 1.05rem;
+        }
+
+        .highlight {
+          background: linear-gradient(120deg, #fff5f5 0%, #ffe8e8 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(231,76,60,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #f8f8f2;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #666;
+          font-family: 'Inter', sans-serif;
+          font-weight: 600;
+        }
+
+        .comparison-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2rem;
+          margin: 3rem 0;
+          padding: 2rem;
+          background: #f8f9fa;
+          border-radius: 18px;
+        }
+
+        .approach-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .approach-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(231,76,60,0.25);
+        }
+
+        .approach-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 1rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        .badge-legacy {
+          background: #e74c3c;
+          color: white;
+          padding: 0.2rem 0.8rem;
+          border-radius: 20px;
+          font-size: 0.75rem;
+          font-weight: 600;
+        }
+
+        .badge-recommended {
+          background: #00b894;
+          color: white;
+          padding: 0.2rem 0.8rem;
+          border-radius: 20px;
+          font-size: 0.75rem;
+          font-weight: 600;
+        }
+
+        .pros-cons {
+          margin-top: 1.5rem;
+        }
+
+        .pros-cons h4 {
+          font-size: 1.1rem;
+          margin: 1rem 0 0.6rem;
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+        }
+
+        .pros-cons ul {
+          margin-left: 1.5rem;
+          font-size: 0.95rem;
+          color: #555;
+        }
+
+        .pros-cons li {
+          margin-bottom: 0.4rem;
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg {
+          width: 100% !important;
+          height: auto !important;
+          max-width: none !important;
+        }
+
+        .decision-tree {
+          background: #f8f9fa;
+          border-radius: 18px;
+          padding: 2.5rem;
+          margin: 3rem 0;
+          text-align: center;
+        }
+
+        .decision-title {
+          font-weight: 700;
+          color: var(--primary);
+          font-size: 1.5rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .example-scenario {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2rem;
+          margin: 3rem 0;
+        }
+
+        .scenario {
+          background: white;
+          padding: 1.8rem;
+          border-radius: 14px;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+        }
+
+        .scenario-title {
+          font-weight: 600;
+          color: var(--primary);
+          margin-bottom: 1rem;
+          font-size: 1.2rem;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .comparison-grid { grid-template-columns: 1fr; }
+          .example-scenario { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>2.1 extends Thread vs. implements Runnable</h1>
+        <h2>The Right Way to Create Tasks in Java</h2>
+        <p>Why 99% of production code uses <code>Runnable</code></p>
+        <div class="badge">Chapter 2 – Thread Creation & Management</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>Two Ways, One Goal</h2>
+            <p>
+                Java gives you <strong>two</strong> ways to define what a thread does:
+            </p>
+            <ul style="margin: 1.5rem 0; padding-left: 2rem; font-size: 1.1rem;">
+                <li><code>extends Thread</code> → <em>IS-A</em> thread</li>
+                <li><code>implements Runnable</code> → <em>HAS-A</em> task</li>
+            </ul>
+            <div class="highlight">
+                <strong>Rule #1:</strong>
+                <em>Use <code>Runnable</code> unless you have a very good reason not to.</em>
+            </div>
+        </section>
+
+        <!-- Side-by-Side Comparison -->
+        <section>
+            <h2>Head-to-Head: Code & Design</h2>
+
+            <div class="comparison-grid">
+                <!-- extends Thread -->
+                <div class="approach-card">
+                    <div class="approach-title">
+                        <span>extends Thread</span>
+                        <span class="badge-legacy">Legacy</span>
+                    </div>
+                    <div class="code-block" style="margin: 0; box-shadow: none;">
+              <pre>
+class Worker extends Thread {
+    private final String name;
+
+    public Worker(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public void run() {
+        System.out.println(name + " working...");
+        // task logic
+    }
+}
+
+// Usage
+new Worker("Alice").start();
+              </pre>
+                    </div>
+                    <div class="pros-cons">
+                        <h4>Pros</h4>
+                        <ul>
+                            <li>Direct access to <code>Thread</code> methods</li>
+                            <li>Simple for beginners</li>
+                        </ul>
+                        <h4>Cons</h4>
+                        <ul>
+                            <li><strong>No inheritance flexibility</strong></li>
+                            <li>Cannot return values</li>
+                            <li>Cannot throw checked exceptions</li>
+                            <li>Tightly coupled to <code>Thread</code></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- implements Runnable -->
+                <div class="approach-card">
+                    <div class="approach-title">
+                        <span>implements Runnable</span>
+                        <span class="badge-recommended">Recommended</span>
+                    </div>
+                    <div class="code-block" style="margin: 0; box-shadow: none;">
+              <pre>
+class Worker implements Runnable {
+    private final String name;
+
+    public Worker(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public void run() {
+        System.out.println(name + " working...");
+        // task logic
+    }
+}
+
+// Usage
+new Thread(new Worker("Alice")).start();
+              </pre>
+                    </div>
+                    <div class="pros-cons">
+                        <h4>Pros</h4>
+                        <ul>
+                            <li><strong>Supports composition</strong></li>
+                            <li>Works with <code>ExecutorService</code></li>
+                            <li>Can implement multiple interfaces</li>
+                            <li>Decoupled from <code>Thread</code></li>
+                        </ul>
+                        <h4>Cons</h4>
+                        <ul>
+                            <li>Slightly more verbose</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Real-World Scenarios -->
+        <section>
+            <h2>When Each Approach Fails</h2>
+
+            <div class="example-scenario">
+                <div class="scenario">
+                    <div class="scenario-title">Scenario 1: You Need Inheritance</div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+// Problem with extends Thread
+class SpecialWorker extends Worker {  // Compile error!
+    // Cannot extend both Thread and Worker
+}
+              </pre>
+                    </div>
+                </div>
+
+                <div class="scenario">
+                    <div class="scenario-title">Scenario 2: Return a Result</div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+// Need Callable<V> instead
+Callable<Integer> task = () -> {
+    return computeResult();
+};
+
+Future<Integer> future =
+    executor.submit(task);
+              </pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>Solution:</strong>
+                Use <code>Runnable</code> to task, <code>Callable</code> to result, <code>ExecutorService</code> to execution.
+            </div>
+        </section>
+
+        <!-- Decision Tree -->
+        <section>
+            <h2>Decision Flow: Which to Use?</h2>
+
+            <div class="decision-tree">
+                <div class="decision-title">Choose the Right Approach</div>
+                <div class="mermaid">
+                    graph TD
+                    A[Need to create a thread?] --> B{Do you need to...}
+                    B -->|Extend another class?| C[Use Runnable]
+                    B -->|Return a value?| D[Use Callable]
+                    B -->|Throw checked exceptions?| D
+                    B -->|Use thread pools?| E[Use Runnable / Callable]
+                    B -->|Simple demo only?| F[extends Thread OK]
+
+                    C --> G[Recommended]
+                    D --> G
+                    E --> G
+                    F --> H[Legacy / Learning]
+
+                    style G fill:#00b894,stroke:#00b894,color:white
+                    style H fill:#e74c3c,stroke:#e74c3c,color:white
+                </div>
+            </div>
+        </section>
+
+        <!-- Best Practices -->
+        <section>
+            <h2>Modern Best Practices</h2>
+
+            <div class="code-block">
+          <pre>
+// 1. Use lambda (Java 8+)
+Runnable task = () -> System.out.println("Hello");
+
+// 2. Use ExecutorService
+ExecutorService executor = Executors.newFixedThreadPool(4);
+executor.submit(task);
+
+// 3. For results: Callable + Future
+Callable<String> callable = () -> "Result";
+Future<String> future = executor.submit(callable);
+
+// 4. Never extend Thread in production
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Framework Support:</strong><br>
+                to Spring <code>@Async</code> to <code>Runnable</code> or <code>Callable</code><br>
+                to JavaFX to <code>Task</code> extends <code>Runnable</code><br>
+                to Android to <code>AsyncTask</code> to <code>Runnable</code>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #fff5f5; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> <code>extends Thread</code> to <strong>Legacy, inflexible</strong></p>
+                <p><strong>2.</strong> <code>implements Runnable</code> to <strong>Flexible, composable, future-proof</strong></p>
+                <p><strong>3.</strong> Use <code>Callable</code> when you need return values</p>
+                <p><strong>4.</strong> <strong>Never</strong> extend <code>Thread</code> in production code</p>
+                <p><strong>5.</strong> Always use <code>ExecutorService</”> for thread management</p>
+                <p><strong>6.</strong> Lambdas + <code>Runnable</code> = clean, modern Java</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-1.6-key-terminology.html" style="color: var(--primary);">← 1.6 Key Terminology</a> |
+            <a href="chapter-2.2-thread-pools-executors.html" style="color: var(--primary);">2.2 Thread Pools & Executors →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#e74c3c',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#e74c3c',
+        lineColor: '#e74c3c',
+        secondaryColor: '#f39c12',
+        tertiaryColor: '#3498db'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>
