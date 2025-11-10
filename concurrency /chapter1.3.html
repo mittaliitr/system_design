@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>1.3 Threads vs. Processes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #0984e3;
+          --secondary: #74b9ff;
+          --accent: #a29bfe;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+          --info: #00cec9;
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          background: white;
+          border-radius: 20px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+          overflow: hidden;
+        }
+
+        header {
+          background: linear-gradient(120deg, var(--primary), var(--secondary));
+          color: white;
+          padding: 3.5rem 2rem;
+          text-align: center;
+        }
+
+        header h1 {
+          font-size: 2.8rem;
+          margin-bottom: 0.5rem;
+          font-weight: 700;
+        }
+
+        header h2 {
+          font-size: 1.6rem;
+          margin-bottom: 0.5rem;
+          opacity: 0.95;
+        }
+
+        header p {
+          font-size: 1.2rem;
+          opacity: 0.9;
+          max-width: 800px;
+          margin: 0 auto;
+        }
+
+        .badge {
+          display: inline-block;
+          background: rgba(255,255,255,0.2);
+          padding: 0.4rem 1rem;
+          border-radius: 50px;
+          font-size: 0.95rem;
+          margin-top: 1.2rem;
+          font-weight: 600;
+        }
+
+        main {
+          padding: 3.5rem 2.5rem;
+        }
+
+        section {
+          margin-bottom: 4rem;
+        }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        h2::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 6px;
+          background: var(--primary);
+          border-radius: 3px;
+        }
+
+        h3 {
+          font-size: 1.5rem;
+          color: var(--dark);
+          margin: 2rem 0 1rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        p {
+          margin-bottom: 1.3rem;
+          color: #444;
+          font-size: 1.05rem;
+        }
+
+        .highlight {
+          background: linear-gradient(120deg, #f6f9ff 0%, #e8f4ff 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(9,132,227,0.08);
+        }
+
+        .code-block {
+          background: #2d2d2d;
+          color: #f8f8f2;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .code-block::before {
+          content: 'Java / Spring Boot';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #666;
+          font-family: 'Inter', sans-serif;
+          font-weight: 600;
+        }
+
+        .comparison-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 2.5rem 0;
+          font-size: 1rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+          border-radius: 14px;
+          overflow: hidden;
+        }
+
+        .comparison-table th {
+          background: var(--primary);
+          color: white;
+          padding: 1.2rem;
+          text-align: left;
+          font-weight: 600;
+        }
+
+        .comparison-table td {
+          padding: 1.2rem;
+          border-bottom: 1px solid #eee;
+          background: #f8f9fa;
+        }
+
+        .comparison-table tr:hover td {
+          background: #e8f4ff;
+        }
+
+        .comparison-table .check {
+          color: var(--success);
+          font-weight: bold;
+          text-align: center;
+        }
+
+        .comparison-table .cross {
+          color: var(--danger);
+          font-weight: bold;
+          text-align: center;
+        }
+
+        .memory-diagram {
+          display: flex;
+          justify-content: center;
+          gap: 2rem;
+          flex-wrap: wrap;
+          margin: 3rem 0;
+          padding: 2rem;
+          background: #f0f4f8;
+          border-radius: 18px;
+        }
+
+        .process-box {
+          flex: 1;
+          min-width: 300px;
+          background: white;
+          border-radius: 16px;
+          padding: 1.8rem;
+          text-align: center;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+          position: relative;
+        }
+
+        .process-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          color: var(--primary);
+          margin-bottom: 1rem;
+        }
+
+        .memory-section {
+          background: #f8f9fa;
+          border: 1px solid #ddd;
+          border-radius: 12px;
+          padding: 1rem;
+          margin: 0.8rem 0;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 0.9rem;
+        }
+
+        .shared {
+          background: #e8f9f0;
+          border-color: var(--success);
+        }
+
+        .isolated {
+          background: #ffe5d9;
+          border-color: var(--danger);
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg {
+          width: 100% !important;
+          height: auto !important;
+          max-width: none !important;
+        }
+
+        .spring-boot-demo {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2rem;
+          margin: 3rem 0;
+          padding: 2rem;
+          background: #f8f9fa;
+          border-radius: 18px;
+        }
+
+        .demo-scenario {
+          background: white;
+          padding: 1.8rem;
+          border-radius: 14px;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+        }
+
+        .demo-title {
+          font-weight: 600;
+          color: var(--primary);
+          margin-bottom: 1rem;
+          font-size: 1.3rem;
+        }
+
+        .user-request {
+          display: flex;
+          align-items: center;
+          gap: 0.8rem;
+          margin: 0.8rem 0;
+          padding: 0.6rem;
+          background: #e8f4ff;
+          border-radius: 10px;
+          font-size: 0.9rem;
+        }
+
+        .request-icon {
+          font-size: 1.4rem;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .memory-diagram { flex-direction: column; }
+          .spring-boot-demo { grid-template-columns: 1fr; }
+          .comparison-table { font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>1.3 Threads vs. Processes</h1>
+        <h2>Lightweight vs. Heavyweight Execution</h2>
+        <p>Why a single Spring Boot instance can handle thousands of users</p>
+        <div class="badge">Chapter 1 – Introduction to Multithreading in Java</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>Think of a Restaurant</h2>
+            <p>
+                A <strong>process</strong> is like opening a <em>new restaurant</em> — expensive, isolated, full setup.<br>
+                A <strong>thread</strong> is like hiring a <em>new waiter</em> in the same restaurant — fast, shared resources.
+            </p>
+            <div class="highlight">
+                <strong>Key Insight:</strong>
+                <em>One process</em> to <em>many threads</em> to <em>thousands of concurrent users</em>
+            </div>
+        </section>
+
+        <!-- Core Comparison -->
+        <section>
+            <h2>Threads vs. Processes: Side-by-Side</h2>
+
+            <div class="comparison-table">
+                <tr>
+                    <th>Aspect</th>
+                    <th>Process</th>
+                    <th>Thread</th>
+                </tr>
+                <tr>
+                    <td><strong>Memory</strong></td>
+                    <td class="cross">Isolated (own heap, stack)</td>
+                    <td class="check">Shared heap, own stack</td>
+                </tr>
+                <tr>
+                    <td><strong>Creation Cost</strong></td>
+                    <td class="cross">High (fork, copy memory)</td>
+                    <td class="check">Low (just stack + PC)</td>
+                </tr>
+                <tr>
+                    <td><strong>Communication</strong></td>
+                    <td class="cross">IPC (pipes, sockets)</td>
+                    <td class="check">Direct shared memory</td>
+                </tr>
+                <tr>
+                    <td><strong>Isolation</strong></td>
+                    <td class="check">Crash-safe</td>
+                    <td class="cross">One crash to all down</td>
+                </tr>
+                <tr>
+                    <td><strong>Scalability</strong></td>
+                    <td class="cross">Limited by RAM</td>
+                    <td class="check">1000s per process</td>
+                </tr>
+            </div>
+        </section>
+
+        <!-- Memory Layout -->
+        <section>
+            <h2>Memory Layout: Visualized</h2>
+
+            <div class="memory-diagram">
+                <div class="process-box">
+                    <div class="process-title">Process A</div>
+                    <div class="memory-section isolated">Heap (isolated)</div>
+                    <div class="memory-section isolated">Static</div>
+                    <div class="memory-section">Thread 1 Stack</div>
+                    <div class="memory-section">Thread 2 Stack</div>
+                </div>
+                <div class="process-box">
+                    <div class="process-title">Process B</div>
+                    <div class="memory-section isolated">Heap (isolated)</div>
+                    <div class="memory-section isolated">Static</div>
+                    <div class="memory-section">Thread 1 Stack</div>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>Threads share:</strong> Heap, static, code, file descriptors<br>
+                <strong>Threads have own:</strong> Stack, registers, program counter
+            </div>
+        </section>
+
+        <!-- Spring Boot Example -->
+        <section>
+            <h2>Real-World: Spring Boot Web Service</h2>
+            <p>
+                A <strong>single Spring Boot instance</strong> (one JVM process) handles <strong>thousands of HTTP requests</strong> using <strong>multiple threads</strong>.
+            </p>
+
+            <div class="spring-boot-demo">
+                <div class="demo-scenario">
+                    <div class="demo-title">Single Process</div>
+                    <pre>
+@SpringBootApplication
+public class App {
+    public static void main(String[] args) {
+        SpringApplication.run(App.class, args);
+    }
+}
+
+@RestController
+class UserController {
+    @GetMapping("/profile")
+    public User getProfile() {
+        return userService.findCurrent();
+    }
+}
+            </pre>
+                </div>
+                <div class="demo-scenario">
+                    <div class="demo-title">1000+ Concurrent Users</div>
+                    <div class="user-request">
+                        <span class="request-icon">User</span> GET /profile to Thread #1
+                    </div>
+                    <div class="user-request">
+                        <span class="request-icon">User</span> GET /profile to Thread #2
+                    </div>
+                    <div class="user-request">
+                        <span class="request-icon">User</span> GET /profile to Thread #3
+                    </div>
+                    <div class="user-request">
+                        <span class="request-icon">User</span> ... to Thread #N
+                    </div>
+                    <p style="margin-top: 1rem; font-size: 0.9rem; color: #666;">
+                        All in <strong>one JVM process</strong><br>
+                        Using <strong>Tomcat thread pool</strong>
+                    </p>
+                </div>
+            </div>
+
+            <div class="code-block">
+          <pre>
+# application.yml
+server:
+  tomcat:
+    max-threads: 200   # Default thread pool
+    min-spare-threads: 10
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Result:</strong>
+                One process to 200+ concurrent requests to <strong>high throughput, low overhead</strong>
+            </div>
+        </section>
+
+        <!-- Fixed Mermaid Sequence Diagram -->
+        <section>
+            <h2>Process & Thread Architecture</h2>
+
+            <div class="mermaid">
+                sequenceDiagram
+                participant Client1 as User A
+                participant Tomcat as Tomcat Thread Pool
+                participant Thread1 as Worker Thread 1
+                participant Service as Spring Service
+                participant DB as Database
+                participant Client2 as User B
+                participant Thread2 as Worker Thread 2
+
+                Client1->>Tomcat: GET /profile
+                Tomcat->>Thread1: Assign request
+                Thread1->>Service: getProfile()
+                Service->>DB: SELECT * FROM users
+                DB-->>Service: User data
+                Service-->>Thread1: User object
+                Thread1-->>Client1: 200 OK
+
+                Client2->>Tomcat: GET /profile
+                Tomcat->>Thread2: Assign request
+                Thread2->>Service: getProfile()
+                Note over Service: Shared Spring Bean
+                Service->>DB: SELECT * FROM users
+                DB-->>Service: User data
+                Service-->>Thread2: User object
+                Thread2-->>Client2: 200 OK
+
+                Note over Tomcat: One JVM Process
+                Note over Thread1,Thread2: Multiple Threads
+            </div>
+        </section>
+
+        <!-- When to Use Which -->
+        <section>
+            <h2>When to Use Processes vs. Threads?</h2>
+
+            <div class="comparison-table">
+                <tr>
+                    <th>Use Case</th>
+                    <th>Processes</th>
+                    <th>Threads</th>
+                </tr>
+                <tr>
+                    <td>Web Server (Spring Boot)</td>
+                    <td class="cross">Too heavy</td>
+                    <td class="check">Perfect</td>
+                </tr>
+                <tr>
+                    <td>Crash Isolation</td>
+                    <td class="check">Yes</td>
+                    <td class="cross">No</td>
+                </tr>
+                <tr>
+                    <td>Microservices</td>
+                    <td class="check">One per service</td>
+                    <td class="check">Many per service</td>
+                </tr>
+                <tr>
+                    <td>Python GIL Workaround</td>
+                    <td class="check">Use processes</td>
+                    <td class="cross">Blocked</td>
+                </tr>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #f6f9ff; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> <strong>Processes</strong> = isolated, expensive, safe</p>
+                <p><strong>2.</strong> <strong>Threads</strong> = shared, cheap, fast, risky</p>
+                <p><strong>3.</strong> Spring Boot: <strong>1 process</strong> to <strong>200+ threads</strong> to <strong>thousands of users</strong></p>
+                <p><strong>4.</strong> Threads share heap to need synchronization</p>
+                <p><strong>5.</strong> Use <strong>processes for isolation</strong>, <strong>threads for concurrency</strong></p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-1.2-benefits-challenges.html" style="color: var(--primary);">to 1.2 Benefits & Challenges</a> |
+            <a href="chapter-1.4-thread-creation.html" style="color: var(--primary);">1.4 Thread Creation to</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    // Force Mermaid to render with high visibility
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#0984e3',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#0984e3',
+        lineColor: '#0984e3',
+        secondaryColor: '#74b9ff',
+        tertiaryColor: '#a29bfe',
+        noteBkgColor: '#fff3f8',
+        noteTextColor: '#d63031',
+        signalColor: '#0984e3',
+        signalTextColor: '#ffffff',
+        activationBorderColor: '#0984e3',
+        activationBkgColor: '#74b9ff'
+      },
+      sequence: {
+        diagramMarginX: 50,
+        diagramMarginY: 30,
+        actorMargin: 80,
+        width: 160,
+        height: 70,
+        boxMargin: 15,
+        messageMargin: 50,
+        noteMargin: 15,
+        mirrorActors: false,
+        bottomMarginAdj: 10
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      },
+      securityLevel: 'loose'
+    });
+
+    // Re-render on load
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

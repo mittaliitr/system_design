@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>1.6 Key Terminology</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #8e44ad;
+          --secondary: #9b59b6;
+          --accent: #3498db;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+          --info: #00cec9;
+          --code-bg: #2d2d2d;
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container {
+          max-width: 1300px;
+          margin: 0 auto;
+          background: white;
+          border-radius: 20px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+          overflow: hidden;
+        }
+
+        header {
+          background: linear-gradient(120deg, var(--primary), var(--secondary));
+          color: white;
+          padding: 3.5rem 2rem;
+          text-align: center;
+        }
+
+        header h1 {
+          font-size: 2.8rem;
+          margin-bottom: 0.5rem;
+          font-weight: 700;
+        }
+
+        header h2 {
+          font-size: 1.6rem;
+          margin-bottom: 0.5rem;
+          opacity: 0.95;
+        }
+
+        header p {
+          font-size: 1.2rem;
+          opacity: 0.9;
+          max-width: 900px;
+          margin: 0 auto;
+        }
+
+        .badge {
+          display: inline-block;
+          background: rgba(255,255,255,0.2);
+          padding: 0.4rem 1rem;
+          border-radius: 50px;
+          font-size: 0.95rem;
+          margin-top: 1.2rem;
+          font-weight: 600;
+        }
+
+        main {
+          padding: 3.5rem 2.5rem;
+        }
+
+        section {
+          margin-bottom: 4.5rem;
+        }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        h2::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 6px;
+          background: var(--primary);
+          border-radius: 3px;
+        }
+
+        h3 {
+          font-size: 1.5rem;
+          color: var(--dark);
+          margin: 2rem 0 1rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        p {
+          margin-bottom: 1.3rem;
+          color: #444;
+          font-size: 1.05rem;
+        }
+
+        .highlight {
+          background: linear-gradient(120deg, #f8f5ff 0%, #f0e8ff 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(142,68,173,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #f8f8f2;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #666;
+          font-family: 'Inter', sans-serif;
+          font-weight: 600;
+        }
+
+        .glossary-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+          gap: 1.8rem;
+          margin: 3rem 0;
+        }
+
+        .term-card {
+          background: white;
+          border-radius: 16px;
+          padding: 1.8rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 1px solid #eee;
+          transition: all 0.4s ease;
+          position: relative;
+        }
+
+        .term-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 16px 32px rgba(142,68,173,0.2);
+          border-color: var(--primary);
+        }
+
+        .term-title {
+          font-weight: 700;
+          font-size: 1.3rem;
+          color: var(--primary);
+          margin-bottom: 0.6rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .term-pronounce {
+          font-size: 0.8rem;
+          color: #888;
+          font-style: italic;
+          margin-left: 0.5rem;
+        }
+
+        .term-def {
+          color: #555;
+          font-size: 0.95rem;
+          line-height: 1.6;
+        }
+
+        .term-example {
+          background: #f8f9fa;
+          padding: 1rem;
+          border-radius: 10px;
+          margin-top: 1rem;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 0.85rem;
+          color: #2d3436;
+          border-left: 4px solid var(--primary);
+        }
+
+        .term-tags {
+          display: flex;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+          margin-top: 1rem;
+        }
+
+        .tag {
+          background: #e8e4ff;
+          color: var(--primary);
+          padding: 0.2rem 0.6rem;
+          border-radius: 20px;
+          font-size: 0.75rem;
+          font-weight: 600;
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg {
+          width: 100% !important;
+          height: auto !important;
+          max-width: none !important;
+        }
+
+        .cheat-sheet {
+          background: #f8f9fa;
+          border-radius: 18px;
+          padding: 2.5rem;
+          margin: 3rem 0;
+          border-left: 6px solid var(--primary);
+        }
+
+        .cheat-title {
+          font-weight: 700;
+          color: var(--primary);
+          font-size: 1.5rem;
+          margin-bottom: 1.5rem;
+          text-align: center;
+        }
+
+        .cheat-table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 0.95rem;
+        }
+
+        .cheat-table th {
+          background: var(--primary);
+          color: white;
+          padding: 1rem;
+          text-align: left;
+          font-weight: 600;
+        }
+
+        .cheat-table td {
+          padding: 1rem;
+          border-bottom: 1px solid #eee;
+          background: white;
+        }
+
+        .cheat-table tr:hover td {
+          background: #f0e8ff;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .glossary-grid { grid-template-columns: 1fr; }
+          .cheat-table { font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>1.6 Key Terminology</h1>
+        <h2>The Vocabulary of Concurrency</h2>
+        <p>Master the language — avoid the bugs</p>
+        <div class="badge">Chapter 1 – Introduction to Multithreading in Java</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>Why Terminology Matters</h2>
+            <p>
+                Confusing <em>race condition</em> with <em>data race</em>? You’ll write broken code.<br>
+                This chapter is your <strong>multithreading dictionary</strong> — 30+ terms, crystal clear.
+            </p>
+            <div class="highlight">
+                <strong>Pro Tip:</strong>
+                Bookmark this page. Refer to it every time you debug a concurrency issue.
+            </div>
+        </section>
+
+        <!-- Core Glossary -->
+        <section>
+            <h2>Essential Terms (A-Z)</h2>
+
+            <div class="glossary-grid">
+                <!-- A -->
+                <div class="term-card">
+                    <div class="term-title">
+                        <span>Atomicity</span>
+                        <span class="term-pronounce">/əˈtɒmɪsɪti/</span>
+                    </div>
+                    <div class="term-def">
+                        An operation that is indivisible — either fully completes or not at all.
+                    </div>
+                    <div class="term-example">
+                        counter++ is <strong>not</strong> atomic → 3 steps: read, increment, write
+                    </div>
+                    <div class="term-tags">
+                        <span class="tag">Safety</span>
+                        <span class="tag">JMM</span>
+                    </div>
+                </div>
+
+                <!-- B -->
+                <div class="term-card">
+                    <div class="term-title">Blocking</div>
+                    <div class="term-def">
+                        A thread pauses execution waiting for a resource (I/O, lock, condition).
+                    </div>
+                    <div class="term-example">
+                        thread.join(), socket.read(), lock.lock()
+                    </div>
+                    <div class="term-tags">
+                        <span class="tag">State</span>
+                        <span class="tag">I/O</span>
+                    </div>
+                </div>
+
+                <!-- C -->
+                <div class="term-card">
+                    <div class="term-title">
+                        <span>Concurrency</span>
+                        <span class="term-pronounce">/kənˈkʌrənsi/</span>
+                    </div>
+                    <div class="term-def">
+                        Multiple tasks <em>make progress</em> in overlapping time periods.
+                    </div>
+                    <div class="term-example">
+                        Web server handles 100 requests at once
+                    </div>
+                    <div class="term-tags">
+                        <span class="tag">Concept</span>
+                    </div>
+                </div>
+
+                <div class="term-card">
+                    <div class="term-title">
+                        <span>Critical Section</span>
+                    </div>
+                    <div class="term-def">
+                        Code that accesses shared resources and must not be executed by >1 thread at a time.
+                    </div>
+                    <div class="term-example">
+                        synchronized(account) { balance += amount; }
+                    </div>
+                    <div class="term-tags">
+                        <span class="tag">Synchronization</span>
+                    </div>
+                </div>
+
+                <!-- D -->
+                <div class="term-card">
+                    <div class="term-title">Daemon Thread</div>
+                    <div class="term-def">
+                        Background thread that does not prevent JVM from exiting.
+                    </div>
+                    <div class="term-example">
+                        GC, Timer, Logging threads
+                    </div>
+                    <div class="term-tags">
+                        <span class="tag">Lifecycle</span>
+                    </div>
+                </div>
+
+                <div class="term-card">
+                    <div class="term-title">Deadlock</div>
+                    <div class="term-def">
+                        Two or more threads permanently blocked, each holding a lock the other needs.
+                    </div>
+                    <div class="term-example">
+                        T1 holds LockA, waits for LockB<br>
+                        T2 holds LockB, waits for LockA
+                    </div>
+                    <div class="term-tags">
+                        <span class="tag">Bug</span>
+                        <span class="tag">Locking</span>
+                    </div>
+                </div>
+
+                <!-- L -->
+                <div class="term-card">
+                    <div class="term-title">Livelock</div>
+                    <div class="term-def">
+                        Threads are active but stuck in a loop of yielding to each other — no progress.
+                    </div>
+                    <div class="term-example">
+                        Two polite people stepping aside in a hallway
+                    </div>
+                    <div class="term-tags">
+                        <span class="tag">Bug</span>
+                    </div>
+                </div>
+
+                <!-- M -->
+                <div class="term-card">
+                    <div class="term-title">Monitor</div>
+                    <div class="term-def">
+                        Object used for synchronization. Every Java object has an intrinsic lock (monitor).
+                    </div>
+                    <div class="term-example">
+                        synchronized(obj) { ... }
+                    </div>
+                    <div class="term-tags">
+                        <span class="tag">JVM</span>
+                    </div>
+                </div>
+
+                <!-- P -->
+                <div class="term-card">
+                    <div class="term-title">Parallelism</div>
+                    <div class="term-def">
+                        Multiple tasks execute <em>simultaneously</em> on different CPU cores.
+                    </div>
+                    <div class="term-example">
+                        ForkJoinPool on 8-core CPU
+                    </div>
+                    <div class="term-tags">
+                        <span class="tag">Performance</span>
+                    </div>
+                </div>
+
+                <!-- R -->
+                <div class="term-card">
+                    <div class="term-title">Race Condition</div>
+                    <div class="term-def">
+                        Behavior depends on timing of uncontrolled events (thread scheduling).
+                    </div>
+                    <div class="term-example">
+                        if (balance > 0) withdraw(amount) → two threads see balance > 0
+                    </div>
+                    <div class="term-tags">
+                        <span class="tag">Bug</span>
+                    </div>
+                </div>
+
+                <!-- S -->
+                <div class="term-card">
+                    <div class="term-title">Starvation</div>
+                    <div class="term-def">
+                        A thread never gets CPU time because others keep running.
+                    </div>
+                    <div class="term-example">
+                        Low-priority thread in busy system
+                    </div>
+                    <div class="term-tags">
+                        <span class="tag">Fairness</span>
+                    </div>
+                </div>
+
+                <!-- T -->
+                <div class="term-card">
+                    <div class="term-title">Thread-Safe</div>
+                    <div class="term-def">
+                        Class or method works correctly when accessed by multiple threads.
+                    </div>
+                    <div class="term-example">
+                        StringBuilder (not safe), StringBuffer (safe)
+                    </div>
+                    <div class="term-tags">
+                        <span class="tag">Design</span>
+                    </div>
+                </div>
+
+                <!-- V -->
+                <div class="term-card">
+                    <div class="term-title">Visibility</div>
+                    <div class="term-def">
+                        Changes by one thread are seen by others (JMM guarantee).
+                    </div>
+                    <div class="term-example">
+                        volatile int x; → writes flush to main memory
+                    </div>
+                    <div class="term-tags">
+                        <span class="tag">JMM</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cheat Sheet -->
+        <section>
+            <h2>Quick Reference Cheat Sheet</h2>
+
+            <div class="cheat-sheet">
+                <div class="cheat-title">Multithreading Glossary – At a Glance</div>
+                <table class="cheat-table">
+                    <tr>
+                        <th>Term</th>
+                        <th>Definition</th>
+                        <th>Java Example</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Atomic</strong></td>
+                        <td>All-or-nothing operation</td>
+                        <td><code>AtomicInteger.incrementAndGet()</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Context Switch</strong></td>
+                        <td>OS saves/restores thread state</td>
+                        <td>CPU scheduler</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fair Lock</strong></td>
+                        <td>Threads granted in request order</td>
+                        <td><code>new ReentrantLock(true)</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Happens-Before</strong></td>
+                        <td>Guaranteed ordering in JMM</td>
+                        <td><code>volatile</code> write to read</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Immutable</strong></td>
+                        <td>Object state never changes</td>
+                        <td><code>String</code>, <code>Integer</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Lock</strong></td>
+                        <td>Mutual exclusion mechanism</td>
+                        <td><code>ReentrantLock</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Thread Pool</strong></td>
+                        <td>Reusable worker threads</td>
+                        <td><code>Executors.newFixedThreadPool(4)</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Volatile</strong></td>
+                        <td>Variable with visibility guarantee</td>
+                        <td><code>volatile boolean running;</code></td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- Visual Relationship -->
+        <section>
+            <h2>Terminology Map</h2>
+
+            <div class="mermaid">
+                graph TD
+                A[Concurrency Problems] --> B[Race Condition]
+                A --> C[Deadlock]
+                A --> D[Livelock]
+                A --> E[Starvation]
+
+                F[Solutions] --> G[Synchronization]
+                F --> H[Atomic Operations]
+                F --> I[Thread-Safe Design]
+                F --> J[Lock Ordering]
+
+                G --> K[Monitor]
+                G --> L[Lock]
+                H --> M[java.util.concurrent.atomic]
+
+                style A fill:#d63031,stroke:#d63031,color:white
+                style F fill:#00b894,stroke:#00b894,color:white
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #f8f5ff; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> <strong>Concurrency ≠ Parallelism</strong> — one is about structure, one is about execution</p>
+                <p><strong>2.</strong> <strong>Race Condition</strong> is the root of most bugs</p>
+                <p><strong>3.</strong> <strong>Visibility</strong> and <strong>Atomicity</strong> are JMM guarantees</p>
+                <p><strong>4.</strong> <strong>Deadlock, Livelock, Starvation</strong> — know the difference</p>
+                <p><strong>5.</strong> <strong>Thread-Safe</strong> = correct under concurrency</p>
+                <p><strong>6.</strong> Use this glossary — speak the language, write better code</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-1.5-real-world-applications.html" style="color: var(--primary);">← 1.5 Real-World Applications</a> |
+            <a href="chapter-2.1-synchronization-basics.html" style="color: var(--primary);">Chapter 2: Synchronization →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#8e44ad',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#8e44ad',
+        lineColor: '#8e44ad',
+        secondaryColor: '#9b59b6',
+        tertiaryColor: '#3498db'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

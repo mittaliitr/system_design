@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>1.4 Java’s Thread Model</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #6c5ce7;
+          --secondary: #a29bfe;
+          --accent: #fd79a8;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+          --info: #00cec9;
+          --code-bg: #2d2d2d;
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          background: white;
+          border-radius: 20px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+          overflow: hidden;
+        }
+
+        header {
+          background: linear-gradient(120deg, var(--primary), var(--secondary));
+          color: white;
+          padding: 3.5rem 2rem;
+          text-align: center;
+        }
+
+        header h1 {
+          font-size: 2.8rem;
+          margin-bottom: 0.5rem;
+          font-weight: 700;
+        }
+
+        header h2 {
+          font-size: 1.6rem;
+          margin-bottom: 0.5rem;
+          opacity: 0.95;
+        }
+
+        header p {
+          font-size: 1.2rem;
+          opacity: 0.9;
+          max-width: 800px;
+          margin: 0 auto;
+        }
+
+        .badge {
+          display: inline-block;
+          background: rgba(255,255,255,0.2);
+          padding: 0.4rem 1rem;
+          border-radius: 50px;
+          font-size: 0.95rem;
+          margin-top: 1.2rem;
+          font-weight: 600;
+        }
+
+        main {
+          padding: 3.5rem 2.5rem;
+        }
+
+        section {
+          margin-bottom: 4rem;
+        }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        h2::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 6px;
+          background: var(--primary);
+          border-radius: 3px;
+        }
+
+        h3 {
+          font-size: 1.5rem;
+          color: var(--dark);
+          margin: 2rem 0 1rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        p {
+          margin-bottom: 1.3rem;
+          color: #444;
+          font-size: 1.05rem;
+        }
+
+        .highlight {
+          background: linear-gradient(120deg, #f6f5ff 0%, #e8e4ff 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(108,92,231,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #f8f8f2;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #666;
+          font-family: 'Inter', sans-serif;
+          font-weight: 600;
+        }
+
+        .thread-creation {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2rem;
+          margin: 3rem 0;
+          padding: 2rem;
+          background: #f8f9fa;
+          border-radius: 18px;
+        }
+
+        .creation-method {
+          background: white;
+          padding: 1.8rem;
+          border-radius: 14px;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          position: relative;
+          transition: all 0.4s ease;
+        }
+
+        .creation-method:hover {
+          transform: translateY(-8px);
+          box-shadow: 0 16px 32px rgba(108,92,231,0.25);
+        }
+
+        .method-title {
+          font-weight: 700;
+          color: var(--primary);
+          margin-bottom: 1rem;
+          font-size: 1.3rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .method-badge {
+          background: var(--primary);
+          color: white;
+          padding: 0.2rem 0.6rem;
+          border-radius: 20px;
+          font-size: 0.75rem;
+          font-weight: 600;
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg {
+          width: 100% !important;
+          height: auto !important;
+          max-width: none !important;
+        }
+
+        .jvm-thread-map {
+          display: flex;
+          justify-content: center;
+          gap: 2rem;
+          flex-wrap: wrap;
+          margin: 3rem 0;
+          padding: 2rem;
+          background: #f0f4f8;
+          border-radius: 18px;
+        }
+
+        .jvm-box {
+          background: white;
+          border-radius: 16px;
+          padding: 1.8rem;
+          text-align: center;
+          min-width: 200px;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+        }
+
+        .jvm-title {
+          font-weight: 700;
+          color: var(--primary);
+          margin-bottom: 1rem;
+          font-size: 1.2rem;
+        }
+
+        .jvm-item {
+          background: #f8f9fa;
+          padding: 0.6rem 1rem;
+          margin: 0.4rem 0;
+          border-radius: 10px;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 0.9rem;
+        }
+
+        .daemon {
+          background: #ffe5d9;
+          border-left: 4px solid var(--danger);
+        }
+
+        .user-thread {
+          background: #e8f9f0;
+          border-left: 4px solid var(--success);
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .thread-creation { grid-template-columns: 1fr; }
+          .jvm-thread-map { flex-direction: column; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>1.4 Java’s Thread Model</h1>
+        <h2>From Java Thread to OS Thread to CPU Core</h2>
+        <p>How the JVM maps <code>Thread</code> objects to real concurrency</p>
+        <div class="badge">Chapter 1 – Introduction to Multithreading in Java</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>Java Threads = OS Threads</h2>
+            <p>
+                Java does <strong>not</strong> have its own thread scheduler.
+                Every <code>java.lang.Thread</code> is a <strong>native OS thread</strong> (1:1 mapping).
+            </p>
+            <div class="highlight">
+                <strong>Key Fact:</strong>
+                <code>new Thread()</code> to <code>start()</code> to <strong>OS pthread (Linux) or Win32 thread</strong>
+            </div>
+        </section>
+
+        <!-- Thread Creation Methods -->
+        <section>
+            <h2>Two Ways to Create a Thread</h2>
+
+            <div class="thread-creation">
+                <div class="creation-method">
+                    <div class="method-title">
+                        Extend <code>Thread</code>
+                        <span class="method-badge">Legacy</span>
+                    </div>
+                    <div class="code-block" style="margin: 0; box-shadow: none;">
+              <pre>
+class Worker extends Thread {
+    public void run() {
+        System.out.println("Working...");
+    }
+}
+
+Thread t = new Worker();
+t.start();
+              </pre>
+                    </div>
+                </div>
+                <div class="creation-method">
+                    <div class="method-title">
+                        Implement <code>Runnable</code>
+                        <span class="method-badge">Recommended</span>
+                    </div>
+                    <div class="code-block" style="margin: 0; box-shadow: none;">
+              <pre>
+Runnable task = () -> {
+    System.out.println("Task running");
+};
+
+Thread t = new Thread(task);
+t.start();
+              </pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>Why <code>Runnable</code>?</strong><br>
+                to Supports composition<br>
+                to Works with <code>ExecutorService</code><br>
+                to Enables <code>Callable</code> and return values
+            </div>
+        </section>
+
+        <!-- JVM Thread Architecture -->
+        <section>
+            <h2>JVM Thread Mapping</h2>
+
+            <div class="jvm-thread-map">
+                <div class="jvm-box">
+                    <div class="jvm-title">Java Layer</div>
+                    <div class="jvm-item"><code>Thread</code> object</div>
+                    <div class="jvm-item"><code>Runnable</code> task</div>
+                    <div class="jvm-item"><code>Thread.start()</code></div>
+                </div>
+                <div class="jvm-box">
+                    <div class="jvm-title">JVM (HotSpot)</div>
+                    <div class="jvm-item">JNI to <code>pthread_create</code></div>
+                    <div class="jvm-item">Thread-local storage</div>
+                    <div class="jvm-item">Safepoint handling</div>
+                </div>
+                <div class="jvm-box">
+                    <div class="jvm-title">OS / CPU</div>
+                    <div class="jvm-item">Kernel thread</div>
+                    <div class="jvm-item">CPU core scheduling</div>
+                    <div class="jvm-item">Context switch</div>
+                </div>
+            </div>
+
+            <div class="mermaid">
+                sequenceDiagram
+                participant App as Java App
+                participant JVM as HotSpot JVM
+                participant OS as OS Kernel
+                participant CPU as CPU Core
+
+                App->>JVM: new Thread(runnable).start()
+                JVM->>OS: pthread_create() / CreateThread()
+                OS->>CPU: Schedule thread
+                CPU-->>OS: Execute instructions
+                OS-->>JVM: Thread runs
+                JVM-->>App: run() method executes
+
+                Note over App,CPU: 1:1 Thread Mapping
+            </div>
+        </section>
+
+        <!-- User vs Daemon Threads -->
+        <section>
+            <h2>User Threads vs. Daemon Threads</h2>
+
+            <div class="jvm-thread-map">
+                <div class="jvm-box">
+                    <div class="jvm-title">User Threads</div>
+                    <div class="jvm-item user-thread">Main thread</div>
+                    <div class="jvm-item user-thread">Worker threads</div>
+                    <div class="jvm-item user-thread">Thread pool tasks</div>
+                </div>
+                <div class="jvm-box">
+                    <div class="jvm-title">Daemon Threads</div>
+                    <div class="jvm-item daemon">GC threads</div>
+                    <div class="jvm-item daemon">Finalizer</div>
+                    <div class="jvm-item daemon">Timer threads</div>
+                </div>
+            </div>
+
+            <div class="code-block">
+          <pre>
+// Daemon thread example
+Thread daemon = new Thread(() -> {
+    while (true) {
+        System.out.println("Background task...");
+        Thread.sleep(1000);
+    }
+});
+daemon.setDaemon(true);  // Must set BEFORE start()
+daemon.start();
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Rule:</strong>
+                JVM exits when <strong>all user threads finish</strong>, even if daemon threads are running.
+            </div>
+        </section>
+
+        <!-- Thread Groups -->
+        <section>
+            <h2>Thread Groups: Logical Grouping</h2>
+
+            <div class="code-block">
+          <pre>
+ThreadGroup group = new ThreadGroup("Workers");
+
+Thread t1 = new Thread(group, () -> { /* task */ }, "Worker-1");
+Thread t2 = new Thread(group, () -> { /* task */ }, "Worker-2");
+
+group.list();           // Print all threads
+group.interrupt();      // Interrupt all
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Use Case:</strong>
+                to Graceful shutdown<br>
+                to Monitoring<br>
+                to Security boundaries
+            </div>
+        </section>
+
+        <!-- Thread Lifecycle (FIXED) -->
+        <section>
+            <h2>Thread Lifecycle States</h2>
+
+            <div class="mermaid">
+                graph TD
+                A["NEW"] -->|"start()"| B["RUNNABLE"]
+                B -->|"run() begins"| C["RUNNING"]
+                C -->|"sleep(), wait(), I/O"| D["BLOCKED / WAITING / TIMED_WAITING"]
+                D -->|"notify(), timeout"| B
+                C -->|"run() ends"| E["TERMINATED"]
+
+                style A fill:#74b9ff,stroke:#74b9ff,color:white
+                style B fill:#00b894,stroke:#00b894,color:white
+                style C fill:#00b894,stroke:#00b894,color:white
+                style D fill:#fdcb6e,stroke:#fdcb6e,color:#333
+                style E fill:#b2bec3,stroke:#b2bec3,color:white
+            </div>
+
+            <div class="highlight">
+                <strong><code>Thread.getState()</code> returns:</strong><br>
+                <code>NEW, RUNNABLE, BLOCKED, WAITING, TIMED_WAITING, TERMINATED</code>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #f6f5ff; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> Java threads to <strong>1:1 OS threads</strong> (no green threads)</p>
+                <p><strong>2.</strong> Prefer <code>Runnable</code> or <code>Callable</code> over extending <code>Thread</code></p>
+                <p><strong>3.</strong> <code>start()</code> to OS thread; <code>run()</code> to just method call</p>
+                <p><strong>4.</strong> <strong>Daemon threads</strong> die when JVM exits</p>
+                <p><strong>5.</strong> Use <code>ThreadGroup</code> for management</p>
+                <p><strong>6.</strong> 6 states: <code>NEW to RUNNABLE to BLOCKED to TERMINATED</code></p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-1.3-threads-vs-processes.html" style="color: var(--primary);">to 1.3 Threads vs. Processes</a> |
+            <a href="chapter-1.5-thread-lifecycle.html" style="color: var(--primary);">1.5 Thread Lifecycle to</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#6c5ce7',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#6c5ce7',
+        lineColor: '#6c5ce7',
+        secondaryColor: '#a29bfe',
+        tertiaryColor: '#fd79a8',
+        noteBkgColor: '#fff3f8',
+        noteTextColor: '#d63031',
+        signalColor: '#6c5ce7',
+        signalTextColor: '#ffffff'
+      },
+      sequence: {
+        diagramMarginX: 50,
+        diagramMarginY: 30,
+        actorMargin: 80,
+        width: 160,
+        height: 70,
+        boxMargin: 15,
+        messageMargin: 50,
+        noteMargin: 15
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      },
+      securityLevel: 'loose'
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

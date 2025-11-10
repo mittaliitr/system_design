@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>1.1 What is Multithreading?</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #00b894;
+          --secondary: #55efc4;
+          --accent: #81ecec;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container {
+          max-width: 1100px;
+          margin: 0 auto;
+          background: white;
+          border-radius: 20px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+          overflow: hidden;
+        }
+
+        header {
+          background: linear-gradient(120deg, var(--primary), var(--secondary));
+          color: white;
+          padding: 3rem 2rem;
+          text-align: center;
+        }
+
+        header h1 {
+          font-size: 2.8rem;
+          margin-bottom: 0.5rem;
+          font-weight: 700;
+        }
+
+        header h2 {
+          font-size: 1.6rem;
+          margin-bottom: 0.5rem;
+          opacity: 0.95;
+        }
+
+        header p {
+          font-size: 1.2rem;
+          opacity: 0.9;
+          max-width: 700px;
+          margin: 0 auto;
+        }
+
+        .badge {
+          display: inline-block;
+          background: rgba(255,255,255,0.2);
+          padding: 0.4rem 1rem;
+          border-radius: 50px;
+          font-size: 0.95rem;
+          margin-top: 1.2rem;
+          font-weight: 600;
+        }
+
+        main {
+          padding: 3.5rem 2.5rem;
+        }
+
+        section {
+          margin-bottom: 4rem;
+        }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        h2::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 6px;
+          background: var(--primary);
+          border-radius: 3px;
+        }
+
+        h3 {
+          font-size: 1.5rem;
+          color: var(--dark);
+          margin: 2rem 0 1rem;
+        }
+
+        p {
+          margin-bottom: 1.3rem;
+          color: #444;
+          font-size: 1.05rem;
+        }
+
+        .highlight {
+          background: linear-gradient(120deg, #f6fff8 0%, #e8f9f0 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(0,184,148,0.08);
+        }
+
+        .analogy {
+          background: #e8f9f0;
+          border: 1px solid var(--accent);
+          color: #006d5b;
+        }
+
+        .code-block {
+          background: #2d2d2d;
+          color: #f8f8f2;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #666;
+          font-family: 'Inter', sans-serif;
+          font-weight: 600;
+        }
+
+        .thread-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 1.8rem;
+          margin: 2.5rem 0;
+        }
+
+        .thread-card {
+          background: white;
+          border: 2px solid #e9ecef;
+          border-radius: 18px;
+          padding: 1.8rem;
+          text-align: center;
+          transition: all 0.4s ease;
+          cursor: pointer;
+          position: relative;
+          overflow: hidden;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+        }
+
+        .thread-card::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: linear-gradient(135deg, transparent, rgba(0,184,148,0.1));
+          opacity: 0;
+          transition: opacity 0.4s;
+        }
+
+        .thread-card:hover::before {
+          opacity: 1;
+        }
+
+        .thread-card:hover {
+          transform: translateY(-10px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(0,184,148,0.25);
+        }
+
+        .thread-icon {
+          font-size: 3rem;
+          margin-bottom: 1rem;
+          color: var(--primary);
+        }
+
+        .thread-title {
+          font-weight: 700;
+          color: var(--primary);
+          margin-bottom: 0.6rem;
+          font-size: 1.3rem;
+        }
+
+        .thread-desc {
+          color: #555;
+          font-size: 0.95rem;
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .mermaid svg {
+          width: 100% !important;
+          height: auto !important;
+        }
+
+        .comparison-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 2.5rem 0;
+          font-size: 1rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+          border-radius: 14px;
+          overflow: hidden;
+        }
+
+        .comparison-table th {
+          background: var(--primary);
+          color: white;
+          padding: 1.2rem;
+          text-align: left;
+          font-weight: 600;
+        }
+
+        .comparison-table td {
+          padding: 1.2rem;
+          border-bottom: 1px solid #eee;
+          background: #f8f9fa;
+        }
+
+        .comparison-table tr:hover td {
+          background: #e8f9f0;
+        }
+
+        .comparison-table .check {
+          color: var(--success);
+          font-weight: bold;
+          text-align: center;
+        }
+
+        .comparison-table .cross {
+          color: var(--danger);
+          font-weight: bold;
+          text-align: center;
+        }
+
+        .timeline {
+          display: flex;
+          justify-content: center;
+          gap: 2rem;
+          flex-wrap: wrap;
+          margin: 3rem 0;
+          padding: 2rem;
+          background: #f0f4f8;
+          border-radius: 18px;
+        }
+
+        .timeline-step {
+          text-align: center;
+          flex: 1;
+          min-width: 180px;
+          padding: 1.5rem;
+          border-radius: 16px;
+          background: white;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+          position: relative;
+        }
+
+        .timeline-step::after {
+          content: '→';
+          position: absolute;
+          right: -1.2rem;
+          top: 50%;
+          transform: translateY(-50%);
+          font-size: 1.8rem;
+          color: var(--primary);
+          font-weight: bold;
+        }
+
+        .timeline-step:last-child::after {
+          display: none;
+        }
+
+        .step-year {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 1.4rem;
+          font-weight: 700;
+          color: var(--primary);
+          margin-bottom: 0.6rem;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .thread-grid { grid-template-columns: 1fr; }
+          .timeline { flex-direction: column; }
+          .timeline-step::after { display: none; }
+          .comparison-table { font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>1.1 What is Multithreading?</h1>
+        <h2>The Power of Doing Many Things at Once</h2>
+        <p>From single-tasking to parallel execution — the foundation of modern applications</p>
+        <div class="badge">Chapter 1 – Introduction to Multithreading in Java</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>Imagine a Restaurant Kitchen</h2>
+            <p>
+                One chef cooking alone vs. a team of chefs working together. The food comes out faster, customers are happier, and the kitchen runs smoothly.
+            </p>
+            <div class="highlight analogy">
+                <strong>Analogy:</strong>
+                <em>Multithreading</em> is like having <strong>multiple chefs</strong> in the kitchen.
+                Each handles a different task — chopping, cooking, plating — all at the same time.
+            </div>
+        </section>
+
+        <!-- Definition -->
+        <section>
+            <h2>Multithreading: The Core Idea</h2>
+            <p>
+                <strong>Multithreading</strong> is the ability of a CPU (or CPUs) to execute <strong>multiple threads</strong> of instructions <strong>concurrently</strong> within a single process.
+            </p>
+
+            <div class="thread-grid">
+                <div class="thread-card">
+                    <div class="thread-icon">Thread</div>
+                    <div class="thread-title">Thread</div>
+                    <div class="thread-desc">Lightweight unit of execution<br>Shares memory & resources</div>
+                </div>
+                <div class="thread-card">
+                    <div class="thread-icon">Process</div>
+                    <div class="thread-title">Process</div>
+                    <div class="thread-desc">Heavyweight, isolated<br>Own memory space</div>
+                </div>
+                <div class="thread-card">
+                    <div class="thread-icon">Core</div>
+                    <div class="thread-title">CPU Core</div>
+                    <div class="thread-desc">Physical execution unit<br>Can run one thread at a time</div>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>Key:</strong>
+                One <strong>process</strong> → many <strong>threads</strong><br>
+                Threads share <strong>heap</strong> and <strong>static data</strong>, but have own <strong>stack</strong>
+            </div>
+        </section>
+
+        <!-- Why Multithreading? -->
+        <section>
+            <h2>Why Use Multithreading?</h2>
+
+            <div class="comparison-table">
+                <tr>
+                    <th>Benefit</th>
+                    <th>Single-Threaded</th>
+                    <th>Multithreaded</th>
+                </tr>
+                <tr>
+                    <td><strong>Responsiveness</strong></td>
+                    <td class="cross">Blocked on I/O</td>
+                    <td class="check">UI stays responsive</td>
+                </tr>
+                <tr>
+                    <td><strong>Throughput</strong></td>
+                    <td class="cross">One task at a time</td>
+                    <td class="check">Parallel processing</td>
+                </tr>
+                <tr>
+                    <td><strong>Resource Utilization</strong></td>
+                    <td class="cross">CPU idle during I/O</td>
+                    <td class="check">Full CPU + I/O overlap</td>
+                </tr>
+                <tr>
+                    <td><strong>Scalability</strong></td>
+                    <td class="cross">Limited to 1 core</td>
+                    <td class="check">Uses all cores</td>
+                </tr>
+            </div>
+
+            <div class="mermaid">
+                graph TD
+                A[Main Thread] --> B[UI Updates]
+                A --> C[Network Request]
+                A --> D[File I/O]
+                A --> E[Computation]
+                style A fill:#00b894,stroke:#00b894,color:white
+                style B fill:#81ecec,stroke:#00b894
+                style C fill:#81ecec,stroke:#00b894
+                style D fill:#81ecec,stroke:#00b894
+                style E fill:#81ecec,stroke:#00b894
+            </div>
+        </section>
+
+        <!-- Real-World Examples -->
+        <section>
+            <h2>Multithreading in Action</h2>
+
+            <div class="timeline">
+                <div class="timeline-step">
+                    <div class="step-year">Web Server</div>
+                    <p>Handle 1000+ requests<br>concurrently</p>
+                </div>
+                <div class="timeline-step">
+                    <div class="step-year">Video Game</div>
+                    <p>Render graphics, physics,<br>AI, input — all at 60 FPS</p>
+                </div>
+                <div class="timeline-step">
+                    <div class="step-year">IDE</div>
+                    <p>Code completion, build,<br>debug, UI — never freeze</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Thread vs Process -->
+        <section>
+            <h2>Thread vs Process: Visualized</h2>
+
+            <div class="mermaid">
+                graph LR
+                subgraph Process_A ["Process A"]
+                H1[Heap]
+                S1[Static]
+                T1[Thread 1<br>Stack]
+                T2[Thread 2<br>Stack]
+                T3[Thread 3<br>Stack]
+                end
+                subgraph Process_B ["Process B"]
+                H2[Heap]
+                S2[Static]
+                T4[Thread 1<br>Stack]
+                end
+                H1 --- T1 & T2 & T3
+                H2 --- T4
+                style Process_A fill:#f8f9fa,stroke:#00b894,stroke-width:3px
+                style Process_B fill:#f8f9fa,stroke:#d63031,stroke-width:3px
+            </div>
+
+            <div class="highlight">
+                <strong>Threads share:</strong> Heap, static, file descriptors<br>
+                <strong>Threads have own:</strong> Stack, registers, PC
+            </div>
+        </section>
+
+        <!-- Java Thread Creation -->
+        <section>
+            <h2>First Java Thread: Hello World</h2>
+
+            <div class="code-block">
+          <pre>
+// Extend Thread
+class MyThread extends Thread {
+    public void run() {
+        System.out.println("Hello from thread!");
+    }
+}
+
+// Or implement Runnable (preferred)
+class MyTask implements Runnable {
+    public void run() {
+        System.out.println("Task running...");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Thread t1 = new MyThread();
+        Thread t2 = new Thread(new MyTask());
+
+        t1.start();  // Don't call run() directly!
+        t2.start();
+    }
+}
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Never call <code>run()</code> directly</strong> — use <code>start()</code> to spawn OS thread
+            </div>
+        </section>
+
+        <!-- Concurrency vs Parallelism -->
+        <section>
+            <h2>Concurrency ≠ Parallelism</h2>
+
+            <div class="mermaid">
+                graph TD
+                A[Concurrency] --> B[Multiple tasks<br>make progress]
+                A --> C[Interleaved execution]
+                D[Parallelism] --> E[Multiple tasks<br>execute simultaneously]
+                D --> F[Requires multiple cores]
+                style A fill:#00b894,stroke:#00b894,color:white
+                style D fill:#fd79a8,stroke:#fd79a8,color:white
+            </div>
+
+            <div class="highlight">
+                <strong>Concurrency</strong> = <em>logical</em> multitasking<br>
+                <strong>Parallelism</strong> = <em>physical</em> simultaneous execution
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #e8f9f0; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> <strong>Multithreading</strong> = multiple threads in one process.</p>
+                <p><strong>2.</strong> Threads share memory → fast, but need synchronization.</p>
+                <p><strong>3.</strong> Enables <strong>responsiveness</strong>, <strong>throughput</strong>, <strong>scalability</strong>.</p>
+                <p><strong>4.</strong> Java: <code>Thread</code> class or <code>Runnable</code> interface.</p>
+                <p><strong>5.</strong> Use <code>start()</code>, not <code>run()</code>.</p>
+                <p><strong>6.</strong> Concurrency ≠ Parallelism.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-0.7-visuals.html" style="color: var(--primary);">← Chapter 0: Foundations</a> |
+            <a href="chapter-1.2-thread-lifecycle.html" style="color: var(--primary);">1.2 Thread Lifecycle →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#00b894',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#00b894',
+        lineColor: '#00b894',
+        secondaryColor: '#55efc4',
+        tertiaryColor: '#81ecec'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>
