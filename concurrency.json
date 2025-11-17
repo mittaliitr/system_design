@@ -1,498 +1,407 @@
 {
-  "name": "Java Concurrency in Practice",
-  "url": "",
+  "name": "Mastering Multithreading in Java: From Basics to Advanced Concepts Including Project Loom",
   "children": [
     {
-      "name": "Part I: Fundamentals",
-      "url": "",
+      "name": "0. Computer Architecture & Concurrency Foundations",
       "children": [
         {
-          "name": "Chapter 1 - Introduction",
-          "page": 1,
-          "url": "https://solutionsarchitecture.medium.com/java-concurrency-tutorial-from-basics-to-advanced-89f3f6d1a9b9",
+          "name": "0.1 The CPU: Fetch-Decode-Execute Cycle",
+          "url": "concurrency /chapter1.html",
+          "tag": "hardware"
+        },
+        {
+          "name": "0.2 Registers: CPU’s Fast Scratchpad",
+          "url": "concurrency /chapter2.html",
+          "tag": "hardware"
+        },
+        {
+          "name": "0.3 Memory Hierarchy: Registers → Cache → RAM → Disk",
+          "url": "concurrency /chapter3.html",
+          "tag": "hardware"
+        },
+        {
+          "name": "0.4 Memory Model & Cache Coherence",
+          "url": "concurrency /chapter4.html",
+          "tag": "hardware"
+        },
+        {
+          "name": "0.5 OS Threading: Kernel vs. User Threads",
+          "url": "concurrency /chapter5.html",
+          "tag": "os"
+        },
+        {
+          "name": "0.6 Concurrency Primitives",
           "children": [
             {
-              "name": "1.1 A (Very) Brief History of Concurrency",
-              "page": 2,
-              "url": "https://www.dre.vanderbilt.edu/~schmidt/cs891f/2019-PDFs/1.2.1-overview-of-concurrency-in-java.pdf"
+              "name": "Locks (Mutex): Atomic Test-and-Set, Critical Section",
+              "url": "concurrency /chapter6.html",
+              "tag": "primitive"
             },
             {
-              "name": "1.2 Benefits of Threads",
-              "page": 3,
-              "url": "https://solutionsarchitecture.medium.com/java-concurrency-tutorial-from-basics-to-advanced-89f3f6d1a9b9"
+              "name": "Semaphores: Binary & Counting, P/V Operations",
+              "url": "concurrency /chapter6.2.html",
+              "tag": "primitive"
             },
             {
-              "name": "1.3 Risks of Threads",
-              "page": 5,
-              "url": "https://solutionsarchitecture.medium.com/java-concurrency-tutorial-from-basics-to-advanced-89f3f6d1a9b9"
-            },
-            {
-              "name": "1.4 Threads are Everywhere",
-              "page": 8,
-              "url": "https://solutionsarchitecture.medium.com/java-concurrency-tutorial-from-basics-to-advanced-89f3f6d1a9b9"
+              "name": "Monitors, Spinlocks, Futexes",
+              "url": "concurrency /chapter6.3.html",
+              "tag": "primitive"
             }
           ]
         },
         {
-          "name": "Chapter 2 - Thread Safety",
-          "page": 11,
-          "url": "https://web.mit.edu/6.005/www/fa16/classes/20-thread-safety/",
-          "children": [
-            {
-              "name": "2.1 What is Thread Safety?",
-              "page": 12,
-              "url": "https://web.mit.edu/6.005/www/fa16/classes/20-thread-safety/"
-            },
-            {
-              "name": "2.2 Atomicity",
-              "page": 13,
-              "url": "https://naveen-metta.medium.com/atomic-operations-in-java-mastering-thread-safety-and-concurrency-7c3360ec0bc5"
-            },
-            {
-              "name": "2.3 Locking",
-              "page": 16,
-              "url": "https://www.vogella.com/tutorials/JavaConcurrency/article.html"
-            },
-            {
-              "name": "2.4 Guarding State with Locks",
-              "page": 19,
-              "url": "https://www.vogella.com/tutorials/JavaConcurrency/article.html"
-            },
-            {
-              "name": "2.5 Liveness and Performance",
-              "page": 20,
-              "url": "https://www.idc-online.com/technical_references/pdfs/information_technology/Deadlock_in_Java_with_Example.pdf"
-            }
-          ]
-        },
-        {
-          "name": "Chapter 3 - Sharing Objects",
-          "page": 23,
-          "url": "",
-          "children": [
-            {
-              "name": "3.1 Visibility",
-              "page": 23,
-              "url": "https://dzone.com/articles/java-concurrency-visibility-and-synchronized"
-            },
-            {
-              "name": "3.2 Publication and Escape",
-              "page": 26,
-              "url": "https://joamatab.github.io/book-notes/java-concurrency-in-practice.html#publication-and-escape"
-            },
-            {
-              "name": "3.3 Thread Confinement",
-              "page": 28,
-              "url": "https://dzone.com/articles/java-concurrency-thread-confinement"
-            },
-            {
-              "name": "3.4 Immutability",
-              "page": 31,
-              "url": "https://joamatab.github.io/book-notes/java-concurrency-in-practice.html#immutability"
-            },
-            {
-              "name": "3.5 Safe Publication",
-              "page": 33,
-              "url": "https://joamatab.github.io/book-notes/java-concurrency-in-practice.html#safe-publication"
-            }
-          ]
-        },
-        {
-          "name": "Chapter 4 - Composing Objects",
-          "page": 37,
-          "url": "",
-          "children": [
-            {
-              "name": "4.1 Designing a Thread-safe Class",
-              "page": 37,
-              "url": "https://www.baeldung.com/java-thread-safe-classes"
-            },
-            {
-              "name": "4.2 Instance Confinement",
-              "page": 39,
-              "url": "https://dzone.com/articles/thread-confinement-in-java"
-            },
-            {
-              "name": "4.3 Delegating Thread Safety",
-              "page": 41,
-              "url": "https://www.journaldev.com/1340/java-thread-safety-volatile-synchronized-locks"
-            },
-            {
-              "name": "4.4 Adding Functionality to Existing Thread-safe Classes",
-              "page": 47,
-              "url": "https://www.baeldung.com/java-thread-safe-collections#decorators"
-            },
-            {
-              "name": "4.5 Documenting Synchronization Policies",
-              "page": 49,
-              "url": "https://www.oracle.com/technical-resources/articles/java/concurrency.html#synchronization"
-            }
-          ]
-        },
-        {
-          "name": "Chapter 5 - Building Blocks",
-          "page": 51,
-          "url": "",
-          "children": [
-            {
-              "name": "5.1 Synchronized Collections",
-              "page": 51,
-              "url": "https://docs.oracle.com/javase/8/docs/api/java/util/Collections.html#synchronizedMap-java.util.Map-"
-            },
-            {
-              "name": "5.2 Concurrent Collections",
-              "page": 54,
-              "url": "https://www.baeldung.com/java-concurrent-collections"
-            },
-            {
-              "name": "5.3 Blocking Queues and the Producer-consumer Pattern",
-              "page": 56,
-              "url": "https://www.baeldung.com/java-blocking-queue"
-            },
-            {
-              "name": "5.4 Blocking and Interruptible Methods",
-              "page": 59,
-              "url": "https://docs.oracle.com/javase/tutorial/essential/concurrency/interrupt.html"
-            },
-            {
-              "name": "5.5 Synchronizers",
-              "page": 60,
-              "url": "https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/package-summary.html#Synchronizers"
-            },
-            {
-              "name": "5.6 Building an Efficient, Scalable Result Cache",
-              "page": 64,
-              "url": "https://www.baeldung.com/java-cache"
-            }
-          ]
+          "name": "0.7 Visuals: Diagrams of CPU, Memory Pyramid, Lock & Semaphore Flow",
+          "url": "concurrency /chapter6.4.html",
+          "tag": "visual"
         }
       ]
     },
     {
-      "name": "Part II: Structuring Concurrent Applications",
-      "url": "",
+      "name": "1. Introduction to Multithreading",
       "children": [
         {
-          "name": "Chapter 6 - Task Execution",
-          "page": 72,
-          "url": "",
-          "children": [
-            {
-              "name": "6.1 Executing Tasks in Threads",
-              "page": 72,
-              "url": "https://www.baeldung.com/java-executor-service-tutorial"
-            },
-            {
-              "name": "6.2 The Executor Framework",
-              "page": 74,
-              "url": "https://www.oracle.com/technical-resources/articles/java/exec-framework.html"
-            },
-            {
-              "name": "6.3 Finding Exploitable Parallelism",
-              "page": 78,
-              "url": "https://www.baeldung.com/java-8-parallel-streams"
-            }
-          ]
+          "name": "1.1 What is Multithreading?",
+          "url": "concurrency /chapter1.1.html",
+          "tag": "basics"
         },
         {
-          "name": "Chapter 7 - Cancellation and Shutdown",
-          "page": 85,
-          "url": "",
-          "children": [
-            {
-              "name": "7.1 Task Cancellation",
-              "page": 85,
-              "url": "https://docs.oracle.com/javase/tutorial/essential/concurrency/cancellation.html"
-            },
-            {
-              "name": "7.2 Stopping a Thread-based Service",
-              "page": 93,
-              "url": "https://www.baeldung.com/java-stop-thread"
-            },
-            {
-              "name": "7.3 Handling Abnormal Thread Termination",
-              "page": 100,
-              "url": "https://www.baeldung.com/java-thread-uncaught-exception-handler"
-            },
-            {
-              "name": "7.4 JVM Shutdown",
-              "page": 102,
-              "url": "https://docs.oracle.com/javase/8/docs/api/java/lang/Runtime.html#addShutdownHook-java.lang.Thread-"
-            }
-          ]
+          "name": "1.2 Benefits and Challenges",
+          "url": "concurrency /chapter1.2.html",
+          "tag": "basics"
         },
         {
-          "name": "Chapter 8 - Applying Thread Pools",
-          "page": 104,
-          "url": "",
-          "children": [
-            {
-              "name": "8.1 Implicit Couplings Between Tasks and Execution Policies",
-              "page": 104,
-              "url": "https://www.baeldung.com/thread-pool-java-and-guava"
-            },
-            {
-              "name": "8.2 Sizing Thread Pools",
-              "page": 105,
-              "url": "https://www.baeldung.com/java-thread-pool-size"
-            },
-            {
-              "name": "8.3 Configuring ThreadPoolExecutor",
-              "page": 106,
-              "url": "https://www.baeldung.com/java-executor-configuration"
-            },
-            {
-              "name": "8.4 Extending ThreadPoolExecutor",
-              "page": 111,
-              "url": "https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ThreadPoolExecutor.html"
-            },
-            {
-              "name": "8.5 Parallelizing Recursive Algorithms",
-              "page": 112,
-              "url": "https://www.baeldung.com/java-fork-join"
-            }
-          ]
+          "name": "1.3 Threads vs. Processes",
+          "url": "concurrency /chapter1.3.html",
+          "tag": "basics"
         },
         {
-          "name": "Chapter 9 - GUI Applications",
-          "page": 117,
-          "url": "",
-          "children": [
-            {
-              "name": "9.1 Why are GUIs Single-threaded?",
-              "page": 117,
-              "url": "https://docs.oracle.com/javase/tutorial/uiswing/concurrency/"
-            },
-            {
-              "name": "9.2 Short-running GUI Tasks",
-              "page": 119,
-              "url": "https://docs.oracle.com/javase/tutorial/uiswing/concurrency/worker.html"
-            },
-            {
-              "name": "9.3 Long-running GUI Tasks",
-              "page": 121,
-              "url": "https://www.baeldung.com/java-swingworker"
-            },
-            {
-              "name": "9.4 Shared Data Models",
-              "page": 123,
-              "url": "https://docs.oracle.com/javase/tutorial/uiswing/misc/model.html"
-            },
-            {
-              "name": "9.5 Other Forms of Single-threaded Subsystems",
-              "page": 125,
-              "url": "https://www.oracle.com/technical-resources/articles/javase/concurrency.html#threads"
-            }
-          ]
+          "name": "1.4 Java’s Thread Model",
+          "url": "concurrency /chapter1.4.html",
+          "tag": "java"
+        },
+        {
+          "name": "1.5 Real-World Applications",
+          "url": "concurrency /chapter1.5.html",
+          "tag": "realworld"
+        },
+        {
+          "name": "1.6 Key Terminology",
+          "url": "concurrency /chapter1.6.html",
+          "tag": "basics"
         }
       ]
     },
     {
-      "name": "Part III: Liveness, Performance, and Testing",
-      "url": "",
+      "name": "2. Creating and Managing Threads",
       "children": [
         {
-          "name": "Chapter 10 - Avoiding Liveness Hazards",
-          "page": 128,
-          "url": "",
-          "children": [
-            {
-              "name": "10.1 Deadlock",
-              "page": 128,
-              "url": "https://www.idc-online.com/technical_references/pdfs/information_technology/Deadlock_in_Java_with_Example.pdf"
-            },
-            {
-              "name": "10.2 Avoiding and Diagnosing Deadlocks",
-              "page": 133,
-              "url": "https://www.idc-online.com/technical_references/pdfs/information_technology/Deadlock_in_Java_with_Example.pdf"
-            },
-            {
-              "name": "10.3 Other Liveness Hazards",
-              "page": 135,
-              "url": "https://www.baeldung.com/java-deadlock"
-            }
-          ]
+          "name": "2.1 extends Thread vs. implements Runnable",
+          "url": "concurrency /chapter2.1.html",
+          "tag": "creation"
         },
         {
-          "name": "Chapter 11 - Performance and Scalability",
-          "page": 137,
-          "url": "",
-          "children": [
-            {
-              "name": "11.1 Thinking about Performance",
-              "page": 137,
-              "url": "https://www.baeldung.com/java-performance"
-            },
-            {
-              "name": "11.2 Amdahl's Law",
-              "page": 139,
-              "url": "https://en.wikipedia.org/wiki/Amdahl%27s_law"
-            },
-            {
-              "name": "11.3 Costs Introduced by Threads",
-              "page": 142,
-              "url": "https://www.baeldung.com/java-thread-pool-tuning"
-            },
-            {
-              "name": "11.4 Reducing Lock Contention",
-              "page": 144,
-              "url": "https://www.baeldung.com/java-lock-contention"
-            },
-            {
-              "name": "11.5 Example: Comparing Map Performance",
-              "page": 150,
-              "url": "https://www.baeldung.com/java-collections-performance"
-            },
-            {
-              "name": "11.6 Reducing Context Switch Overhead",
-              "page": 151,
-              "url": "https://stackoverflow.com/questions/18360603/what-is-the-cost-of-a-context-switch"
-            }
-          ]
+          "name": "2.2 Thread Lifecycle & States",
+          "url": "concurrency /chapter2.2.html",
+          "tag": "lifecycle"
         },
         {
-          "name": "Chapter 12 - Testing Concurrent Programs",
-          "page": 153,
-          "url": "",
-          "children": [
-            {
-              "name": "12.1 Testing for Correctness",
-              "page": 153,
-              "url": "https://www.baeldung.com/java-testing-concurrency"
-            },
-            {
-              "name": "12.2 Testing for Performance",
-              "page": 160,
-              "url": "https://dzone.com/articles/concurrency-performance-testing"
-            },
-            {
-              "name": "12.3 Avoiding Performance Testing Pitfalls",
-              "page": 165,
-              "url": "https://medium.com/swlh/avoiding-performance-testing-pitfalls-9835e37550c6"
-            },
-            {
-              "name": "12.4 Complementary Testing Approaches",
-              "page": 167,
-              "url": "https://www.infoq.com/articles/testing-concurrent-java/"
-            }
-          ]
+          "name": "2.3 start(), join(), sleep(), interrupt()",
+          "url": "concurrency /chapter2.3.html",
+          "tag": "control"
+        },
+        {
+          "name": "2.4 Daemon Threads",
+          "url": "concurrency /chapter2.4.html",
+          "tag": "daemon"
+        },
+        {
+          "name": "2.5 Thread Priorities",
+          "url": "concurrency /chapter2.5.html",
+          "tag": "scheduling"
+        },
+        {
+          "name": "2.6 Real-World: Background Sync in a Mobile App",
+          "url": "concurrency /chapter2.6.html",
+          "tag": "realworld"
         }
       ]
     },
     {
-      "name": "Part IV: Advanced Topics",
-      "url": "",
+      "name": "3. Synchronization and Thread Safety",
       "children": [
         {
-          "name": "Chapter 13 - Explicit Locks",
-          "page": 171,
-          "url": "",
+          "name": "3.1 Race Conditions & Data Races",
+          "url": "https://en.wikipedia.org/wiki/Race_condition",
+          "tag": "issue"
+        },
+        {
+          "name": "3.2 synchronized Keyword & Blocks",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/concurrency/sync.html",
+          "tag": "sync"
+        },
+        {
+          "name": "3.3 Intrinsic Locks & Monitors",
+          "url": "https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html#jls-17.1",
+          "tag": "monitor"
+        },
+        {
+          "name": "3.4 wait(), notify(), notifyAll()",
+          "url": "https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html#wait--",
+          "tag": "comm"
+        },
+        {
+          "name": "3.5 Deadlock, Livelock, Starvation",
+          "url": "https://www.baeldung.com/java-deadlock-livelock-starvation",
+          "tag": "pitfall"
+        },
+        {
+          "name": "3.6 volatile Keyword",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/concurrency/volatile.html",
+          "tag": "visibility"
+        },
+        {
+          "name": "3.7 Real-World: Concurrent Bank Transfers",
+          "tag": "realworld"
+        }
+      ]
+    },
+    {
+      "name": "4. Concurrency Utilities in Java",
+      "children": [
+        {
+          "name": "4.1 java.util.concurrent Package",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/package-summary.html",
+          "tag": "package"
+        },
+        {
+          "name": "4.2 ExecutorService & Thread Pools",
+          "url": "https://www.baeldung.com/thread-pool-java-and-guava",
+          "tag": "executor"
+        },
+        {
+          "name": "4.3 Callable & Future",
+          "url": "https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/Callable.html",
+          "tag": "future"
+        },
+        {
+          "name": "4.4 ReentrantLock, ReadWriteLock",
+          "url": "https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/locks/ReentrantLock.html",
+          "tag": "lock"
+        },
+        {
+          "name": "4.5 Semaphore, CountDownLatch, CyclicBarrier",
+          "url": "https://www.baeldung.com/java-semaphore",
+          "tag": "sync"
+        },
+        {
+          "name": "4.6 Real-World: Web Server Handling 10K+ Requests",
+          "tag": "realworld"
+        }
+      ]
+    },
+    {
+      "name": "5. Advanced Concurrency Topics",
+      "children": [
+        {
+          "name": "5.1 Atomic Variables (AtomicInteger, LongAdder)",
+          "url": "https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/atomic/AtomicInteger.html",
+          "tag": "atomic"
+        },
+        {
+          "name": "5.2 Concurrent Collections (ConcurrentHashMap)",
+          "url": "https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentHashMap.html",
+          "tag": "collection"
+        },
+        {
+          "name": "5.3 Fork/Join Framework",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/concurrency/forkjoin.html",
+          "tag": "parallel"
+        },
+        {
+          "name": "5.4 ThreadLocal & InheritableThreadLocal",
+          "url": "https://docs.oracle.com/javase/8/docs/api/java/lang/ThreadLocal.html",
+          "tag": "local"
+        },
+        {
+          "name": "5.5 Blocking Queues & Producer-Consumer",
+          "url": "https://www.baeldung.com/java-blocking-queue",
+          "tag": "queue"
+        },
+        {
+          "name": "5.6 Java Memory Model (JMM) Deep Dive",
+          "url": "https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html",
+          "tag": "jmm"
+        },
+        {
+          "name": "5.7 Real-World: Real-Time Analytics Pipeline",
+          "tag": "realworld"
+        }
+      ]
+    },
+    {
+      "name": "6. Project Loom: Virtual Threads & Structured Concurrency",
+      "children": [
+        {
+          "name": "6.1 Why Virtual Threads? (vs. Platform Threads)",
+          "url": "https://openjdk.org/jeps/444",
+          "tag": "loom"
+        },
+        {
+          "name": "6.2 Thread.ofVirtual().start()",
+          "url": "https://docs.oracle.com/en/java/javase/21/core/virtual-threads.html",
+          "tag": "virtual"
+        },
+        {
+          "name": "6.3 StructuredTaskScope for Error Propagation",
+          "url": "https://openjdk.org/jeps/453",
+          "tag": "structured"
+        },
+        {
+          "name": "6.4 Scoped Values (Thread-Local Alternative)",
+          "url": "https://openjdk.org/jeps/446",
+          "tag": "scoped"
+        },
+        {
+          "name": "6.5 Scalability: 1 Million Concurrent Tasks",
+          "url": "https://www.infoq.com/articles/java-virtual-threads-performance/",
+          "tag": "scale"
+        },
+        {
+          "name": "6.6 Real-World: High-Concurrency API Gateway",
+          "tag": "realworld"
+        }
+      ]
+    },
+    {
+      "name": "7. Best Practices and Common Pitfalls",
+      "children": [
+        {
+          "name": "7.1 Designing Thread-Safe Classes",
+          "url": "https://www.ibm.com/developerworks/library/j-jtp0618/index.html",
+          "tag": "design"
+        },
+        {
+          "name": "7.2 Exception Handling in Threads",
+          "url": "https://www.baeldung.com/java-thread-uncaught-exception-handler",
+          "tag": "exception"
+        },
+        {
+          "name": "7.3 Performance Optimization (Avoid Over-Sync)",
+          "tag": "perf"
+        },
+        {
+          "name": "7.4 Debugging: jstack, jconsole, VisualVM",
+          "url": "https://docs.oracle.com/javase/8/docs/technotes/tools/",
+          "tag": "debug"
+        },
+        {
+          "name": "7.5 Testing: JCStress, Thread Weaver",
+          "url": "https://openjdk.org/projects/code-tools/jcstress/",
+          "tag": "testing"
+        },
+        {
+          "name": "7.6 Real-World: Autoscaling in Kubernetes",
+          "tag": "realworld"
+        }
+      ]
+    },
+    {
+      "name": "8. Real-World Projects and Case Studies",
+      "children": [
+        {
+          "name": "8.1 Project: Parallel File Downloader",
+          "url": "https://github.com/kdn251/java-multithreading-examples",
+          "tag": "project"
+        },
+        {
+          "name": "8.2 Project: Multi-Client Chat Server",
+          "url": "https://www.baeldung.com/java-chat-application",
+          "tag": "project"
+        },
+        {
+          "name": "8.3 Project: Image Processor with Fork/Join",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/concurrency/examples/ForkBlur.java.html",
+          "tag": "project"
+        },
+        {
+          "name": "8.4 Case Study: DoorDash – Real-Time Order Processing",
+          "url": "https://doordash.engineering/2023/06/12/scaling-doordash-with-java/",
+          "tag": "casestudy"
+        },
+        {
+          "name": "8.5 Case Study: Cloud Kitchen Management System",
+          "url": "https://www.geektrust.in/blog/cloud-kitchen-scheduling",
+          "tag": "casestudy"
+        },
+        {
+          "name": "8.6 Case Study: Movie Ticketing System (BookMyShow Style)",
+          "url": "https://www.bookmyshow.com/engineering/scaling-ticketing",
+          "tag": "casestudy"
+        },
+        {
+          "name": "8.7 Bonus Mini-Project: Simulate Movie Booking CLI",
+          "url": "https://github.com/java-concurrency/ticketing-system",
+          "tag": "project"
+        }
+      ]
+    },
+    {
+      "name": "9. Conclusion and Further Reading",
+      "children": [
+        {
+          "name": "9.1 From Registers to Virtual Threads: Full Journey",
+          "tag": "summary"
+        },
+        {
+          "name": "9.2 Future: Loom, Fibers, Reactive Streams",
+          "url": "https://openjdk.org/projects/loom/",
+          "tag": "future"
+        },
+        {
+          "name": "9.3 Recommended Books",
           "children": [
             {
-              "name": "13.1 Lock and ReentrantLock",
-              "page": 171,
-              "url": "https://www.baeldung.com/java-reentrant-lock"
+              "name": "Java Concurrency in Practice – Brian Goetz",
+              "url": "https://jcip.net/",
+              "tag": "book"
             },
             {
-              "name": "13.2 Performance Considerations",
-              "page": 174,
-              "url": "https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/locks/ReentrantLock.html"
-            },
-            {
-              "name": "13.3 Fairness",
-              "page": 175,
-              "url": "https://www.baeldung.com/java-lock-fairness"
-            },
-            {
-              "name": "13.4 Choosing Between Synchronized and ReentrantLock",
-              "page": 176,
-              "url": "https://www.baeldung.com/java-synchronized-vs-lock"
-            },
-            {
-              "name": "13.5 Read-write Locks",
-              "page": 176,
-              "url": "https://www.baeldung.com/java-read-write-locks"
+              "name": "Operating System Concepts – Silberschatz",
+              "url": "https://www.wiley.com/en-us/Operating+System+Concepts%2C+10th+Edition-p-9781119456339",
+              "tag": "book"
             }
           ]
         },
         {
-          "name": "Chapter 14 - Building Custom Synchronizers",
-          "page": 179,
-          "url": "",
+          "name": "9.4 Online Resources",
           "children": [
             {
-              "name": "14.1 Managing State Dependence",
-              "page": 179,
-              "url": "https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/locks/Condition.html"
+              "name": "OpenJDK Loom Docs",
+              "url": "https://openjdk.org/projects/loom/",
+              "tag": "resource"
             },
             {
-              "name": "14.2 Using Condition Queues",
-              "page": 183,
-              "url": "https://www.baeldung.com/java-condition-variable"
+              "name": "Baeldung Java Concurrency",
+              "url": "https://www.baeldung.com/java-concurrency",
+              "tag": "resource"
             },
             {
-              "name": "14.3 Explicit Condition Objects",
-              "page": 188,
-              "url": "https://www.baeldung.com/java-explicit-locks"
-            },
-            {
-              "name": "14.4 Anatomy of a Synchronizer",
-              "page": 189,
-              "url": "https://www.baeldung.com/java-aqs"
-            },
-            {
-              "name": "14.5 AbstractQueuedSynchronizer",
-              "page": 190,
-              "url": "https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/locks/AbstractQueuedSynchronizer.html"
-            },
-            {
-              "name": "14.6 AQS in Java.util.concurrent Synchronizer Classes",
-              "page": 192,
-              "url": "https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/package-summary.html"
+              "name": "Jenkov Tutorials",
+              "url": "https://jenkov.com/tutorials/java-concurrency/index.html",
+              "tag": "resource"
             }
           ]
         },
         {
-          "name": "Chapter 15 - Atomic Variables and Non-blocking Synchronization",
-          "page": 195,
-          "url": "",
+          "name": "9.5 Practice Challenges",
           "children": [
             {
-              "name": "15.1 Disadvantages of Locking",
-              "page": 195,
-              "url": "https://www.baeldung.com/java-locks-vs-atomics"
+              "name": "Build a mini DoorDash CLI",
+              "tag": "challenge"
             },
             {
-              "name": "15.2 Hardware Support for Concurrency",
-              "page": 196,
-              "url": "https://en.wikipedia.org/wiki/Compare-and-swap"
-            },
-            {
-              "name": "15.3 Atomic Variable Classes",
-              "page": 198,
-              "url": "https://www.baeldung.com/java-atomic-variables"
-            },
-            {
-              "name": "15.4 Non-blocking Algorithms",
-              "page": 201,
-              "url": "https://www.baeldung.com/java-non-blocking-concurrency"
-            }
-          ]
-        },
-        {
-          "name": "Chapter 16 - The Java Memory Model",
-          "page": 207,
-          "url": "",
-          "children": [
-            {
-              "name": "16.1 What is a Memory Model, and Why would I Want One?",
-              "page": 207,
-              "url": "https://www.baeldung.com/java-memory-model"
-            },
-            {
-              "name": "16.2 Publication",
-              "page": 211,
-              "url": "https://www.baeldung.com/java-safe-publication"
+              "name": "Simulate 1000 users booking 100 seats",
+              "tag": "challenge"
             }
           ]
         }
