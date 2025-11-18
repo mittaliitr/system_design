@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>6.1 Why Virtual Threads? (vs. Platform Threads)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #7c3aed;
+          --secondary: #9333ea;
+          --accent: #c084fc;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #10b981;
+          --warning: #f59e0b;
+          --danger: #ef4444;
+          --info: #3b82f6;
+          --code-bg: #1e1b4b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 4rem 2rem; text-align: center; }
+
+        header h1 { font-size: 2.8rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.6rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.2rem; opacity: 0.9; max-width: 900px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.95rem; margin-top: 1.2rem; font-weight: 600; }
+
+        main { padding: 4rem 3rem; }
+
+        section { margin-bottom: 5rem; }
+
+        h2 {
+          font-size: 2.2rem;
+          color: var(--primary);
+          margin-bottom: 1.8rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #f3f0ff 0%, #e8e0ff 100%);
+          padding: 1.6rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2.5rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(124,58,237,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #e9d5ff;
+          padding: 1.6rem;
+          border-radius: 16px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2.5rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.8rem;
+          right: 1.4rem;
+          font-size: 0.9rem;
+          color: #a78bfa;
+          font-weight: 600;
+        }
+
+        .comparison-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+          gap: 2rem;
+          margin: 3rem 0;
+        }
+
+        .comparison-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .comparison-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(124,58,237,0.25);
+        }
+
+        .card-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 1rem;
+          color: var(--primary);
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        .badge-platform { background: #ef4444; color: white; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .badge-virtual { background: #10b981; color: white; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 3rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        .performance-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 3rem 0;
+          font-size: 1rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+          border-radius: 14px;
+          overflow: hidden;
+        }
+
+        .performance-table th {
+          background: var(--primary);
+          color: white;
+          padding: 1.2rem;
+          text-align: left;
+          font-weight: 600;
+        }
+
+        .performance-table td {
+          padding: 1.2rem;
+          border-bottom: 1px solid #eee;
+          background: #f8f9fa;
+        }
+
+        .performance-table tr:hover td {
+          background: #f0e8ff;
+        }
+
+        .check { color: var(--success); font-weight: bold; text-align: center; }
+        .cross { color: var(--danger); font-weight: bold; text-align: center; }
+
+        .loom-demo {
+          background: #f8f9fa;
+          border-radius: 18px;
+          padding: 2.5rem;
+          margin: 3rem 0;
+          border-left: 6px solid var(--primary);
+        }
+
+        .demo-title {
+          font-weight: 700;
+          color: var(--primary);
+          font-size: 1.4rem;
+          margin-bottom: 1.5rem;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .comparison-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>6.1 Why Virtual Threads?</h1>
+        <h2>Platform Threads Are Dead — Long Live Virtual Threads!</h2>
+        <p>The biggest concurrency revolution since Java 5</p>
+        <div class="badge">Chapter 6 – Project Loom</div>
+    </header>
+
+    <main>
+        <!-- The Problem -->
+        <section>
+            <h2>Platform Threads: Expensive & Scarce</h2>
+            <p>
+                For 25 years, every <code>java.lang.Thread</code> was a <strong>platform (OS) thread</strong>.
+            </p>
+            <div class="highlight">
+                <strong>Reality:</strong> Creating 10,000+ platform threads → OOM, thrashing, death<br>
+                <strong>Result:</strong> Everyone uses thread pools → complex, blocking code becomes reactive hell
+            </div>
+        </section>
+
+        <!-- Comparison -->
+        <section>
+            <h2>Platform Threads vs Virtual Threads</h2>
+
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <div class="card-title">
+                        Platform Threads
+                        <span class="badge-platform">Old World</span>
+                    </div>
+                    <div class="highlight">
+                        • 1:1 with OS thread<br>
+                        • ~1–8 MB stack<br>
+                        • Expensive context switch<br>
+                        • Max ~10,000–30,000<br>
+                        • Blocking = wasted thread
+                    </div>
+                </div>
+
+                <div class="comparison-card">
+                    <div class="card-title">
+                        Virtual Threads (Project Loom)
+                        <span class="badge-virtual">New World</span>
+                    </div>
+                    <div class="highlight">
+                        • M:N with carrier threads<br>
+                        • ~Few KB stack<br>
+                        • Cheap context switch<br>
+                        • Millions possible<br>
+                        • Blocking = just pause virtual thread
+                    </div>
+                </div>
+            </div>
+
+            <table class="performance-table">
+                <tr>
+                    <th>Metric</th>
+                    <th>Platform Thread</th>
+                    <th>Virtual Thread</th>
+                </tr>
+                <tr>
+                    <td>Memory per thread</td>
+                    <td>1–8 MB</td>
+                    <td>~Few KB</td>
+                </tr>
+                <tr>
+                    <td>Creation cost</td>
+                    <td>High</td>
+                    <td>Near zero</td>
+                </tr>
+                <tr>
+                    <td>Max concurrent</td>
+                    <td>~10,000</td>
+                    <td>1,000,000+</td>
+                </tr>
+                <tr>
+                    <td>Blocking I/O</td>
+                    <td>Wastes OS thread</td>
+                    <td>Carrier thread freed</td>
+                </tr>
+                <tr>
+                    <td>Code style</td>
+                    <td>Reactive / callbacks</td>
+                    <td>Plain blocking code</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- The Magic -->
+        <section>
+            <h2>How Virtual Threads Work</h2>
+
+            <div class="mermaid">
+                graph TD
+                A[Virtual Thread] -->|blocked on I/O| B[Carrier Thread Pool]
+                A -->|running| C[Mounted on carrier]
+                B -->|unblock| A
+                D[100,000 Virtual Threads] --> B[200 Carrier Threads]
+
+                style A fill:#7c3aed,stroke:#7c3aed,color:white
+                style B fill:#00b894,stroke:#00b894,color:white
+            </div>
+
+            <div class="highlight">
+                <strong>M:N scheduling:</strong><br>
+                Millions of virtual threads → few carrier (platform) threads<br>
+                When virtual thread blocks → carrier thread runs another virtual thread
+            </div>
+        </section>
+
+        <!-- Real Demo -->
+        <section>
+            <h2>One Million Threads — No Problem</h2>
+
+            <div class="code-block">
+          <pre>
+// Java 21+ — This just works!
+try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+    IntStream.range(0, 1_000_000).forEach(i -> {
+        executor.submit(() -> {
+            Thread.sleep(Duration.ofSeconds(1));
+            System.out.println("Task " + i + " done");
+        });
+    });
+} // Auto shutdown + join
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Result:</strong> 1,000,000 tasks → ~few hundred MB RAM → runs in seconds<br>
+                Same code with platform threads → OOM in < 10,000
+            </div>
+        </section>
+
+        <!-- Why Now? -->
+        <section>
+            <h2>The End of Reactive Programming Pain</h2>
+
+            <div class="highlight">
+                <strong>Before Loom:</strong> High concurrency → Reactive (RxJava, Project Reactor)<br>
+                <strong>After Loom:</strong> Write simple blocking code → get reactive performance
+            </div>
+
+            <div class="code-block">
+          <pre>
+// Old reactive hell
+userService.findUser(id)
+    .flatMap(user -> orderService.findOrders(user))
+    .subscribe(orders -> render(orders));
+
+// New: plain Java
+User user = userService.findUser(id);     // blocks virtual thread
+List<Order> orders = orderService.findOrders(user);
+render(orders);
+          </pre>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #f3f0ff; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> Platform threads = expensive, scarce (max ~10k)</p>
+                <p><strong>2.</strong> Virtual threads = cheap, abundant (millions)</p>
+                <p><strong>3.</strong> M:N scheduling → carrier threads reused</p>
+                <p><strong>4.</strong> Blocking code becomes scalable again</p>
+                <p><strong>5.</strong> No more reactive complexity for concurrency</p>
+                <p><strong>6.</strong> Java 21+ → <code>Executors.newVirtualThreadPerTaskExecutor()</code></p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-6-toc.html" style="color: var(--primary);">← Chapter 6 TOC</a> |
+            <a href="chapter-6.2-virtual-start.html" style="color: var(--primary);">6.2 Thread.ofVirtual().start() →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#7c3aed',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#7c3aed',
+        lineColor: '#7c3aed',
+        secondaryColor: '#9333ea',
+        tertiaryColor: '#c084fc'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>6.4 Scoped Values</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #8b5cf6;
+          --secondary: #a78bfa;
+          --accent: #c084fc;
+          --dark: #1e1b4b;
+          --light: #f8fafc;
+          --gray: #64748b;
+          --success: #10b981;
+          --warning: #f59e0b;
+          --danger: #ef4444;
+          --info: #3b82f6;
+          --code-bg: #1e1b4b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 3.5rem 2rem; text-align: center; }
+
+        header h1 { font-size: 2.8rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.6rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.2rem; opacity: 0.9; max-width: 900px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.95rem; margin-top: 1.2rem; font-weight: 600; }
+
+        main { padding: 3.5rem 2.5rem; }
+
+        section { margin-bottom: 4.5rem; }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #f3f0ff 0%, #e8e0ff 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(139,92,246,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #e9d5ff;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+        }
+
+        .code-block::before {
+          content: 'Java 21+';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #a78bfa;
+          font-weight: 600;
+        }
+
+        .comparison-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+          gap: 2rem;
+          margin: 3rem 0;
+        }
+
+        .comparison-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .comparison-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(139,92,246,0.25);
+        }
+
+        .card-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 1rem;
+          color: var(--primary);
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        .badge-old { background: #ef4444; color: white; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .badge-new { background: #10b981; color: white; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        .scoped-demo {
+          background: #f8f9fa;
+          border-radius: 18px;
+          padding: 2.5rem;
+          margin: 3rem 0;
+          border-left: 6px solid var(--primary);
+        }
+
+        .demo-title {
+          font-weight: 700;
+          color: var(--primary);
+          font-size: 1.4rem;
+          margin-bottom: 1.5rem;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .comparison-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>6.4 Scoped Values</h1>
+        <h2>The Modern, Immutable Replacement for ThreadLocal</h2>
+        <p>Inheritable, immutable context — perfect for virtual threads</p>
+        <div class="badge">Chapter 6 – Project Loom</div>
+    </header>
+
+    <main>
+        <!-- The Problem with ThreadLocal -->
+        <section>
+            <h2>ThreadLocal = Leaky, Mutable, Dangerous</h2>
+            <p>
+                <code>ThreadLocal</code> has been the standard way to pass context (user ID, request ID, etc.) for 25 years.
+            </p>
+            <div class="highlight">
+                <strong>Problems:</strong><br>
+                • Mutable → race conditions<br>
+                • Not inherited by child threads<br>
+                • Memory leaks in thread pools<br>
+                • Manual cleanup required
+            </div>
+
+            <div class="code-block">
+          <pre>
+// Classic ThreadLocal problems
+private static final ThreadLocal<User> userHolder = new ThreadLocal<>();
+
+public void processRequest() {
+    userHolder.set(currentUser);
+    try {
+        doWork();  // Must remember to remove!
+    } finally {
+        userHolder.remove();  // Easy to forget!
+    }
+}
+          </pre>
+            </div>
+        </section>
+
+        <!-- Scoped Values — The Fix -->
+        <section>
+            <h2>ScopedValue — Immutable & Inherited</h2>
+
+            <div class="code-block">
+          <pre>
+// Java 21+ — immutable, inherited, no leaks!
+private static final ScopedValue<User> USER = ScopedValue.newInstance();
+
+ScopedValue.where(USER, currentUser)
+    .run(() -> {
+        doWork();               // USER.get() works
+        executor.submit(() -> {
+            // Inherited automatically!
+            log("User: " + USER.get().id());
+        });
+    });
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Magic:</strong><br>
+                • <strong>Immutable</strong> binding<br>
+                • <strong>Inherited</strong> by all child virtual threads<br>
+                • <strong>Automatic cleanup</strong> — no leaks<br>
+                • Perfect for request context, transaction ID, logging MDC
+            </div>
+        </section>
+
+        <!-- Comparison -->
+        <section>
+            <h2>ThreadLocal vs ScopedValue</h2>
+
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <div class="card-title">
+                        ThreadLocal
+                        <span class="badge-old">Legacy</span>
+                    </div>
+                    <div class="highlight">
+                        • Mutable<br>
+                        • Not inherited<br>
+                        • Manual remove()<br>
+                        • Memory leaks in pools
+                    </div>
+                </div>
+
+                <div class="comparison-card">
+                    <div class="card-title">
+                        ScopedValue
+                        <span class="badge-new">Future</span>
+                    </div>
+                    <div class="highlight">
+                        • Immutable binding<br>
+                        • Inherited by children<br>
+                        • Automatic scope end<br>
+                        • Zero leaks
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Real-World: Request Context -->
+        <section>
+            <h2>Real-World: Web Request Context</h2>
+
+            <div class="scoped-demo">
+                <div class="demo-title">Spring Boot + Virtual Threads + Scoped Values</div>
+                <div class="code-block">
+            <pre>
+private static final ScopedValue<String> REQUEST_ID = ScopedValue.newInstance();
+private static final ScopedValue<User> CURRENT_USER = ScopedValue.newInstance();
+
+@GetMapping("/orders")
+public String getOrders() {
+    return ScopedValue.where(REQUEST_ID, generateId())
+        .where(CURRENT_USER, authService.getCurrentUser())
+        .call(() -> orderService.getOrders());  // All children inherit!
+}
+
+@Service
+class OrderService {
+    public String getOrders() {
+        log("Processing for user: " + CURRENT_USER.get().id()
+            + " req: " + REQUEST_ID.get());
+        // Works even in @Async or virtual threads!
+    }
+}
+            </pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Virtual Threads Integration -->
+        <section>
+            <h2>Perfect Match with Virtual Threads</h2>
+
+            <div class="mermaid">
+                graph TD
+                A[Parent Virtual Thread] -->|ScopedValue.where()| B[Child Virtual Thread 1]
+                A --> C[Child Virtual Thread 2]
+                B --> D[Deep Call Stack]
+                B & C & D -->|automatically inherit| E[Scoped Values]
+
+                style E fill:#8b5cf6,stroke:#8b5cf6,color:white
+            </div>
+
+            <div class="highlight">
+                <strong>With platform threads:</strong> ThreadLocal not inherited<br>
+                <strong>With virtual threads + ScopedValue:</strong> Context flows everywhere
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #f3f0ff; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> <code>ScopedValue</code> = immutable, inheritable ThreadLocal replacement</p>
+                <p><strong>2.</strong> Use <code>ScopedValue.where(key, value).run/call()</code></p>
+                <p><strong>3.</strong> Automatically inherited by all child virtual threads</p>
+                <p><strong>4.</strong> No memory leaks — scope ends, value gone</p>
+                <p><strong>5.</strong> Perfect for request IDs, user context, MDC logging</p>
+                <p><strong>6.</strong> The future of context propagation in Java</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-6.3-structured-concurrency.html" style="color: var(--primary);">← 6.3 Structured Concurrency</a> |
+            <a href="chapter-6.5-scalability.html" style="color: var(--primary);">6.5 Scalability: 1 Million Tasks →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#8b5cf6',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#8b5cf6',
+        lineColor: '#8b5 moe',
+        secondaryColor: '#a78bfa',
+        tertiaryColor: '#c084fc'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

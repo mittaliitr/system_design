@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>6. Project Loom: Virtual Threads & Structured Concurrency</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #6366f1;   /* indigo-500 */
+          --secondary: #818cf8; /* indigo-400 */
+          --accent: #c084fc;    /* purple-400 */
+          --dark: #1e1b4b;
+          --light: #f8fafc;
+          --gray: #64748b;
+          --success: #10b981;
+          --warning: #f59e0b;
+          --danger: #ef4444;
+          --info: #3b82f6;
+          --code-bg: #0f0c29;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius:PVC 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 4rem 2rem; text-align: center; }
+
+        header h1 { font-size: 3rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.8rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.3rem; opacity: 0.9; max-width: 1000px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.5rem 1. Loom2rem; border-radius: 50px; font-size: 1rem; margin-top: 1.5rem; font-weight: 600; }
+
+        main { padding: 4rem 3rem; }
+
+        section { margin-bottom: 5rem; }
+
+        h2 {
+          font-size: 2.2rem;
+          color: var(--primary);
+          margin-bottom: 1.8rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #f3f0ff 0%, #e8e0ff 100%);
+          padding: 1.6rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2.5rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(124,58,237,0.08);
+        }
+
+        .loom-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+          gap: 2rem;
+          margin: 4rem 0;
+        }
+
+        .loom-card {
+          background: white;
+          border-radius: 18px;
+          padding: 2.5rem;
+          text-align: center;
+          box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+          transition: all 0.4s ease;
+          border: 2px solid #eee;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .loom-card::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: linear-gradient(135deg, transparent, rgba(99,102,241,0.1));
+          opacity: 0;
+          transition: opacity 0.4s;
+        }
+
+        .loom-card:hover::before {
+          opacity: 1;
+        }
+
+        .loom-card:hover {
+          transform: translateY(-12px);
+          border-color: var(--primary);
+          box-shadow: 0 20px 40px rgba(99,102,241,0.25);
+        }
+
+        .loom-number {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 3.5rem;
+          font-weight: 700;
+          color: var(--primary);
+          margin-bottom: 0.5rem;
+        }
+
+        .loom-title {
+          font-weight: 700;
+          font-size: 1.5rem;
+          margin-bottom: 0.8rem;
+          color: var(--dark);
+        }
+
+        .loom-desc {
+          color: #555;
+          line-height: 1.6;
+        }
+
+        .loom-link {
+          display: inline-block;
+          margin-top: 1rem;
+          padding: 0.6rem 1.2rem;
+          background: var(--primary);
+          color: white;
+          border-radius: 30px;
+          text-decoration: none;
+          font-weight: 600;
+          transition: all 0.3s;
+        }
+
+        .loom-link:hover {
+          background: var(--secondary);
+          transform: scale(1.05);
+        }
+
+        .tag {
+          display: inline-block;
+          background: var(--accent);
+          color: white;
+          padding: 0.2rem 0.8rem;
+          border-radius: 20px;
+          font-size: 0.8rem;
+          margin-top: 0.8rem;
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 3rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        footer {
+          text-align: center;
+          padding: 3rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 1rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.4rem; }
+          header h2 { font-size: 1.4rem; }
+          .loom-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>6. Project Loom</h1>
+        <h2>Virtual Threads & Structured Concurrency</h2>
+        <p>The biggest change to Java concurrency since 2004</p>
+        <div class="badge">Chapter 6 – The Future Is Here (Java 21+)</div>
+    </header>
+
+    <main>
+        <section>
+            <h2>Chapter Overview</h2>
+
+            <div class="loom-grid">
+                <div class="loom-card">
+                    <div class="loom-number">6.1</div>
+                    <div class="loom-title">Why Virtual Threads?</div>
+                    <div class="loom-desc">Platform threads are expensive — virtual threads are cheap</div>
+                    <a href="https://openjdk.org/jeps/444" target="_blank" class="loom-link">JEP 444 →</a>
+                    <div class="tag">loom</div>
+                </div>
+
+                <div class="loom-card">
+                    <div class="loom-number">6.2</div>
+                    <div class="loom-title">Thread.ofVirtual().start()</div>
+                    <div class="loom-desc">Create millions of threads with zero overhead</div>
+                    <a href="https://docs.oracle.com/en/java/javase/21/core/virtual-threads.html" target="_blank" class="loom-link">Official Docs →</a>
+                    <div class="tag">virtual</div>
+                </div>
+
+                <div class="loom-card">
+                    <div class="loom-number">6.3</div>
+                    <div class="loom-title">StructuredTaskScope</div>
+                    <div class="loom-desc">Structured concurrency — error propagation & cancellation</div>
+                    <a href="https://openjdk.org/jeps/453" target="_blank" class="loom-link">JEP 453 →</a>
+                    <div class="tag">structured</div>
+                </div>
+
+                <div class="loom-card">
+                    <div class="loom-number">6.4</div>
+                    <div class="loom-title">Scoped Values</div>
+                    <div class="loom-desc">Thread-local alternative — immutable & inherited</div>
+                    <a href="https://openjdk.org/jeps/446" target="_blank" class="loom-link">JEP 446 →</a>
+                    <div class="tag">scoped</div>
+                </div>
+
+                <div class="loom-card">
+                    <div class="loom-number">6.5</div>
+                    <div class="loom-title">Scalability: 1 Million Tasks</div>
+                    <div class="loom-desc">From 200 threads → 1,000,000+ virtual threads</div>
+                    <a href="https://www.infoq.com/articles/java-virtual-threads-performance/" target="_blank" class="loom-link">Performance Study →</a>
+                    <div class="tag">scale</div>
+                </div>
+
+                <div class="loom-card">
+                    <div class="loom-number">6.6</div>
+                    <div class="loom-title">Real-World: High-Concurrency API Gateway</div>
+                    <div class="loom-desc">One virtual thread per request — the future of Spring Boot</div>
+                    <div class="tag">realworld</div>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>Project Loom Changes Everything:</strong><br>
+                • Write blocking code — get async performance<br>
+                • Millions of concurrent tasks<br>
+                • No more callback hell or reactive complexity<br>
+                • Structured concurrency = automatic cancellation & error handling
+            </div>
+
+            <div class="mermaid">
+                graph TD
+                A[Project Loom] --> B[Virtual Threads]
+                A --> C[Structured Concurrency]
+                A --> D[Scoped Values]
+                B --> E[1,000,000+ threads]
+                C --> F[Automatic cancellation]
+                D --> G[Immutable context]
+                style A fill:#6366f1,stroke:#6366f1,color:white
+                style E fill:#00b894,stroke:#00b894,color:white
+            </div>
+        </section>
+
+        <section>
+            <h2>Ready to Begin?</h2>
+            <div style="text-align: center; padding: 3rem; background: #f3f0ff; border-radius: 20px; border: 4px solid var(--primary);">
+                <p style="font-size: 1.8rem; font-weight: 700; color: var(--primary);">
+                    Chapter 6 starts now.<br>
+                    Say <strong>"6.1"</strong> to begin with “Why Virtual Threads?”
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-5.8-real-world.html" style="color: var(--primary);">← Chapter 5: Blocking Queues</a> |
+            <a href="#" style="color: var(--primary);">Chapter 6: Project Loom →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({ 
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: { 
+        primaryColor: '#6366f1',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#6366f1',
+        lineColor: '#6366f1',
+        secondaryColor: '#818cf8',
+        tertiaryColor: '#c084fc'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

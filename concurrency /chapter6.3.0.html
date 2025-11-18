@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>6.3 Structured Concurrency — StructuredTaskScope</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #6366f1;
+          --secondary: #818cf8;
+          --accent: #c084fc;
+          --dark: #1e1b4b;
+          --light: #f8fafc;
+          --gray: #64748b;
+          --success: #10b981;
+          --warning: #f59e0b;
+          --danger: #ef4444;
+          --info: #3b82f6;
+          --code-bg: #0f0c29;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 3.5rem 2rem; text-align: center; }
+
+        header h1 { font-size: 2.8rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.6rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.2rem; opacity: 0.9; max-width: 900px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.95rem; margin-top: 1.2rem; font-weight: 600; }
+
+        main { padding: 3.5rem 2.5rem; }
+
+        section { margin-bottom: 4.5rem; }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #f3f0ff 0%, #e8e0ff 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(124,58,237,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #e9d5ff;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+        }
+
+        .code-block::before {
+          content: 'Java 21+';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #a78bfa;
+          font-weight: 600;
+        }
+
+        .problem-solution {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2rem;
+          margin: 3rem 0;
+          padding: 2rem;
+          background: #f8f9fa;
+          border-radius: 18px;
+        }
+
+        .problem-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+        }
+
+        .problem-card.danger { border-color: var(--danger); }
+        .problem-card.success { border-color: var(--success); }
+
+        .card-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 1rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        .badge-danger { background: var(--danger); color: white; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .badge-success { background: var(--success); color: white; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        .scope-demo {
+          background: #f8f9fa;
+          border-radius: 18px;
+          padding: 2.5rem;
+          margin: 3rem 0;
+          border-left: 6px solid var(--primary);
+        }
+
+        .demo-title {
+          font-weight: 700;
+          color: var(--primary);
+          font-size: 1.4rem;
+          margin-bottom: 1.5rem;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .problem-solution { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>6.3 Structured Concurrency</h1>
+        <h2>StructuredTaskScope — No More Orphaned Threads</h2>
+        <p>Automatic cancellation, error propagation, and clean shutdown</p>
+        <div class="badge">Chapter 6 – Project Loom</div>
+    </header>
+
+    <main>
+        <!-- The Problem -->
+        <section>
+            <h2>The Orphaned Thread Nightmare</h2>
+            <p>
+                With virtual threads, creating millions is easy.<br>
+                But what happens when the parent task fails or is cancelled?
+            </p>
+            <div class="problem-solution">
+                <div class="problem-card danger">
+                    <div class="card-title">
+                        Old Way — Orphaned Threads
+                        <span class="badge-danger">Danger</span>
+                    </div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+    executor.submit(() -> longRunningTask());   // Child
+    throw new RuntimeException("Parent failed!");
+}
+// Child keeps running forever → leak!
+              </pre>
+                    </div>
+                </div>
+
+                <div class="problem-card success">
+                    <div class="card-title">
+                        StructuredTaskScope — Automatic Cancellation
+                        <span class="badge-success">Safe</span>
+                    </div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+try (var scope = new StructuredTaskScope<Void>()) {
+    scope.fork(() -> longRunningTask());
+    throw new RuntimeException("Parent failed!");
+} // Scope closes → all child tasks cancelled!
+              </pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>Structured concurrency:</strong><br>
+                Child tasks are <strong>scoped</strong> to the lifetime of the parent.<br>
+                Parent ends → children cancelled automatically.
+            </div>
+        </section>
+
+        <!-- The API -->
+        <section>
+            <h2>StructuredTaskScope — The New Primitive</h2>
+
+            <div class="code-block">
+          <pre>
+// Java 21+ (incubating → preview → stable in 22+)
+try (var scope = new StructuredTaskScope<Void>()) {
+
+    Future<String> user  = scope.fork(() -> fetchUser());
+    Future<String> order = scope.fork(() -> fetchOrder());
+
+    scope.join();           // Wait for both (or first failure)
+    scope.throwIfFailed();  // Propagate exception
+
+    System.out.println(user.resultNow() + order.resultNow());
+
+} // Auto-shutdown + cancel unfinished
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Magic:</strong><br>
+                • <code>fork()</code> → virtual thread per subtask<br>
+                • <code>join()</code> → wait for completion<br>
+                • Scope close → unfinished tasks cancelled<br>
+                • Exceptions propagated
+            </div>
+        </section>
+
+        <!-- Policies -->
+        <section>
+            <h2>Built-in Policies</h2>
+
+            <div class="code-block">
+          <pre>
+// Shutdown on first success (racing)
+try (var scope = new StructuredTaskScope.ShutdownOnSuccess<String>()) {
+    scope.fork(() -> callServiceA());
+    scope.fork(() -> callServiceB());
+    scope.join();
+    String result = scope.result();  // First successful
+}
+
+// Shutdown on first failure
+try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+    scope.fork(task1);
+    scope.fork(task2);
+    scope.join();
+    scope.throwIfFailed(e -> new WebApplicationException(e));
+}
+          </pre>
+            </div>
+        </section>
+
+        <!-- Error Propagation -->
+        <section>
+            <h2>Automatic Error Handling</h2>
+
+            <div class="mermaid">
+                sequenceDiagram
+                participant Parent
+                participant Scope
+                participant Child1
+                participant Child2
+
+                Parent->>Scope: fork(Child1)
+                Parent->>Scope: fork(Child2)
+                Child1-->>Scope: throws IOException
+                Scope->>Child2: cancel()
+                Scope->>Parent: throwIfFailed()
+                Parent--x Parent: WebApplicationException
+            </div>
+
+            <div class="highlight">
+                <strong>One failure → all children cancelled → exception propagated</strong>
+            </div>
+        </section>
+
+        <!-- Real-World Use Cases -->
+        <section>
+            <h2>Real-World Patterns</h2>
+
+            <div class="problem-solution">
+                <div class="problem-card">
+                    <div class="card-title">Resilient Service Call</div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+try (var scope = new StructuredTaskScope.ShutdownOnSuccess<User>()) {
+    scope.fork(() -> userServiceA.get(id));
+    scope.fork(() -> userServiceB.get(id));
+    scope.join();
+    return scope.result();  // First successful
+}
+              </pre>
+                    </div>
+                </div>
+
+                <div class="problem-card">
+                    <div class="card-title">Parallel Data Fetch</div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+    var userF  = scope.fork(() -> fetchUser());
+    var orderF = scope.fork(() -> fetchOrders());
+    var prefF  = scope.fork(() -> fetchPrefs());
+
+    scope.join();
+    scope.throwIfFailed();
+
+    return new Dashboard(userF.resultNow(), orderF.resultNow(), prefF.resultNow());
+}
+              </pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #f3f0ff; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> <code>StructuredTaskScope</code> = structured concurrency for virtual threads</p>
+                <p><strong>2.</strong> <code>fork()</code> + <code>join()</code> in try-with-resources</p>
+                <p><strong>3.</strong> Automatic cancellation on scope close</p>
+                <p><strong>4.</strong> Built-in policies: <code>ShutdownOnSuccess</code>, <code>ShutdownOnFailure</code></p>
+                <p><strong>5.</strong> No more orphaned tasks or memory leaks</p>
+                <p><strong>6.</strong> The future of concurrent Java programming</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-6.2-virtual-start.html" style="color: var(--primary);">← 6.2 Thread.ofVirtual().start()</a> |
+            <a href="chapter-6.4-scoped-values.html" style="color: var(--primary);">6.4 Scoped Values →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#6366f1',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#6366f1',
+        lineColor: '#6366f1',
+        secondaryColor: '#818cf8',
+        tertiaryColor: '#c084fc'
+      },
+      sequence: {
+        diagramMarginX: 50,
+        diagramMarginY: 30,
+        actorMargin: 80,
+        width: 160,
+        height: 70,
+        boxMargin: 15,
+        messageMargin: 50,
+        noteMargin: 15
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

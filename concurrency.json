@@ -244,34 +244,43 @@
     },
     {
       "name": "6. Project Loom: Virtual Threads & Structured Concurrency",
+      "url": "concurrency /chapter6.0.0.html",
+
       "children": [
         {
           "name": "6.1 Why Virtual Threads? (vs. Platform Threads)",
-          "url": "https://openjdk.org/jeps/444",
+          "url": "concurrency /chapter6.1.0.html",
+
           "tag": "loom"
         },
         {
           "name": "6.2 Thread.ofVirtual().start()",
-          "url": "https://docs.oracle.com/en/java/javase/21/core/virtual-threads.html",
+          "url": "concurrency /chapter6.2.0.html",
+
           "tag": "virtual"
         },
         {
           "name": "6.3 StructuredTaskScope for Error Propagation",
-          "url": "https://openjdk.org/jeps/453",
+          "url": "concurrency /chapter6.3.0.html",
+
           "tag": "structured"
         },
         {
           "name": "6.4 Scoped Values (Thread-Local Alternative)",
-          "url": "https://openjdk.org/jeps/446",
+          "url": "concurrency /chapter6.4.0.html",
+
           "tag": "scoped"
         },
         {
           "name": "6.5 Scalability: 1 Million Concurrent Tasks",
-          "url": "https://www.infoq.com/articles/java-virtual-threads-performance/",
+          "url": "concurrency /chapter6.5.0.html",
+
           "tag": "scale"
         },
         {
           "name": "6.6 Real-World: High-Concurrency API Gateway",
+          "url": "concurrency /chapter6.6.0.html",
+
           "tag": "realworld"
         }
       ]

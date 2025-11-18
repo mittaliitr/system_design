@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>6.2 Thread.ofVirtual().start()</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #6366f1;   /* indigo-500 */
+          --secondary: #818cf8; /* indigo-400 */
+          --accent: #c084fc;    /* purple-400 */
+          --dark: #1e1b4b;
+          --light: #f8fafc;
+          --gray: #64748b;
+          --success: #10b981;
+          --warning: #f59e0b;
+          --danger: #ef4444;
+          --info: #3b82f6;
+          --code-bg: #0f0c29;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 3.5rem 2rem; text-align: center; }
+
+        header h1 { font-size: 2.8rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.6rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.2rem; opacity: 0.9; max-width: 900px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.95rem; margin-top: 1.2rem; font-weight: 600; }
+
+        main { padding: 3.5rem 2.5rem; }
+
+        section { margin-bottom: 4.5rem; }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #f3f0ff 0%, #e8e0ff 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(124,58,237,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #e9d5ff;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+        }
+
+        .code-block::before {
+          content: 'Java 21+';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #a78bfa;
+          font-weight: 600;
+        }
+
+        .creation-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+          gap: 2rem;
+          margin: 3rem 0;
+        }
+
+        .creation-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .creation-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(99,102,241,0.25);
+        }
+
+        .card-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 1rem;
+          color: var(--primary);
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        .badge-old { background: #ef4444; color: white; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .badge-new { background: #10b981; color: white; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        .million-demo {
+          background: #f8f9fa;
+          border-radius: 18px;
+          padding: 2.5rem;
+          margin: 3rem 0;
+          border-left: 6px solid var(--primary);
+        }
+
+        .demo-title {
+          font-weight: 700;
+          color: var(--primary);
+          font-size: 1.4rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .perf-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 2.5rem 0;
+          font-size: 0.95rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+          border-radius: 14px;
+          overflow: hidden;
+        }
+
+        .perf-table th {
+          background: var(--primary);
+          color: white;
+          padding: 1.2rem;
+          text-align: left;
+          font-weight: 600;
+        }
+
+        .perf-table td {
+          padding: 1.2rem;
+          border-bottom: 1px solid #eee;
+          background: #f8f9fa;
+        }
+
+        .perf-table tr:hover td {
+          background: #f0e8ff;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .creation-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>6.2 Thread.ofVirtual().start()</h1>
+        <h2>Creating Millions of Threads — The New Way</h2>
+        <p>From <code>new Thread()</code> to <code>Thread.ofVirtual()</code></p>
+        <div class="badge">Chapter 6 – Project Loom</div>
+    </header>
+
+    <main>
+        <!-- The New API -->
+        <section>
+            <h2>The Two New Ways to Create Virtual Threads</h2>
+
+            <div class="creation-grid">
+                <div class="creation-card">
+                    <div class="card-title">
+                        Thread.ofVirtual()
+                        <span class="badge-new">Recommended</span>
+                    </div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+// Builder style — most flexible
+Thread virtual = Thread.ofVirtual()
+    .name("worker-", 0)
+    .uncaughtExceptionHandler((t, e) -> log(e))
+    .start(() -> work());
+
+virtual.join(); // Optional
+              </pre>
+                    </div>
+                </div>
+
+                <div class="creation-card">
+                    <div class="card-title">
+                        Executors.newVirtualThreadPerTaskExecutor()
+                        <span class="badge-new">For Executors</span>
+                    </div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+    for (int i = 0; i < 1_000_000; i++) {
+        executor.submit(() -> task(i));
+    }
+} // Auto-shutdown + join
+              </pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>Key:</strong><br>
+                • <code>Thread.ofVirtual()</code> = single thread<br>
+                • <code>newVirtualThreadPerTaskExecutor()</code> = one virtual thread per task (perfect for servers)
+            </div>
+        </section>
+
+        <!-- Old vs New -->
+        <section>
+            <h2>Old World vs New World</h2>
+
+            <div class="creation-grid">
+                <div class="creation-card">
+                    <div class="card-title">
+                        Old (Platform Threads)
+                        <span class="badge-old">Avoid</span>
+                    </div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+new Thread(() -> task()).start();  // Expensive!
+              </pre>
+                    </div>
+                    <div class="highlight">
+                        Max ~10,000 threads<br>
+                        High memory<br>
+                        Slow creation
+                    </div>
+                </div>
+
+                <div class="creation-card">
+                    <div class="card-title">
+                        New (Virtual Threads)
+                        <span class="badge-new">Use This</span>
+                    </div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+Thread.ofVirtual().start(() -> task());
+// or
+executor.submit(() -> task());
+              </pre>
+                    </div>
+                    <div class="highlight">
+                        Millions of threads<br>
+                        ~KB per thread<br>
+                        Near-zero cost
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Million Thread Demo -->
+        <section>
+            <h2>One Million Virtual Threads — It Just Works</h2>
+
+            <div class="million-demo">
+                <div class="demo-title">Run This in Java 21+</div>
+                <div class="code-block">
+            <pre>
+try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+    IntStream.range(0, 1_000_000).forEach(i -> {
+        executor.submit(() -> {
+            Thread.sleep(1000);
+            System.out.println("Task " + i + " on " + Thread.currentThread());
+        });
+    });
+} // Auto-joins all 1M threads!
+System.out.println("All done!");
+            </pre>
+                </div>
+                <div class="highlight">
+                    <strong>Result:</strong><br>
+                    • ~200–500 MB RAM<br>
+                    • Runs in ~1 second (plus sleep)<br>
+                    • Same code with platform threads → OOM in < 10k
+                </div>
+            </div>
+        </section>
+
+        <!-- Thread Builder API -->
+        <section>
+            <h2>Thread.Builder — Full Control</h2>
+
+            <div class="code-block">
+          <pre>
+Thread.Builder builder = Thread.ofVirtual()
+    .name("worker-", 1)
+    .uncaughtExceptionHandler((t, e) -> log(e));
+
+Thread t1 = builder.start(task1);
+Thread t2 = builder.start(task2);
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Also works for platform threads:</strong><br>
+                <code>Thread.ofPlatform().daemon(true).start()</code>
+            </div>
+        </section>
+
+        <!-- Compatibility -->
+        <section>
+            <h2>100% Backward Compatible</h2>
+
+            <div class="highlight">
+                <strong>All existing code works unchanged</strong><br>
+                • <code>synchronized</code>, <code>ThreadLocal</code>, <code>join()</code>, <code>interrupt()</code><br>
+                • <code>ThreadLocal</code> → still per-thread (virtual thread)<br>
+                • No breaking changes
+            </div>
+
+            <div class="code-block">
+          <pre>
+// Your 10-year-old code works perfectly on virtual threads
+synchronized(lock) {
+    Thread.sleep(1000);  // Now unmounts carrier thread!
+}
+          </pre>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #f3f0ff; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> <code>Thread.ofVirtual().start()</code> = single virtual thread</p>
+                <p><strong>2.</strong> <code>newVirtualThreadPerTaskExecutor()</code> = one VT per task</p>
+                <p><strong>3.</strong> Millions of threads → KB memory, near-zero cost</p>
+                <p><strong>4.</strong> Try-with-resources → auto-join all tasks</p>
+                <p><strong>5.</strong> Fully backward compatible</p>
+                <p><strong>6.</strong> <strong>Never use new Thread() again</strong></p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-6.1-why-virtual-threads.html" style="color: var(--primary);">← 6.1 Why Virtual Threads?</a> |
+            <a href="chapter-6.3-structured-concurrency.html" style="color: var(--primary);">6.3 Structured Concurrency →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#6366f1',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#6366f1',
+        lineColor: '#6366f1',
+        secondaryColor: '#818cf8',
+        tertiaryColor: '#c084fc'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>
