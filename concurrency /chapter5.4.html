@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>5.4 LinkedBlockingQueue</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #8e44ad;
+          --secondary: #9b59b6;
+          --accent: #e74c3c;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+          --info: #00cec9;
+          --code-bg: #2d2d2d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 3.5rem 2rem; text-align: center; }
+
+        header h1 { font-size: 2.8rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.6rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.2rem; opacity: 0.9; max-width: 900px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.95rem; margin-top: 1.2rem; font-weight: 600; }
+
+        main { padding: 3.5rem 2.5rem; }
+
+        section { margin-bottom: 4.5rem; }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #f5f0ff 0%, #e8e0ff 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(155,89,182,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #f8f8f2;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #666;
+          font-weight: 600;
+        }
+
+        .linked-visual {
+          display: flex;
+          justify-content: center;
+          gap: 1rem;
+          flex-wrap: wrap;
+          margin: 3rem 0;
+          padding: 2rem;
+          background: #f8f9fa;
+          border-radius: 18px;
+        }
+
+        .node {
+          width: 100px;
+          height: 80px;
+          background: white;
+          border: 3px solid var(--primary);
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: 'JetBrains Mono', monospace;
+          font-weight: 700;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+          position: relative;
+        }
+
+        .node::after {
+          content: '→';
+          position: absolute;
+          right: -30px;
+          font-size: 2rem;
+          color: var(--primary);
+        }
+
+        .node:last-child::after { display: none; }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        .comparison-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 2.5rem 0;
+          font-size: 0.95rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+          border-radius: 14px;
+          overflow: hidden;
+        }
+
+        .comparison-table th {
+          background: var(--primary);
+          color: white;
+          padding: 1.2rem;
+          text-align: left;
+          font-weight: 600;
+        }
+
+        .comparison-table td {
+          padding: 1.2rem;
+          border-bottom: 1px solid #eee;
+          background: #f8f9fa;
+        }
+
+        .comparison-table tr:hover td {
+          background: #e8e0ff;
+        }
+
+        .oom-warning {
+          background: #fff5f5;
+          padding: 1.5rem;
+          border-radius: 12px;
+          border-left: 6px solid var(--danger);
+          margin: 2rem 0;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .linked-visual { flex-direction: column; align-items: center; }
+          .node::after { display: none; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>5.4 LinkedBlockingQueue</h1>
+        <h2>(Optionally) Bounded — But Beware the Unbounded Default</h2>
+        <p>The most misused BlockingQueue in production</p>
+        <div class="badge">Chapter 5 – Blocking Queues & Producer-Consumer</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>LinkedBlockingQueue — The Double-Edged Sword</h2>
+            <p>
+                <code>LinkedBlockingQueue</code> is a linked-list based queue.<br>
+                It can be <strong>bounded</strong> or <strong>unbounded</strong> (default: <code>Integer.MAX_VALUE</code>!).
+            </p>
+            <div class="oom-warning">
+                <strong>Danger:</strong>
+                <code>new LinkedBlockingQueue<>()</code> → <strong>unbounded queue</strong> → <strong>OutOfMemoryError</strong> under backpressure!
+            </div>
+        </section>
+
+        <!-- Visual Structure -->
+        <section>
+            <h2>Internal Structure: Linked Nodes</h2>
+
+            <div class="linked-visual">
+                <div class="node">Item A</div>
+                <div class="node">Item B</div>
+                <div class="node">Item C</div>
+                <div class="node">...</div>
+                <div class="node">Item Z</div>
+            </div>
+
+            <div class="highlight">
+                <strong>Two locks:</strong><br>
+                • <code>putLock</code> for producers<br>
+                • <code>takeLock</code> for consumers<br>
+                → Higher concurrency than single lock
+            </div>
+        </section>
+
+        <!-- Constructor Trap -->
+        <section>
+            <h2>The Infamous Constructor Trap</h2>
+
+            <div class="code-block">
+          <pre>
+// WRONG — unbounded! (2.1 billion capacity)
+BlockingQueue<String> queue = new LinkedBlockingQueue<>();
+
+// CORRECT — bounded
+BlockingQueue<String> queue = new LinkedBlockingQueue<>(1000);
+          </pre>
+            </div>
+
+            <div class="oom-warning">
+                <strong>Default capacity = Integer.MAX_VALUE</strong><br>
+                Producer fills queue → OOM before consumer wakes up!
+            </div>
+        </section>
+
+        <!-- Performance -->
+        <section>
+            <h2>Performance vs ArrayBlockingQueue</h2>
+
+            <table class="comparison-table">
+                <tr>
+                    <th>Metric</th>
+                    <th>ArrayBlockingQueue</th>
+                    <th>LinkedBlockingQueue</th>
+                </tr>
+                <tr>
+                    <td><strong>Throughput</strong></td>
+                    <td>~45M ops/s</td>
+                    <td>~18M ops/s</td>
+                </tr>
+                <tr>
+                    <td><strong>Memory</strong></td>
+                    <td>Fixed array</td>
+                    <td>Node per element</td>
+                </tr>
+                <tr>
+                    <td><strong>GC Pressure</strong></td>
+                    <td>Low</td>
+                    <td>High (object allocation)</td>
+                </tr>
+                <tr>
+                    <td><strong>Concurrency</strong></td>
+                    <td>Single lock</td>
+                    <td>Dual lock (put/take)</td>
+                </tr>
+            </table>
+
+            <div class="highlight">
+                <strong>ArrayBlockingQueue wins</strong> in 95% of cases.<br>
+                Use Linked only if you truly need dynamic sizing.
+            </div>
+        </section>
+
+        <!-- When to Use -->
+        <section>
+            <h2>When LinkedBlockingQueue Makes Sense</h2>
+
+            <div class="code-block">
+          <pre>
+// Rare valid use: truly unbounded (e.g., event bus)
+BlockingQueue<Event> events = new LinkedBlockingQueue<>();
+
+// Or very large bounded queue
+BlockingQueue<Task> tasks = new LinkedBlockingQueue<>(1_000_000);
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Valid cases:</strong><br>
+                • Event bus (unbounded)<br>
+                • Very large bounded queue (>100K)<br>
+                • Need separate put/take locks
+            </div>
+        </section>
+
+        <!-- Real-World Pitfall -->
+        <section>
+            <h2>Real Crash Story: The Unbounded Queue</h2>
+
+            <div class="oom-warning">
+                <strong>Production Incident:</strong><br>
+                Service used <code>new LinkedBlockingQueue<>()</code><br>
+                Consumer slowed down → queue grew to 2 billion items → OOM<br>
+                <strong>Fix:</strong> Switch to <code>ArrayBlockingQueue(10_000)</code> + backpressure
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #f5f0ff; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> <code>LinkedBlockingQueue</code> = linked nodes, optional capacity</p>
+                <p><strong>2.</strong> Default constructor = <strong>unbounded</strong> (dangerous!)</p>
+                <p><strong>3.</strong> Slower than <code>ArrayBlockingQueue</code> due to allocation</p>
+                <p><strong>4.</strong> Dual locks → higher concurrency under extreme load</p>
+                <p><strong>5.</strong> <strong>Never</strong> use unbounded in production</p>
+                <p><strong>6.</strong> Prefer <code>ArrayBlockingQueue</code> in 99% of cases</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-5.3-arrayblockingqueue.html" style="color: var(--primary);">← 5.3 ArrayBlockingQueue</a> |
+            <a href="chapter-5.5-priorityblockingqueue.html" style="color: var(--primary);">5.5 PriorityBlockingQueue →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#8e44ad',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#8e44ad',
+        lineColor: '#8e44ad',
+        secondaryColor: '#9b59b6',
+        tertiaryColor: '#e74c3c'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

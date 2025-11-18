@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>5.6 SynchronousQueue</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #8e44ad;
+          --secondary: #9b59b6;
+          --accent: #e74c3c;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+          --info: #00cec9;
+          --code-bg: #2d2d2d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 3.5rem 2rem; text-align: center; }
+
+        header h1 { font-size: 2.8rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.6rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.2rem; opacity: 0.9; max-width: 900px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.95rem; margin-top: 1.2rem; font-weight: 600; }
+
+        main { padding: 3.5rem 2.5rem; }
+
+        section { margin-bottom: 4.5rem; }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #f5f0ff 0%, #e8e0ff 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(155,89,182,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #f8f8f2;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #666;
+          font-weight: 600;
+        }
+
+        .handoff-visual {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 3rem;
+          margin: 3rem 0;
+          padding: 3rem;
+          background: #f8f9fa;
+          border-radius: 18px;
+          flex-wrap: wrap;
+        }
+
+        .hand {
+          font-size: 6rem;
+          animation: wave 2s infinite;
+        }
+
+        @keyframes wave {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-20px); }
+        }
+
+        .zero-capacity {
+          font-size: 3rem;
+          font-weight: 700;
+          color: var(--danger);
+          text-align: center;
+          margin: 2rem 0;
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        .use-cases {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 2rem;
+          margin: 3rem 0;
+        }
+
+        .use-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .use-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(155,89,182,0.25);
+        }
+
+        .use-title {
+          font-weight: 700;
+          font-size: 1.3rem;
+          margin-bottom: 0.8rem;
+          color: var(--primary);
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .handoff-visual { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>5.6 SynchronousQueue</h1>
+        <h2>Zero-Capacity Direct Handoff</h2>
+        <p>The weirdest — and often fastest — BlockingQueue</p>
+        <div class="badge">Chapter 5 – Blocking Queues & Producer-Consumer</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>SynchronousQueue — No Storage, Pure Handoff</h2>
+            <p>
+                <code>SynchronousQueue</code> has <strong>capacity = 0</strong>.<br>
+                Every <code>put()</code> must wait for a matching <code>take()</code> and vice versa.
+            </p>
+            <div class="highlight">
+                <strong>It’s not a queue — it’s a rendezvous point.</strong>
+            </div>
+        </section>
+
+        <!-- Visual -->
+        <section>
+            <h2>Direct Producer ↔ Consumer Handoff</h2>
+
+            <div class="handoff-visual">
+                <div class="hand">Hand</div>
+                <div class="zero-capacity">Capacity = 0</div>
+                <div class="hand">Hand</div>
+            </div>
+
+            <div class="highlight">
+                <strong>Behavior:</strong><br>
+                • <code>put(item)</code> blocks until another thread calls <code>take()</code><br>
+                • <code>take()</code> blocks until another thread calls <code>put()</code><br>
+                • Direct handoff — no buffering
+            </div>
+        </section>
+
+        <!-- Code -->
+        <section>
+            <h2>Simple Producer-Consumer with SynchronousQueue</h2>
+
+            <div class="code-block">
+          <pre>
+BlockingQueue<String> handoff = new SynchronousQueue<>();
+
+// Producer thread
+new Thread(() -> {
+    String item = produce();
+    try {
+        handoff.put(item);  // Waits for consumer
+        System.out.println("Item handed off");
+    } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+    }
+}).start();
+
+// Consumer thread
+new Thread(() -> {
+    try {
+        String item = handoff.take();  // Waits for producer
+        consume(item);
+    } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+    }
+}).start();
+          </pre>
+            </div>
+        </section>
+
+        <!-- Fair vs Non-Fair -->
+        <section>
+            <h2>Fair vs Non-Fair Mode</h2>
+
+            <div class="code-block">
+          <pre>
+// Non-fair (default) — higher throughput
+SynchronousQueue<String> queue = new SynchronousQueue<>();
+
+// Fair — FIFO ordering (slightly slower)
+SynchronousQueue<String> fairQueue = new SynchronousQueue<>(true);
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Fair = true:</strong> Waiting threads served in arrival order<br>
+                <strong>Fair = false:</strong> Faster, but possible starvation
+            </div>
+        </section>
+
+        <!-- Real-World Use: Executors.newCachedThreadPool() -->
+        <section>
+            <h2>The Most Important Use Case</h2>
+
+            <div class="highlight">
+                <strong>Executors.newCachedThreadPool() uses SynchronousQueue internally!</strong>
+            </div>
+
+            <div class="code-block">
+          <pre>
+// Under the hood of newCachedThreadPool()
+ExecutorService pool = new ThreadPoolExecutor(
+    0, Integer.MAX_VALUE,
+    60L, TimeUnit.SECONDS,
+    new SynchronousQueue<Runnable>()  // Direct handoff!
+);
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Why?</strong><br>
+                • No idle threads → zero overhead when idle<br>
+                • New task → either reuse idle thread or create new<br>
+                • Direct handoff → maximum responsiveness
+            </div>
+        </section>
+
+        <!-- Performance -->
+        <section>
+            <h2>Performance Characteristics</h2>
+
+            <div class="mermaid">
+                graph TD
+                A[SynchronousQueue] --> B[Zero memory overhead]
+                A --> C[Direct handoff]
+                A --> D[No queue contention]
+                A --> E[Best for cached pools]
+
+                style A fill:#8e44ad,stroke:#8e44ad,color:white
+                style E fill:#00b894,stroke:#00b894,color:white
+            </div>
+
+            <div class="highlight">
+                <strong>Fastest possible handoff</strong> — no buffering, no allocation<br>
+                Used when you want <strong>unbounded threads</strong> with <strong>zero idle cost</strong>
+            </div>
+        </section>
+
+        <!-- When to Use -->
+        <section>
+            <h2>When to Use SynchronousQueue</h2>
+
+            <div class="highlight">
+                <strong>Perfect for:</strong><br>
+                • <code>Executors.newCachedThreadPool()</code><br>
+                • Actor systems (direct message passing)<br>
+                • Request-response patterns<br>
+                • When you want <strong>no buffering</strong>
+            </div>
+
+            <div class="highlight">
+                <strong>Never for:</strong><br>
+                • Bounded work queues<br>
+                • Backpressure<br>
+                • When you need ordering
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #f5f0ff; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> <code>SynchronousQueue</code> = capacity 0 → direct handoff</p>
+                <p><strong>2.</strong> <code>put()</code> waits for <code>take()</code> and vice versa</p>
+                <p><strong>3.</strong> Powers <code>newCachedThreadPool()</code></p>
+                <p><strong>4.</strong> Zero memory overhead, maximum speed</p>
+                <p><strong>5.</strong> Optional fairness (<code>true</code> constructor)</p>
+                <p><strong>6.</strong> Use when you want <strong>unbounded threads with no idle cost</strong></p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-5.5-priorityblockingqueue.html" style="color: var(--primary);">← 5.5 PriorityBlockingQueue</a> |
+            <a href="chapter-5.7-delayqueue-transferqueue.html" style="color: var(--primary);">5.7 DelayQueue & TransferQueue →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#8e44ad',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#8e44ad',
+        lineColor: '#8e44ad',
+        secondaryColor: '#9b59b6',
+        tertiaryColor: '#e74c3c'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>5.8 Real-World: Kafka, Disruptor, SQS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #130f40;
+          --secondary: #1a164d;
+          --accent: #00cec9;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+          --info: #00cec9;
+          --code-bg: #0f0c29;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #130f40 0%, #1a164d 100%);
+          color: var(--light);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; background: rgba(255,255,255,0.05); border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); overflow: hidden; backdrop-filter: blur(10px); }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 4rem 2rem; text-align: center; }
+
+        header h1 { font-size: 3rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.8rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.3rem; opacity: 0.9; max-width: 1000px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.5rem 1.2rem; border-radius: 50px; font-size: 1rem; margin-top: 1.5rem; font-weight: 600; }
+
+        main { padding: 4rem 3rem; }
+
+        section { margin-bottom: 5rem; }
+
+        h2 {
+          font-size: 2.2rem;
+          color: white;
+          margin-bottom: 1.8rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--accent); border-radius: 3px; }
+
+        .highlight {
+          background: rgba(0,206,201,0.15);
+          padding: 1.6rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2.5rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(0,206,201,0.2);
+          color: #ddd;
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #cdd9e5;
+          padding: 1.6rem;
+          border-radius: 16px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2.5rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+        }
+
+        .code-block::before {
+          content: 'Java / Config';
+          position: absolute;
+          top: 0.8rem;
+          right: 1.4rem;
+          font-size: 0.9rem;
+          color: #64748b;
+          font-weight: 600;
+        }
+
+        .system-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+          gap: 2.5rem;
+          margin: 4rem 0;
+        }
+
+        .system-card {
+          background: rgba(255,255,255,0.08);
+          border-radius: 20px;
+          padding: 2.5rem;
+          text-align: center;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+          border: 1px solid rgba(255,255,255,0.1);
+          transition: all 0.5s ease;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .system-card::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: linear-gradient(135deg, transparent, rgba(255,255,255,0.05));
+          opacity: 0;
+          transition: opacity 0.5s;
+        }
+
+        .system-card:hover::before {
+          opacity: 1;
+        }
+
+        .system-card:hover {
+          transform: translateY(-15px);
+          box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
+
+        .system-logo {
+          font-size: 4rem;
+          margin-bottom: 1rem;
+        }
+
+        .system-title {
+          font-weight: 700;
+          font-size: 1.6rem;
+          margin-bottom: 1rem;
+          color: white;
+        }
+
+        .system-desc {
+          color: #ccc;
+          line-height: 1.7;
+        }
+
+        .system-stats {
+          display: flex;
+          justify-content: center;
+          gap: 2rem;
+          flex-wrap: wrap;
+          margin-top: 1.5rem;
+        }
+
+        .stat {
+          background: rgba(255,255,255,0.1);
+          padding: 0.8rem 1.2rem;
+          border-radius: 12px;
+          font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-value {
+          font-size: 1.4rem;
+          font-weight: 700;
+          color: var(--accent);
+        }
+
+        .stat-label {
+          font-size: 0.8rem;
+          color: #aaa;
+        }
+
+        .mermaid {
+          background: rgba(255,255,255,0.05);
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid rgba(255,255,255,0.1);
+          margin: 3rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        footer {
+          text-align: center;
+          padding: 3rem;
+          background: rgba(0,0,0,0.3);
+          color: #ccc;
+          font-size: 1rem;
+          border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.4rem; }
+          header h2 { font-size: 1.4rem; }
+          .system-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>5.8 Real-World: Kafka, Disruptor, SQS</h1>
+        <h2>How the Pros Build Ultra-Fast Message Systems</h2>
+        <p>BlockingQueue concepts at planetary scale</p>
+        <div class="badge">Chapter 5 – The Endgame</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>From BlockingQueue to Global Infrastructure</h2>
+            <p>
+                Every concept you learned in Chapter 5 — bounded queues, backpressure, zero-copy, ordering — is used in the world’s fastest systems.
+            </p>
+            <div class="highlight">
+                <strong>Today you’ll see:</strong><br>
+                • How <strong>Kafka</strong> is a distributed ArrayBlockingQueue<br>
+                • How <strong>LMAX Disruptor</strong> beats every Java queue<br>
+                • How <strong>Amazon SQS</strong> implements producer-consumer as a service
+            </div>
+        </section>
+
+        <!-- The Three Titans -->
+        <section>
+            <h2>The Three Legends</h2>
+
+            <div class="system-grid">
+                <!-- Kafka -->
+                <div class="system-card">
+                    <div class="system-logo">Kafka</div>
+                    <div class="system-title">Apache Kafka</div>
+                    <div class="system-desc">
+                        The de-facto standard for event streaming.<br>
+                        2+ trillion messages/day at companies like Netflix, Uber, LinkedIn.
+                    </div>
+                    <div class="system-stats">
+                        <div class="stat">
+                            <div class="stat-value">2T+</div>
+                            <div class="stat-label">messages/day</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">99.99%</div>
+                            <div class="stat-label">uptime</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Disruptor -->
+                <div class="system-card">
+                    <div class="system-logo">Disruptor</div>
+                    <div class="system-title">LMAX Disruptor</div>
+                    <div class="system-desc">
+                        The fastest message passing framework ever built.<br>
+                        6 million+ ops/sec on a single thread.
+                    </div>
+                    <div class="system-stats">
+                        <div class="stat">
+                            <div class="stat-value">6M+</div>
+                            <div class="stat-label">ops/sec</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">~30ns</div>
+                            <div class="stat-label">latency</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SQS -->
+                <div class="system-card">
+                    <div class="system-logo">SQS</div>
+                    <div class="system-title">Amazon SQS</div>
+                    <div class="system-desc">
+                        Fully managed message queuing service.<br>
+                        Used by millions of AWS customers.
+                    </div>
+                    <div class="system-stats">
+                        <div class="stat">
+                            <div class="stat-value">Unlimited</div>
+                            <div class="stat-label">throughput</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">99.999%</div>
+                            <div class="stat-label">durability</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Kafka Deep Dive - FIXED Mermaid -->
+        <section>
+            <h2>Kafka = Distributed Log + BlockingQueue Concepts</h2>
+
+            <div class="mermaid">
+                graph TD
+                P["Producers"] -->|"put()"| T["Topic Partitions"]
+                T -->|"take()"| C["Consumers"]
+                T --> Disk["Commit Log + Indexes"]
+                style T fill:#00b894,stroke:#00b894,color:white
+                style Disk fill:#f39c12,stroke:#f39c12,color:white
+            </div>
+
+            <div class="highlight">
+                <strong>Kafka uses:</strong><br>
+                • Bounded segments (like ArrayBlockingQueue chunks)<br>
+                • Zero-copy sends<br>
+                • Backpressure via consumer lag<br>
+                • Exactly-once semantics
+            </div>
+        </section>
+
+        <!-- Disruptor -->
+        <section>
+            <h2>Disruptor = Ring Buffer on Steroids</h2>
+
+            <div class="mermaid">
+                graph LR
+                A["Producer"] -->|"sequence++"| R["Ring Buffer\n(pre-allocated array)"]
+                R -->|"waitFor(sequence)"| C["Consumer 1"]
+                R -->|"waitFor(sequence)"| C2["Consumer 2"]
+                style R fill:#f39c12,stroke:#f39c12,color:white
+            </div>
+
+            <div class="highlight">
+                <strong>Disruptor tricks:</strong><br>
+                • Pre-allocated ring buffer (no GC)<br>
+                • Single writer principle<br>
+                • Cache-line padding<br>
+                • Mechanical sympathy
+            </div>
+
+            <div class="highlight">
+                <strong>Performance:</strong> 6M+ messages/sec on one thread<br>
+                Used in LMAX trading platform — $10B/day
+            </div>
+        </section>
+
+        <!-- SQS -->
+        <section>
+            <h2>SQS = Serverless BlockingQueue</h2>
+
+            <div class="code-block">
+          <pre>
+// Producer
+sqs.sendMessage(new SendMessageRequest(queueUrl, "order-123"));
+
+// Consumer
+while (true) {
+    ReceiveMessageResult msg = sqs.receiveMessage(queueUrl);
+    for (Message m : msg.getMessages()) {
+        process(m.getBody());
+        sqs.deleteMessage(queueUrl, m.getReceiptHandle());
+    }
+}
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>SQS features:</strong><br>
+                • Unlimited throughput<br>
+                • At-least-once / exactly-once<br>
+                • FIFO queues with ordering<br>
+                • Dead-letter queues
+            </div>
+        </section>
+
+        <!-- Chapter 5 Summary -->
+        <section>
+            <h2>Chapter 5 Complete — You Are Ready</h2>
+
+            <div style="background: rgba(0,0,0,0.3); padding: 3rem; border-radius: 20px; border-left: 8px solid var(--accent); text-align: center;">
+                <p style="font-size: 1.8rem; font-weight: 700; color: white; margin-bottom: 2rem;">
+                    You now understand the pattern that powers:
+                </p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin: 2rem 0;">
+                    <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 16px;">
+                        <div style="font-size: 3rem;">Kafka</div>
+                        <div>Event streaming</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 16px;">
+                        <div style="font-size: 3rem;">Disruptor</div>
+                        <div>Ultra-low latency</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 16px;">
+                        <div style="font-size: 3rem;">SQS</div>
+                        <div>Serverless queues</div>
+                    </div>
+                </div>
+                <p style="font-size: 1.6rem; margin-top: 2rem; color: #ccc;">
+                    All built on the same producer-consumer foundation you just mastered.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-5.7-delay-transfer.html" style="color: var(--accent);">← 5.7 DelayQueue & TransferQueue</a> |
+            <a href="chapter-6.1-atomic-variables.html" style="color: var(--accent);">Chapter 6: Atomic Variables →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#130f40',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#130f40',
+        lineColor: '#00cec9',
+        secondaryColor: '#1a164d',
+        tertiaryColor: '#e74c3c'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>5.1 The Producer-Consumer Pattern</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #16a085;
+          --secondary: #1abc9c;
+          --accent: #3498db;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+          --info: #00cec9;
+          --code-bg: #2d2d2d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #16a085 0%, #1abc9c 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 3.5rem 2rem; text-align: center; }
+
+        header h1 { font-size: 2.8rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.6rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.2rem; opacity: 0.9; max-width: 900px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.95rem; margin-top: 1.2rem; font-weight: 600; }
+
+        main { padding: 3.5rem 2.5rem; }
+
+        section { margin-bottom: 4.5rem; }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #f0fff4 0%, #e8fff0 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(22,160,133,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #f8f8f2;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #666;
+          font-weight: 600;
+        }
+
+        .pc-diagram {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 2rem;
+          flex-wrap: wrap;
+          margin: 3rem 0;
+          padding: 2rem;
+          background: #f8f9fa;
+          border-radius: 18px;
+        }
+
+        .role-box {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          text-align: center;
+          min-width: 220px;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .role-box:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(22,160,133,0.25);
+        }
+
+        .role-icon {
+          font-size: 3rem;
+          margin-bottom: 1rem;
+        }
+
+        .role-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 0.8rem;
+          color: var(--primary);
+        }
+
+        .buffer-box {
+          background: #f1c40f;
+          color: white;
+          padding: 1.5rem 3rem;
+          border-radius: 50px;
+          font-weight: 700;
+          font-size: 1.2rem;
+          box-shadow: 0 8px 20px rgba(241,196,15,0.3);
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        .problem-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 2rem;
+          margin: 3rem 0;
+        }
+
+        .problem-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .problem-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(22,160,133,0.25);
+        }
+
+        .problem-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 1rem;
+          color: var(--danger);
+        }
+
+        .solution-title {
+          color: var(--success);
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .pc-diagram { flex-direction: column; }
+          .problem-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>5.1 The Producer-Consumer Pattern</h1>
+        <h2>The Most Important Concurrency Pattern in History</h2>
+        <p>Kafka, RabbitMQ, SQS, thread pools — all built on this</p>
+        <div class="badge">Chapter 5 – Blocking Queues & Producer-Consumer</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>The Pattern That Powers the World</h2>
+            <p>
+                The <strong>Producer-Consumer</strong> pattern is the foundation of every scalable, asynchronous system.
+            </p>
+            <div class="highlight">
+                <strong>Used by:</strong><br>
+                • Kafka (topics)<br>
+                • RabbitMQ, SQS, ActiveMQ<br>
+                • Thread pools<br>
+                • Reactive streams<br>
+                • Image processing pipelines<br>
+                • Microservices communication
+            </div>
+        </section>
+
+        <!-- The Pattern -->
+        <section>
+            <h2>Producer-Consumer in 60 Seconds</h2>
+
+            <div class="pc-diagram">
+                <div class="role-box">
+                    <div class="role-icon">Producer</div>
+                    <div class="role-title">Producer</div>
+                    <div>Generates data</div>
+                </div>
+                <div class="buffer-box">Shared Buffer</div>
+                <div class="role-box">
+                    <div class="role-icon">Consumer</div>
+                    <div class="role-title">Consumer</div>
+                    <div>Processes data</div>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>Rules:</strong><br>
+                • Producer <strong>waits</strong> if buffer full<br>
+                • Consumer <strong>waits</strong> if buffer empty<br>
+                • Safe concurrent access
+            </div>
+        </section>
+
+        <!-- Problems Without It -->
+        <section>
+            <h2>What Happens Without Producer-Consumer?</h2>
+
+            <div class="problem-grid">
+                <div class="problem-card">
+                    <div class="problem-title">Problem 1: Busy Waiting</div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+// CPU burns 100% waiting
+while (buffer.isEmpty()) { }  // Spins forever!
+              </pre>
+                    </div>
+                    <div class="highlight">
+                        Wastes CPU, drains battery
+                    </div>
+                </div>
+
+                <div class="problem-card">
+                    <div class="problem-title">Problem 2: Race Conditions</div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+// No synchronization
+buffer.add(item);  // Two producers → corruption
+              </pre>
+                    </div>
+                    <div class="highlight">
+                        Lost or corrupted items
+                    </div>
+                </div>
+
+                <div class="problem-card">
+                    <div class="problem-title">Problem 3: No Backpressure</div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+// Producer runs wild
+while (true) buffer.add(produce());  // OOM!
+              </pre>
+                    </div>
+                    <div class="highlight">
+                        Memory explosion
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- The Solution -->
+        <section>
+            <h2>The Perfect Solution: BlockingQueue</h2>
+
+            <div class="code-block">
+          <pre>
+BlockingQueue<String> queue = new ArrayBlockingQueue<>(100);
+
+executor.submit(() -> {
+    while (true) {
+        String item = produce();
+        queue.put(item);  // Blocks when full — backpressure!
+    }
+});
+
+executor.submit(() -> {
+    while (true) {
+        String item = queue.take();  // Blocks when empty
+        consume(item);
+    }
+});
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Magic:</strong><br>
+                • <code>put()</code> blocks when full<br>
+                • <code>take()</code> blocks when empty<br>
+                • Thread-safe, no explicit<br>
+                • No busy waiting, no race conditions
+            </div>
+        </section>
+
+        <!-- Classic Implementation -->
+        <section>
+            <h2>Classic wait()/notify() Version (Educational)</h2>
+
+            <div class="code-block">
+          <pre>
+class BoundedBuffer<T> {
+    private final List<T> buffer = new ArrayList<>();
+    private final int capacity;
+    private final Object lock = new Object();
+
+    public BoundedBuffer(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public void put(T item) throws InterruptedException {
+        synchronized(lock) {
+            while (buffer.size() == capacity) {
+                lock.wait();  // Release lock, sleep
+            }
+            buffer.add(item);
+            lock.notifyAll();
+        }
+    }
+
+    public T take() throws InterruptedException {
+        synchronized(lock) {
+            while (buffer.isEmpty()) {
+                lock.wait();
+            }
+            T item = buffer.remove(0);
+            lock.notifyAll();
+            return item;
+        }
+    }
+}
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Works</strong> — but <strong>error-prone</strong><br>
+                <strong>Modern Java:</strong> Use <code>BlockingQueue</code> instead
+            </div>
+        </section>
+
+        <!-- Real-World Analogy -->
+        <section>
+            <h2>Real-World Analogy: Restaurant Kitchen</h2>
+
+            <div class="mermaid">
+                graph TD
+                A[Cooks<br>(Producers)] --> B[Kitchen Counter<br>(Bounded Buffer)]
+                B --> C[Waiters<br>(Consumers)]
+                A -->|Counter full| D[Wait]
+                C -->|Counter empty| E[Wait]
+                style B fill:#f1c40f,stroke:#f39c12,color:#2c3e50
+            </div>
+        </section>
+
+        <!-- Benefits -->
+        <section>
+            <h2>Why This Pattern Wins</h2>
+
+            <div class="highlight">
+                <strong>Benefits:</strong><br>
+                • <strong>Decoupling</strong>: Producers and consumers independent<br>
+                • <strong>Backpressure</strong>: Slow consumer → producer waits<br>
+                • <strong>Load smoothing</strong>: Bursts absorbed by queue<br>
+                • <strong>Scalability</strong>: Add more producers/consumers independently
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #f0fff4; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> Producer-Consumer = <strong>decoupled, scalable, backpressured</strong></p>
+                <p><strong>2.</strong> Core problem: coordinating producers and consumers</p>
+                <p><strong>3.</strong> <code>BlockingQueue</code> = the perfect solution</p>
+                <p><strong>4.</strong> <code>put()</code> blocks when full, <code>take()</code> blocks when empty</p>
+                <p><strong>5.</strong> Powers Kafka, message queues, thread pools</p>
+                <p><strong>6.</strong> Never implement your own — use <code>java.util.concurrent</code></p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-5-toc.html" style="color: var(--primary);">← Chapter 5 TOC</a> |
+            <a href="chapter-5.2-blockingqueue.html" style="color: var(--primary);">5.2 BlockingQueue Interface →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#16a085',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#16a085',
+        lineColor: '#16a085',
+        secondaryColor: '#1abc9c',
+        tertiaryColor: '#3498db'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

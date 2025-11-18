@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>5.2 The BlockingQueue Interface</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #16a085;
+          --secondary: #1abc9c;
+          --accent: #3498db;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+          --info: #00cec9;
+          --code-bg: #2d2d2d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #16a085 0%, #1abc9c 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 3.5rem 2rem; text-align: center; }
+
+        header h1 { font-size: 2.8rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.6rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.2rem; opacity: 0.9; max-width: 900px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.95rem; margin-top: 1.2rem; font-weight: 600; }
+
+        main { padding: 3.5rem 2.5rem; }
+
+        section { margin-bottom: 4.5rem; }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #f0fff4 0%, #e8fff0 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(22,160,133,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #f8f8f2;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #666;
+          font-weight: 600;
+        }
+
+        .method-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+          gap: 2rem;
+          margin: 3rem 0;
+        }
+
+        .method-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .method-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(22,160,133,0.25);
+        }
+
+        .method-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 0.8rem;
+          color: var(--primary);
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        .method-signature {
+          background: #f8f9fa;
+          padding: 0.8rem;
+          border-radius: 10px;
+          margin: 1rem 0;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 0.9rem;
+          color: #2d3436;
+          border-left: 4px solid var(--primary);
+        }
+
+        .throws {
+          font-size: 0.85rem;
+          color: var(--danger);
+          margin-top: 0.5rem;
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        .queue-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 2.5rem 0;
+          font-size: 0.95rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+          border-radius: 14px;
+          overflow: hidden;
+        }
+
+        .queue-table th {
+          background: var(--primary);
+          color: white;
+          padding: 1.2rem;
+          text-align: left;
+          font-weight: 600;
+        }
+
+        .queue-table td {
+          padding: 1.2rem;
+          border-bottom: 1px solid #eee;
+          background: #f8f9fa;
+        }
+
+        .queue-table tr:hover td {
+          background: #e8fff0;
+        }
+
+        .blocking { color: var(--success); font-weight: bold; }
+        .non-blocking { color: var(--warning); font-weight: bold; }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .method-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>5.2 The BlockingQueue Interface</h1>
+        <h2>The Heart of Producer-Consumer in Java</h2>
+        <p>put() and take() — the two methods that changed everything</p>
+        <div class="badge">Chapter 5 – Blocking Queues & Producer-Consumer</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>BlockingQueue — The Perfect Buffer</h2>
+            <p>
+                <code>java.util.concurrent.BlockingQueue<E></code> is a <strong>thread-safe queue</strong> that <strong>blocks</strong> when:
+            </p>
+            <ul style="margin: 1.5rem 0; padding-left: 2rem; font-size: 1.1rem;">
+                <li>You <code>put()</code> into a full queue</li>
+                <li>You <code>take()</code> from an empty queue</li>
+            </ul>
+            <div class="highlight">
+                <strong>No more wait()/notify() boilerplate.<br>
+                    No more race conditions.<br>
+                    Just put() and take().</strong>
+            </div>
+        </section>
+
+        <!-- The Core Methods -->
+        <section>
+            <h2>The 4 Core Method Families</h2>
+
+            <div class="method-grid">
+                <div class="method-card">
+                    <div class="method-title">Blocks Forever</div>
+                    <div class="method-signature">void put(E e) throws InterruptedException</div>
+                    <div class="method-signature">E take() throws InterruptedException</div>
+                    <div class="highlight">
+                        Waits indefinitely<br>
+                        Most common in production
+                    </div>
+                </div>
+
+                <div class="method-card">
+                    <div class="method-title">Timeout</div>
+                    <div class="method-signature">boolean offer(E e, long timeout, TimeUnit unit)</div>
+                    <div class="method-signature">E poll(long timeout, TimeUnit unit)</div>
+                    <div class="highlight">
+                        Wait up to timeout<br>
+                        Great for backpressure
+                    </div>
+                </div>
+
+                <div class="method-card">
+                    <div class="method-title">Non-blocking</div>
+                    <div class="method-signature">boolean offer(E e)</div>
+                    <div class="method-signature">E poll()</div>
+                    <div class="highlight">
+                        Returns immediately<br>
+                        Returns false/null if can't
+                    </div>
+                </div>
+
+                <div class="method-card">
+                    <div class="method-title">Throws Exception</div>
+                    <div class="method-signature">void add(E e)</div>
+                    <div class="method-signature">E remove()</div>
+                    <div class="highlight">
+                        Like regular Queue<br>
+                        Throws if full/empty
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Method Table -->
+        <section>
+            <h2>Complete Method Matrix</h2>
+
+            <table class="queue-table">
+                <tr>
+                    <th></th>
+                    <th>Full Queue</th>
+                    <th>Empty Queue</th>
+                    <th>Special Value</th>
+                    <th>Throws Exception</th>
+                    <th>Timeout</th>
+                </tr>
+                <tr>
+                    <td><strong>Insert</strong></td>
+                    <td><code>put(e)</code></td>
+                    <td><code>add(e)</code></td>
+                    <td><code>offer(e)</code></td>
+                    <td><code>add(e)</code></td>
+                    <td><code>offer(e,t)</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Remove</strong></td>
+                    <td><code>take()</code></td>
+                    <td><code>remove()</code></td>
+                    <td><code>poll()</code></td>
+                    <td><code>remove()</code></td>
+                    <td><code>poll(t)</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Examine</strong></td>
+                    <td colspan="5"><code>element()</code> / <code>peek()</code></td>
+                </tr>
+            </table>
+
+            <div class="highlight">
+                <strong>Golden Rule:</strong><br>
+                <code>put()</code> + <code>take()</code> = perfect producer-consumer<br>
+                <code>offer()</code> + <code>poll(timeout)</code> = backpressure-aware
+            </div>
+        </section>
+
+        <!-- Implementations Overview -->
+        <section>
+            <h2>BlockingQueue Implementations</h2>
+
+            <div class="mermaid">
+                classDiagram
+                direction TB
+                class BlockingQueue {
+                <<interface>>
+                +put(E)
+                +take()
+                +offer(E, timeout)
+                +poll(timeout)
+                }
+                class ArrayBlockingQueue
+                class LinkedBlockingQueue
+                class LinkedBlockingDeque
+                class PriorityBlockingQueue
+                class DelayQueue
+                class SynchronousQueue
+                class LinkedTransferQueue
+
+                BlockingQueue <|.. ArrayBlockingQueue
+                BlockingQueue <|.. LinkedBlockingQueue
+                BlockingQueue <|.. LinkedBlockingDeque
+                BlockingQueue <|.. PriorityBlockingQueue
+                BlockingQueue <|.. DelayQueue
+                BlockingQueue <|.. SynchronousQueue
+                BlockingQueue <|.. LinkedTransferQueue
+
+                note for ArrayBlockingQueue "Fixed size\nFair option\nHigh throughput"
+                note for LinkedBlockingQueue "Optional bounded\nUnbounded default"
+                note for SynchronousQueue "Zero capacity\nDirect handoff"
+            </div>
+        </section>
+
+        <!-- Producer-Consumer with BlockingQueue -->
+        <section>
+            <h2>One-Liner Producer-Consumer</h2>
+
+            <div class="code-block">
+          <pre>
+BlockingQueue<Task> queue = new ArrayBlockingQueue<>(100);
+
+// Producer
+executor.submit(() -> {
+    while (running) {
+        Task task = produce();
+        queue.put(task);  // Blocks when full
+    }
+});
+
+// Consumer
+executor.submit(() -> {
+    while (running) {
+        Task task = queue.take();  // Blocks when empty
+        process(task);
+    }
+});
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>No synchronization<br>
+                    No wait()/notify()<br>
+                    No race conditions<br>
+                    No busy waiting</strong>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #f0fff4; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> <code>BlockingQueue</code> = thread-safe queue with blocking operations</p>
+                <p><strong>2.</strong> <code>put()</code> blocks when full → natural backpressure</p>
+                <p><strong>3.</strong> <code>take()</code> blocks when empty → no busy waiting</p>
+                <p><strong>4.</strong> Four method families: blocking, timeout, non-blocking, exception-throwing</p>
+                <p><strong>5.</strong> 7 major implementations — choose by use case</p>
+                <p><strong>6.</strong> The <strong>perfect</strong> producer-consumer solution</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-5.1-producer-consumer.html" style="color: var(--primary);">← 5.1 Producer-Consumer Pattern</a> |
+            <a href="chapter-5.3-arrayblockingqueue.html" style="color: var(--primary);">5.3 ArrayBlockingQueue →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#16a085',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#16a085',
+        lineColor: '#16a085',
+        secondaryColor: '#1abc9c',
+        tertiaryColor: '#3498db'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      },
+      classDiagram: {
+        useMaxWidth: true
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

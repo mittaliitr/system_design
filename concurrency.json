@@ -205,41 +205,40 @@
       ]
     },
     {
-      "name": "5. Advanced Concurrency Topics",
+      "name": "5. Advanced Concurrent Queues",
+      "url": "concurrency /chapter5.0.html",
       "children": [
         {
-          "name": "5.1 Atomic Variables (AtomicInteger, LongAdder)",
-          "url": "https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/atomic/AtomicInteger.html",
-          "tag": "atomic"
+          "name": "5.1 The Producer-Consumer Pattern",
+          "url": "concurrency /chapter5.1.html"
         },
         {
-          "name": "5.2 Concurrent Collections (ConcurrentHashMap)",
-          "url": "https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentHashMap.html",
-          "tag": "collection"
+          "name": "5.2 BlockingQueue Interface",
+          "url": "concurrency /chapter5.2.html"
         },
         {
-          "name": "5.3 Fork/Join Framework",
-          "url": "https://docs.oracle.com/javase/tutorial/essential/concurrency/forkjoin.html",
-          "tag": "parallel"
+          "name": "5.3 ArrayBlockingQueue",
+          "url": "concurrency /chapter5.3.html"
         },
         {
-          "name": "5.4 ThreadLocal & InheritableThreadLocal",
-          "url": "https://docs.oracle.com/javase/8/docs/api/java/lang/ThreadLocal.html",
-          "tag": "local"
+          "name": "5.4 LinkedBlockingQueue",
+          "url": "concurrency /chapter5.4.html"
         },
         {
-          "name": "5.5 Blocking Queues & Producer-Consumer",
-          "url": "https://www.baeldung.com/java-blocking-queue",
-          "tag": "queue"
+          "name": "5.5 PriorityBlockingQueue",
+          "url": "concurrency /chapter5.5.html"
         },
         {
-          "name": "5.6 Java Memory Model (JMM) Deep Dive",
-          "url": "https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html",
-          "tag": "jmm"
+          "name": "5.6 SynchronousQueue",
+          "url": "concurrency /chapter5.6.html"
         },
         {
-          "name": "5.7 Real-World: Real-Time Analytics Pipeline",
-          "tag": "realworld"
+          "name": "5.7 DelayQueue & TransferQueue",
+          "url": "concurrency /chapter5.7.html"
+        },
+        {
+          "name": "5.8 Real-World: Kafka, Disruptor, SQS",
+          "url": "concurrency /chapter5.8.html"
         }
       ]
     },

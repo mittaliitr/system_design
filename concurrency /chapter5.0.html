@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Chapter 5 – Blocking Queues & Producer-Consumer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #16a085;
+          --secondary: #1abc9c;
+          --accent: #3498db;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+          --info: #00cec9;
+          --code-bg: #2d2d2d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #16a085 0%, #1abc9c 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 4rem 2rem; text-align: center; }
+
+        header h1 { font-size: 3rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.8rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.3rem; opacity: 0.9; max-width: 1000px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.5rem 1.2rem; border-radius: 50px; font-size: 1rem; margin-top: 1.5rem; font-weight: 600; }
+
+        main { padding: 4rem 3rem; }
+
+        section { margin-bottom: 5rem; }
+
+        h2 {
+          font-size: 2.2rem;
+          color: var(--primary);
+          margin-bottom: 1.8rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #f0fff4 0%, #e8fff0 100%);
+          padding: 1.6rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2.5rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(22,160,133,0.08);
+        }
+
+        .toc-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 2rem;
+          margin: 4rem 0;
+        }
+
+        .toc-card {
+          background: white;
+          border-radius: 18px;
+          padding: 2rem;
+          text-align: center;
+          box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+          transition: all 0.4s ease;
+          border: 2px solid #eee;
+        }
+
+        .toc-card:hover {
+          transform: translateY(-12px);
+          border-color: var(--primary);
+          box-shadow: 0 20px 40px rgba(22,160,133,0.25);
+        }
+
+        .toc-number {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 3rem;
+          font-weight: 700;
+          color: var(--primary);
+          margin-bottom: 0.5rem;
+        }
+
+        .toc-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 0.8rem;
+          color: var(--dark);
+        }
+
+        .toc-desc {
+          color: #555;
+          font-size: 1rem;
+          line-height: 1.6;
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 3rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        footer {
+          text-align: center;
+          padding: 3rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 1rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.4rem; }
+          header h2 { font-size: 1.4rem; }
+          .toc-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Chapter 5</h1>
+        <h2>Blocking Queues & Producer-Consumer</h2>
+        <p>The heart of every message broker, thread pool, and reactive system</p>
+        <div class="badge">Welcome to Real-World Concurrency</div>
+    </header>
+
+    <main>
+        <section>
+            <h2>Chapter 5 – Table of Contents</h2>
+
+            <div class="toc-grid">
+                <div class="toc-card">
+                    <div class="toc-number">5.1</div>
+                    <div class="toc-title">The Producer-Consumer Pattern</div>
+                    <div class="toc-desc">Why every scalable system uses it</div>
+                </div>
+                <div class="toc-card">
+                    <div class="toc-number">5.2</div>
+                    <div class="toc-title">BlockingQueue Interface</div>
+                    <div class="toc-desc">put(), take(), and the magic of blocking</div>
+                </div>
+                <div class="toc-card">
+                    <div class="toc-number">5.3</div>
+                    <div class="toc-title">ArrayBlockingQueue</div>
+                    <div class="toc-desc">Fixed-size, fair, high-performance</div>
+                </div>
+                <div class="toc-card">
+                    <div class="toc-number">5.4</div>
+                    <div class="toc-title">LinkedBlockingQueue</div>
+                    <div class="toc-desc">Unbounded (and when it's dangerous)</div>
+                </div>
+                <div class="toc-card">
+                    <div class="toc-number">5.5</div>
+                    <div class="toc-title">PriorityBlockingQueue</div>
+                    <div class="toc-desc">Ordered processing</div>
+                </div>
+                <div class="toc-card">
+                    <div class="toc-number">5.6</div>
+                    <div class="toc-title">SynchronousQueue</div>
+                    <div class="toc-desc">Zero-capacity handoff</div>
+                </div>
+                <div class="toc-card">
+                    <div class="toc-number">5.7</div>
+                    <div class="toc-title">DelayQueue & TransferQueue</div>
+                    <div class="toc-desc">Scheduled tasks and direct handoff</div>
+                </div>
+                <div class="toc-card">
+                    <div class="toc-number">5.8</div>
+                    <div class="toc-title">Real-World: Kafka, Disruptor, SQS</div>
+                    <div class="toc-desc">How the pros do it</div>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>By the end of Chapter 5:</strong><br>
+                • You will understand the <strong>core pattern</strong> behind Kafka, RabbitMQ, SQS<br>
+                • You will never write <code>wait()/notify()</code> for producer-consumer again<br>
+                • You will design <strong>scalable, backpressure-aware</strong> systems
+            </div>
+
+            <div class="mermaid">
+                graph TD
+                A[Chapter 5] --> B[Master Producer-Consumer]
+                A --> C[Never use wait/notify again]
+                A --> D[Design like Kafka]
+                A --> E[Backpressure & Fairness]
+                A --> F[Zero bugs, max throughput]
+
+                style B fill:#00b894,stroke:#00b894,color:white
+                style F fill:#00b894,stroke:#00b894,color:white
+            </div>
+        </section>
+
+        <section>
+            <h2>Ready?</h2>
+            <div style="text-align: center; padding: 3rem; background: #f0fff4; border-radius: 20px; border: 4px solid var(--primary);">
+                <p style="font-size: 1.8rem; font-weight: 700; color: var(--primary);">
+                    Chapter 5 begins now.<br>
+                    Say <strong>"5.1"</strong> to start with the Producer-Consumer Pattern
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-4.8-best-practices.html" style="color: var(--primary);">← Chapter 4: Executors & Pools</a> |
+            <a href="#" style="color: var(--primary);">Chapter 5: Blocking Queues →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#16a085',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#16a085',
+        lineColor: '#16a085',
+        secondaryColor: '#1abc9c',
+        tertiaryColor: '#3498db'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

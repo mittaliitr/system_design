@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>5.3 ArrayBlockingQueue</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #16a085;
+          --secondary: #1abc9c;
+          --accent: #3498db;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+          --info: #00cec9;
+          --code-bg: #2d2d2d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #16a085 0%, #1abc9c 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 3.5rem 2rem; text-align: center; }
+
+        header h1 { font-size: 2.8rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.6rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.2rem; opacity: 0.9; max-width: 900px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.95rem; margin-top: 1.2rem; font-weight: 600; }
+
+        main { padding: 3.5rem 2.5rem; }
+
+        section { margin-bottom: 4.5rem; }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #f0fff4 0%, #e8fff0 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(22,160,133,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #f8f8f2;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #666;
+          font-weight: 600;
+        }
+
+        .array-visual {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 1rem;
+          flex-wrap: wrap;
+          margin: 3rem 0;
+          padding: 2rem;
+          background: #f8f9fa;
+          border-radius: 18px;
+        }
+
+        .array-slot {
+          width: 80px;
+          height: 80px;
+          background: white;
+          border: 3px solid var(--primary);
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 1.1rem;
+          font-weight: 700;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+          transition: all 0.4s ease;
+        }
+
+        .array-slot:hover {
+          transform: scale(1.1);
+          background: #e8fff0;
+        }
+
+        .array-head {
+          background: var(--success);
+          color: white;
+        }
+
+        .array-tail {
+          background: var(--info);
+          color: white;
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        .perf-comparison {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2rem;
+          margin: 3rem 0;
+        }
+
+        .perf-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          text-align: center;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+        }
+
+        .perf-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 1rem;
+          color: var(--primary);
+        }
+
+        .perf-value {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 2.5rem;
+          font-weight: 700;
+          color: var(--success);
+        }
+
+        .perf-label {
+          color: #666;
+          margin-top: 0.5rem;
+        }
+
+        .fairness-demo {
+          background: #f8f9fa;
+          border-radius: 18px;
+          padding: 2.5rem;
+          margin: 3rem 0;
+          border-left: 6px solid var(--primary);
+        }
+
+        .demo-title {
+          font-weight: 700;
+          color: var(--primary);
+          font-size: 1.4rem;
+          margin-bottom: 1.5rem;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .perf-comparison { grid-template-columns: 1fr; }
+          .array-visual { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>5.3 ArrayBlockingQueue</h1>
+        <h2>The High-Performance, Bounded Workhorse</h2>
+        <p>Fixed size, fair, and blazing fast</p>
+        <div class="badge">Chapter 5 – Blocking Queues & Producer-Consumer</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>ArrayBlockingQueue — The Gold Standard</h2>
+            <p>
+                <code>ArrayBlockingQueue</code> is the <strong>most commonly used</strong> BlockingQueue in production.
+            </p>
+            <div class="highlight">
+                <strong>Why?</strong><br>
+                • Fixed, bounded size → natural backpressure<br>
+                • Single array + two indices → <strong>best performance</strong><br>
+                • Optional fairness → prevent starvation
+            </div>
+        </section>
+
+        <!-- Visual Structure -->
+        <section>
+            <h2>Internal Structure: Circular Array</h2>
+
+            <div class="array-visual">
+                <div class="array-slot array-tail">Tail</div>
+                <div class="array-slot">A</div>
+                <div class="array-slot">B</div>
+                <div class="array-slot">C</div>
+                <div class="array-slot">D</div>
+                <div class="array-slot">E</div>
+                <div class="array-slot array-head">Head</div>
+            </div>
+
+            <div class="highlight">
+                <strong>Two indices:</strong><br>
+                • <code>putIndex</code> — where next item goes<br>
+                • <code>takeIndex</code> — where next item comes from<br>
+                Wrap around → circular buffer
+            </div>
+        </section>
+
+        <!-- Constructor Options -->
+        <section>
+            <h2>Constructor: Fairness Matters</h2>
+
+            <div class="code-block">
+          <pre>
+// Unfair (default) — higher throughput
+BlockingQueue<String> queue = new ArrayBlockingQueue<>(1000);
+
+// Fair — FIFO waiting order (slightly slower)
+BlockingQueue<String> fairQueue = new ArrayBlockingQueue<>(1000, true);
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Fair = true:</strong> Threads waiting on <code>put()</code>/<code>take()</code> are served in arrival order<br>
+                <strong>Fair = false:</strong> Faster, but possible starvation under heavy load
+            </div>
+        </section>
+
+        <!-- Performance -->
+        <section>
+            <h2>Performance: The Fastest BlockingQueue</h2>
+
+            <div class="perf-comparison">
+                <div class="perf-card">
+                    <div class="perf-title">ArrayBlockingQueue</div>
+                    <div class="perf-value">~45M ops/s</div>
+                    <div class="perf-label">Single array, minimal overhead</div>
+                </div>
+                <div class="perf-card">
+                    <div class="perf-title">LinkedBlockingQueue</div>
+                    <div class="perf-value">~18M ops/s</div>
+                    <div class="perf-label">Node allocation overhead</div>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>Why so fast?</strong><br>
+                • Single array allocation<br>
+                • Two atomic indices<br>
+                • No node allocation/garbage
+            </div>
+        </section>
+
+        <!-- Real-World Usage -->
+        <section>
+            <h2>Production Pattern: Bounded Task Queue</h2>
+
+            <div class="code-block">
+          <pre>
+BlockingQueue<Runnable> tasks = new ArrayBlockingQueue<>(5000, true);
+
+ExecutorService executor = Executors.newFixedThreadPool(16);
+
+for (int i = 0; i < 16; i++) {
+    executor.submit(() -> {
+        while (true) {
+            Runnable task = tasks.take();  // Blocks when empty
+            task.run();
+        }
+    });
+}
+
+// Submit work — blocks when queue full!
+public void submit(Runnable task) throws InterruptedException {
+    tasks.put(task);  // Natural backpressure
+}
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Benefits:</strong><br>
+                • Bounded memory<br>
+                • Backpressure (slow consumers → producers wait)<br>
+                • Fairness prevents starvation<br>
+                • Maximum throughput
+            </div>
+        </section>
+
+        <!-- Fairness Demo -->
+        <section>
+            <h2>Fairness in Action</h2>
+
+            <div class="fairness-demo">
+                <div class="demo-title">Fair Queue vs Unfair Queue</div>
+                <div class="mermaid">
+                    sequenceDiagram
+                    participant P1 as Producer 1
+                    participant P2 as Producer 2
+                    participant Q as ArrayBlockingQueue (fair=true)
+                    participant C as Consumer
+
+                    Note over P1,C: Queue full
+                    P1->>Q: put() → wait
+                    P2->>Q: put() → wait (FIFO)
+                    C->>Q: take()
+                    Q-->>P1: wake first waiter
+                    Q-->>P2: P2 stays waiting
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #f0fff4; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> <code>ArrayBlockingQueue</code> = fixed size, circular array</p>
+                <p><strong>2.</strong> <strong>Fastest</strong> BlockingQueue implementation</p>
+                <p><strong>3.</strong> Bounded → natural backpressure</p>
+                <p><strong>4.</strong> Optional <code>fair=true</code> → FIFO waiting</p>
+                <p><strong>5.</strong> Use for <strong>high-throughput</strong> producer-consumer</p>
+                <p><strong>6.</strong> The #1 choice in production systems</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-5.2-blockingqueue.html" style="color: var(--primary);">← 5.2 BlockingQueue Interface</a> |
+            <a href="chapter-5.4-linkedblockingqueue.html" style="color: var(--primary);">5.4 LinkedBlockingQueue →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#16a085',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#16a085',
+        lineColor: '#16a085',
+        secondaryColor: '#1abc9c',
+        tertiaryColor: '#3498db'
+      },
+      sequence: {
+        diagramMarginX: 50,
+        diagramMarginY: 30,
+        actorMargin: 80,
+        width: 160,
+        height: 70,
+        boxMargin: 15,
+        messageMargin: 50,
+        noteMargin: 15
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>
