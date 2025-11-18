@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>8.6 Case Study: Movie Ticketing System (BookMyShow Style)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #dc143c;     /* crimson */
+          --secondary: #e63946;
+          --accent: #f1faee;
+          --dark: #1e1b4b;
+          --light: #f8fafc;
+          --gray: #64748b;
+          --success: #10b981;
+          --warning: #f59e0b;
+          --danger: #ef4444;
+          --info: #3b82f6;
+          --code-bg: #1e1b4b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 4rem 2rem; text-align: center; }
+
+        header h1 { font-size: 3rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.8rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.3rem; opacity: 0.9; max-width: 1000px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.5rem 1.2rem; border-radius: 50px; font-size: 1rem; margin-top: 1.5rem; font-weight: 600; }
+
+        main { padding: 4rem 3rem; }
+
+        section { margin-bottom: 5rem; }
+
+        h2 {
+          font-size: 2.2rem;
+          color: var(--primary);
+          margin-bottom: 1.8rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #fee2e2 0%, #fecaca 100%);
+          padding: 1.6rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2.5rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(220,20,60,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #e9d5ff;
+          padding: 1.6rem;
+          border-radius: 16px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2.5rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.8rem;
+          right: 1.4rem;
+          font-size: 0.9rem;
+          color: #a78bfa;
+          font-weight: 600;
+        }
+
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 2rem;
+          margin: 3rem 0;
+        }
+
+        .stat-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          text-align: center;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .stat-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(220,20,60,0.25);
+        }
+
+        .stat-value {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 3rem;
+          font-weight: 700;
+          color: var(--primary);
+        }
+
+        .stat-label {
+          color: #666;
+          margin-top: 0.5rem;
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 3rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        .solution-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+          gap: 2rem;
+          margin: 3rem 0;
+        }
+
+        .solution-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .solution-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(220,20,60,0.25);
+        }
+
+        .solution-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 1rem;
+          color: var(--primary);
+        }
+
+        footer {
+          text-align: center;
+          padding: 3rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 1rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.4rem; }
+          header h2 { font-size: 1.4rem; }
+          .stats-grid { grid-template-columns: 1fr; }
+          .solution-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>8.6 Case Study: Movie Ticketing System</h1>
+        <h2>BookMyShow Style — The Mother of All Concurrency Interviews</h2>
+        <p>100,000 users trying to book 100 seats at the same second</p>
+        <div class="badge">Chapter 8 – Real-World Projects</div>
+    </header>
+
+    <main>
+        <!-- The Nightmare -->
+        <section>
+            <h2>The Ultimate Concurrency Stress Test</h2>
+            <p>
+                Every major movie release (Avengers, KGF, Pushpa) causes the same chaos:
+            </p>
+            <div class="highlight">
+                <strong>Peak load:</strong><br>
+                • 500,000+ concurrent users<br>
+                • 100–200 seats available<br>
+                • All trying to book at 12:00:01 AM
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">1M+</div>
+                    <div class="stat-label">Tickets/second peak</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">99.999%</div>
+                    <div class="stat-label">Uptime required</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Double bookings allowed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">₹100Cr+</div>
+                    <div class="stat-label">Revenue in first hour</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- The Core Problem -->
+        <section>
+            <h2>Problem: Seat Locking & Double Booking</h2>
+
+            <div class="mermaid">
+                sequenceDiagram
+                participant User1
+                participant User2
+                participant Server
+
+                User1->>Server: Lock seat A1
+                User2->>Server: Lock seat A1
+                Server-->>User1: Locked
+                Server-->>User2: Locked → Double booking!
+            </div>
+
+            <div class="highlight">
+                <strong>Requirements:</strong><br>
+                • Atomic seat reservation<br>
+                • Temporary lock (5–10 minutes)<br>
+                • Timeout → release seat<br>
+                • No double booking<br>
+                • High throughput
+            </div>
+        </section>
+
+        <!-- BookMyShow's Solution -->
+        <section>
+            <h2>BookMyShow's Real Architecture (2025)</h2>
+
+            <div class="mermaid">
+                graph TD
+                A[100,000 Requests] --> B[API Gateway<br>(Virtual Threads)]
+                B --> C[Seat Service<br>(Distributed Locks)]
+                C --> D[Redis / Hazelcast<br>(Seat Locks with TTL)]
+                C --> E[Database<br>(Final booking)]
+                F[Timeout Worker] --> D[Expire old locks]
+
+                style C fill:#dc143c,stroke:#dc143c,color:white
+                style D fill:#f39c12,stroke:#f39c12,color:white
+            </div>
+
+            <div class="highlight">
+                <strong>Key Techniques:</strong><br>
+                • Distributed locks (Redis SETNX + TTL)<br>
+                • Optimistic locking with version<br>
+                • Virtual threads for request handling<br>
+                • Queueing system for high-demand shows
+            </div>
+        </section>
+
+        <!-- Classic Java Solution -->
+        <section>
+            <h2>Java-Only Solution: Seat Locking with ReentrantLock</h2>
+
+            <div class="code-block">
+          <pre>
+public class SeatLocker {
+    private final Map<String, ReentrantLock> locks = new ConcurrentHashMap<>();
+    private final ScheduledExecutorService cleaner = Executors.newScheduledThreadPool(1);
+
+    public boolean lockSeat(String seatId, String userId, long timeoutSeconds) {
+        ReentrantLock lock = locks.computeIfAbsent(seatId, k -> new ReentrantLock());
+
+        boolean acquired = false;
+        try {
+            acquired = lock.tryLock(timeoutSeconds, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        if (acquired) {
+            // Schedule unlock
+            cleaner.schedule(() -> {
+                lock.unlock();
+                locks.remove(seatId, lock);
+            }, timeoutSeconds, TimeUnit.SECONDS);
+        }
+        return acquired;
+    }
+}
+          </pre>
+            </div>
+        </section>
+
+        <!-- Virtual Threads Bonus -->
+        <section>
+            <h2>With Virtual Threads — Millions of Users</h2>
+
+            <div class="code-block">
+          <pre>
+@GetMapping("/shows/{id}/seats")
+public String bookSeat(@PathVariable Long showId) {
+    // One virtual thread per request — no blocking!
+    return seatService.tryBookSeat(showId, currentUser());
+    // Virtual thread parks when waiting for lock
+}
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Result:</strong> 200 carrier threads → handle 500,000+ concurrent booking attempts
+            </div>
+        </section>
+
+        <!-- Interview Question -->
+        <section>
+            <h2>The Ultimate Interview Question</h2>
+
+            <div class="highlight">
+                <strong>Design a movie ticketing system that handles 100,000 concurrent users trying to book 100 seats.</strong><br>
+                Must have:<br>
+                • No double booking<br>
+                • Seat lock with timeout<br>
+                • High availability<br>
+                • Scalable to multiple servers
+            </div>
+
+            <div class="solution-grid">
+                <div class="solution-card">
+                    <div class="solution-title">Level 1: Single JVM</div>
+                    <div>ReentrantLock per seat + timeout</div>
+                </div>
+                <div class="solution-card">
+                    <div class="solution-title">Level 2: Distributed</div>
+                    <div>Redis distributed lock + TTL</div>
+                </div>
+                <div class="solution-card">
+                    <div class="solution-title">Level 3: Production</div>
+                    <div>Virtual threads + Redisson + queueing</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways from BookMyShow</h2>
+            <div style="background: #fee2e2; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> Seat booking = the hardest concurrency problem</p>
+                <p><strong>2.</strong> Need distributed locks with timeout</p>
+                <p><strong>3.</strong> Virtual threads handle massive concurrency</p>
+                <p><strong>4.</strong> Redis/Hazelcast for distributed coordination</p>
+                <p><strong>5.</strong> Queueing for ultra-high demand shows</p>
+                <p><strong>6.</strong> The ultimate test of your concurrency skills</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-8.5-cloud-kitchen.html" style="color: var(--primary);">← 8.5 Cloud Kitchen</a> |
+            <a href="chapter-8.7-bonus-project.html" style="color: var(--primary);">8.7 Bonus Mini-Project →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#dc143c',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#dc143c',
+        lineColor: '#dc143c',
+        secondaryColor: '#e63946',
+        tertiaryColor: '#f59e0b'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

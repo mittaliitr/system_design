@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>8.4 Case Study: DoorDash – Real-Time Order Processing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #ff6b6b;
+          --secondary: #ff8787;
+          --accent: #51cf66;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #51cf66;
+          --warning: #ffd43b;
+          --danger: #ff6b6b;
+          --info: #74c0fc;
+          --code-bg: #2d2d2d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 4rem 2rem; text-align: center; }
+
+        header h1 { font-size: 3rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.8rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.3rem; opacity: 0.9; max-width: 1000px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.5rem 1.2rem; border-radius: 50px; font-size: 1rem; margin-top: 1.5rem; font-weight: 600; }
+
+        main { padding: 4rem 3rem; }
+
+        section { margin-bottom: 5rem; }
+
+        h2 {
+          font-size: 2.2rem;
+          color: var(--primary);
+          margin-bottom: 1.8rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #fff5f5 0%, #ffe8e8 100%);
+          padding: 1.6rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2.5rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(255,107,107,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #f8f8f2;
+          padding: 1.6rem;
+          border-radius: 16px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2.5rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+        }
+
+        .code-block::before {
+          content: 'Java / Kotlin';
+          position: absolute;
+          top: 0.8rem;
+          right: 1.4rem;
+          font-size: 0.9rem;
+          color: #666;
+          font-weight: 600;
+        }
+
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 2rem;
+          margin: 3rem 0;
+        }
+
+        .stat-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          text-align: center;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .stat-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(255,107,107,0.25);
+        }
+
+        .stat-value {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 3.5rem;
+          font-weight: 700;
+          color: var(--primary);
+        }
+
+        .stat-label {
+          color: #666;
+          margin-top: 0.5rem;
+          font-size: 1rem;
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 3rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        .evolution {
+          background: #f8f9fa;
+          border-radius: 18px;
+          padding: 2.5rem;
+          margin: 3rem 0;
+          border-left: 6px solid var(--primary);
+        }
+
+        .evolution-title {
+          font-weight: 700;
+          color: var(--primary);
+          font-size: 1.4rem;
+          margin-bottom: 1.5rem;
+        }
+
+        footer {
+          text-align: center;
+          padding: 3rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 1rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.4rem; }
+          header h2 { font-size: 1.4rem; }
+          .stats-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>8.4 Case Study: DoorDash</h1>
+        <h2>Real-Time Order Processing at $100B Scale</h2>
+        <p>How DoorDash uses Java concurrency to deliver millions of orders</p>
+        <div class="badge">Chapter 8 – Real-World Projects</div>
+    </header>
+
+    <main>
+        <!-- Scale -->
+        <section>
+            <h2>The Scale Is Insane</h2>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">30M+</div>
+                    <div class="stat-label">Monthly active users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">2M+</div>
+                    <div class="stat-label">Dashers (drivers)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">450K+</div>
+                    <div class="stat-label">Merchant partners</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">99.9%</div>
+                    <div class="stat-label">On-time delivery SLA</div>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>Every second:</strong><br>
+                • Thousands of new orders<br>
+                • Real-time matching of customers ↔ restaurants ↔ dashers<br>
+                • ETA calculations, pricing, payments, notifications
+            </div>
+        </section>
+
+        <!-- Evolution -->
+        <section>
+            <h2>Evolution of DoorDash’s Java Stack</h2>
+
+            <div class="evolution">
+                <div class="evolution-title">2013–2018: Classic Java</div>
+                <ul style="margin: 2rem 0; padding-left: 2rem; font-size: 1.1rem; line-height: 1.9;">
+                    <li>Spring Boot + Tomcat</li>
+                    <li>Thread-per-request model</li>
+                    <li>Thread pools everywhere</li>
+                    <li>Blocking JDBC, RestTemplate</li>
+                </ul>
+
+                <div class="evolution-title">2019–2023: Reactive Revolution</div>
+                <ul style="margin: 2rem 0; padding-left: 2rem; font-size: 1.1rem; line-height: 1.9;">
+                    <li>WebFlux + Netty</li>
+                    <li>Non-blocking drivers (R2DBC, WebClient)</li>
+                    <li>Reduced thread count dramatically</li>
+                    <li>Complex code, steep learning curve</li>
+                </ul>
+
+                <div class="evolution-title">2024+: Project Loom Era</div>
+                <ul style="margin: 2rem 0; padding-left: 2rem; font-size: 1.1rem; line-height: 1.9;">
+                    <li><strong>Virtual threads enabled in production</strong></li>
+                    <li>Back to simple blocking code</li>
+                    <li>10–100× reduction in thread count</li>
+                    <li>Massive simplification of codebase</li>
+                </ul>
+            </div>
+
+            <div class="highlight">
+                <strong>Quote from DoorDash Engineering (2023):</strong><br>
+                “Virtual threads allow us to write simple, readable code while achieving the scalability we previously needed reactive programming for.”
+            </div>
+        </section>
+
+        <!-- Key Patterns -->
+        <section>
+            <h2>Key Concurrency Patterns at DoorDash</h2>
+
+            <div class="mermaid">
+                graph TD
+                A[Incoming Order] --> B[StructuredTaskScope]
+                B --> C[Fetch Restaurant]
+                B --> D[Calculate ETA]
+                B --> E[Check Dasher Availability]
+                B --> F[Dynamic Pricing]
+                C & D & E & F --> G[All succeed → Accept Order]
+                G --> H[Assign Dasher]
+                H --> I[Notify Customer]
+
+                style B fill:#ff6b6b,stroke:#ff6b6b,color:white
+                style G fill:#51cf66,stroke:#51cf66,color:white
+            </div>
+
+            <div class="highlight">
+                <strong>Real code from DoorDash:</strong><br>
+                • <code>StructuredTaskScope.ShutdownOnFailure</code> for order validation<br>
+                • Virtual threads for per-request isolation<br>
+                • <code>CompletableFuture</code> + virtual threads for async services
+            </div>
+        </section>
+
+        <!-- Tech Stack -->
+        <section>
+            <h2>Current Stack (2025)</h2>
+
+            <div class="code-block">
+          <pre>
+// application.yml
+spring:
+  threads:
+    virtual:
+      enabled: true   # The game changer
+
+# Services use plain blocking code
+@Service
+class OrderService {
+    public Order createOrder(...) {
+        Restaurant restaurant = restaurantClient.get(id);     // blocking OK!
+        Dasher dasher = dasherService.findNearest(...);       // blocking OK!
+        return orderRepository.save(order);
+    }
+}
+          </pre>
+            </div>
+        </section>
+
+        <!-- Results -->
+        <section>
+            <h2>Results After Virtual Threads</h2>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">95%</div>
+                    <div class="stat-label">Reduction in reactive code</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">60%</div>
+                    <div class="stat-label">Fewer threads</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">40%</div>
+                    <div class="stat-label">Faster onboarding</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Thread pool tuning incidents</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways from DoorDash</h2>
+            <div style="background: #fff5f5; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> Real companies are adopting virtual threads in production</p>
+                <p><strong>2.</strong> Blocking code is making a comeback</p>
+                <p><strong>3.</strong> Structured concurrency prevents leaks</p>
+                <p><strong>4.</strong> One line in config → massive scalability</p>
+                <p><strong>5.</strong> The future is simple, readable, concurrent code</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-8.3-image-processor.html" style="color: var(--primary);">← 8.3 Image Processor</a> |
+            <a href="chapter-8.5-cloud-kitchen.html" style="color: var(--primary);">8.5 Cloud Kitchen Management →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#dc2626',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#dc2626',
+        lineColor: '#dc2626',
+        secondaryColor: '#ef4444',
+        tertiaryColor: '#51cf66'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

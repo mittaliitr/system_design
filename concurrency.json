@@ -323,37 +323,42 @@
       "children": [
         {
           "name": "8.1 Project: Parallel File Downloader",
-          "url": "https://github.com/kdn251/java-multithreading-examples",
+          "url": "concurrency /chapter8.1.html",
+
           "tag": "project"
         },
         {
           "name": "8.2 Project: Multi-Client Chat Server",
-          "url": "https://www.baeldung.com/java-chat-application",
+          "url": "concurrency /chapter8.2.html",
+
           "tag": "project"
         },
         {
           "name": "8.3 Project: Image Processor with Fork/Join",
-          "url": "https://docs.oracle.com/javase/tutorial/essential/concurrency/examples/ForkBlur.java.html",
+          "url": "concurrency /chapter8.3.html",
+
           "tag": "project"
         },
         {
           "name": "8.4 Case Study: DoorDash – Real-Time Order Processing",
-          "url": "https://doordash.engineering/2023/06/12/scaling-doordash-with-java/",
+          "url": "concurrency /chapter8.4.html",
+
           "tag": "casestudy"
         },
         {
           "name": "8.5 Case Study: Cloud Kitchen Management System",
-          "url": "https://www.geektrust.in/blog/cloud-kitchen-scheduling",
+          "url": "concurrency /chapter8.5.html",
+
           "tag": "casestudy"
         },
         {
           "name": "8.6 Case Study: Movie Ticketing System (BookMyShow Style)",
-          "url": "https://www.bookmyshow.com/engineering/scaling-ticketing",
+          "url": "concurrency /chapter8.6.html",
           "tag": "casestudy"
         },
         {
           "name": "8.7 Bonus Mini-Project: Simulate Movie Booking CLI",
-          "url": "https://github.com/java-concurrency/ticketing-system",
+          "url": "concurrency /chapter8.7.html",
           "tag": "project"
         }
       ]

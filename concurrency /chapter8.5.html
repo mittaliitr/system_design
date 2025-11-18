@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>8.5 Case Study: Cloud Kitchen Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #f59e0b;
+          --secondary: #fcc419;
+          --accent: #51cf66;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #51cf66;
+          --warning: #ffd43b;
+          --danger: #ef4444;
+          --info: #74c0fc;
+          --code-bg: #2d2d2d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 4rem 2rem; text-align: center; }
+
+        header h1 { font-size: 3rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.8rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.3rem; opacity: 0.9; max-width: 1000px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.5rem 1.2rem; border-radius: 50px; font-size: 1rem; margin-top: 1.5rem; font-weight: 600; }
+
+        main { padding: 4rem 3rem; }
+
+        section { margin-bottom: 5rem; }
+
+        h2 {
+          font-size: 2.2rem;
+          color: var(--primary);
+          margin-bottom: 1.8rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #fffbeb 0%, #fff3c4 100%);
+          padding: 1.6rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2.5rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(245,158,11,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #f8f8f2;
+          padding: 1.6rem;
+          border-radius: 16px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2.5rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.8rem;
+          right: 1.4rem;
+          font-size: 0.9rem;
+          color: #666;
+          font-weight: 600;
+        }
+
+        .kitchen-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 2rem;
+          margin: 3rem 0;
+        }
+
+        .kitchen-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .kitchen-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(245,158,11,0.25);
+        }
+
+        .kitchen-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 1rem;
+          color: var(--primary);
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 3rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 2rem;
+          margin: 3rem 0;
+        }
+
+        .stat-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          text-align: center;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+        }
+
+        .stat-value {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 3rem;
+          font-weight: 700;
+          color: var(--primary);
+        }
+
+        .stat-label {
+          color: #666;
+          margin-top: 0.5rem;
+        }
+
+        footer {
+          text-align: center;
+          padding: 3rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 1rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.4rem; }
+          header h2 { font-size: 1.4rem; }
+          .kitchen-grid { grid-template-columns: 1fr; }
+          .stats-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>8.5 Case Study: Cloud Kitchen Management System</h1>
+        <h2>Swiggy / Zomato Style Order Scheduling</h2>
+        <p>How cloud kitchens juggle 1000+ orders without burning food (or threads)</p>
+        <div class="badge">Chapter 8 – Real-World Projects</div>
+    </header>
+
+    <main>
+        <!-- The Problem -->
+        <section>
+            <h2>The Cloud Kitchen Nightmare</h2>
+            <p>
+                One kitchen, 20+ brands (Swiggy/Zomato), 1000+ incoming orders.<br>
+                Each order has a <strong>preparation time</strong> and must be ready <strong>exactly on time</strong>.
+            </p>
+            <div class="highlight">
+                <strong>Constraints:</strong><br>
+                • Only N burners/stations<br>
+                • Orders must start at the right time (not too early → cold food, not too late → angry customer)<br>
+                • Real-time re-scheduling when orders are delayed
+            </div>
+        </section>
+
+        <!-- Real Numbers -->
+        <section>
+            <h2>Scale in India (2025)</h2>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">50K+</div>
+                    <div class="stat-label">Cloud kitchens</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">1.2B</div>
+                    <div class="stat-label">Orders/year</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">₹50K Cr</div>
+                    <div class="stat-label">Market size</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">15–18min</div>
+                    <div class="stat-label">Avg prep time</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Core Concurrency Pattern -->
+        <section>
+            <h2>The Scheduling Engine</h2>
+
+            <div class="mermaid">
+                graph TD
+                A[Incoming Order] --> B[Calculate Start Time<br>(ETA - Prep Time)]
+                B --> C[PriorityBlockingQueue<br>(by start time)]
+                C --> D[Worker Threads<br>(Burners)]
+                D --> E[Cook Order]
+                E --> F[Ready for Pickup]
+                G[Delay Detected] --> H[Re-schedule affected orders]
+
+                style C fill:#f59e0b,stroke:#f59e0b,color:white
+                style D fill:#51cf66,stroke:#51cf66,color:white
+            </div>
+
+            <div class="highlight">
+                <strong>Key:</strong><br>
+                • <code>PriorityBlockingQueue</code> ordered by <strong>planned start time</strong><br>
+                • Worker threads <code>take()</code> next order when burner free<br>
+                • Delay → re-insert affected orders with new start time
+            </div>
+        </section>
+
+        <!-- Code: The Scheduler -->
+        <section>
+            <h2>Core Scheduler Code (GeekTrust Style)</h2>
+
+            <div class="code-block">
+          <pre>
+record Order(String id, int prepMinutes, LocalDateTime deliveryTime)
+    implements Delayed {
+
+    public long getDelay(TimeUnit unit) {
+        LocalDateTime startTime = deliveryTime.minusMinutes(prepMinutes);
+        return unit.convert(Duration.between(LocalDateTime.now(), startTime).toMillis(),
+                            TimeUnit.MILLISECONDS);
+    }
+
+    public int compareTo(Delayed o) {
+        return Long.compare(this.getDelay(TimeUnit.NANOSECONDS),
+                           o.getDelay(TimeUnit.NANOSECONDS));
+    }
+}
+
+DelayQueue<Order> queue = new DelayQueue<>();
+ExecutorService burners = Executors.newFixedThreadPool(10); // 10 burners
+
+// Consumer workers
+for (int i = 0; i < 10; i++) {
+    burners.submit(() -> {
+        while (true) {
+            try {
+                Order order = queue.take();  // Blocks until ready
+                cook(order);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+    });
+}
+
+// Producer — new order arrives
+public void acceptOrder(Order order) {
+    queue.put(order);  // Will be taken at correct time
+}
+          </pre>
+            </div>
+        </section>
+
+        <!-- Real Challenges -->
+        <section>
+            <h2>Real-World Challenges Solved</h2>
+
+            <div class="kitchen-grid">
+                <div class="kitchen-card">
+                    <div class="kitchen-title">Dynamic Re-scheduling</div>
+                    <div class="highlight">
+                        Order delayed 5 min → push back all dependent orders<br>
+                        Solution: Remove from queue + re-insert with new time
+                    </div>
+                </div>
+                <div class="kitchen-card">
+                    <div class="kitchen-title">Priority Orders</div>
+                    <div class="highlight">
+                        VIP / Prime orders jump the queue<br>
+                        Solution: Custom Comparator in PriorityBlockingQueue
+                    </div>
+                </div>
+                <div class="kitchen-card">
+                    <div class="kitchen-title">Burner Allocation</div>
+                    <div class="highlight">
+                        Different food types need different stations<br>
+                        Solution: Multiple queues per station type
+                    </div>
+                </div>
+                <div class="kitchen-card">
+                    <div class="kitchen-title">Backpressure</div>
+                    <div class="highlight">
+                        Too many orders → reject new ones<br>
+                        Solution: Bounded queue + rejection policy
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways from Cloud Kitchens</h2>
+            <div style="background: #fffbeb; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> Real-time scheduling = <code>DelayQueue</code> or <code>PriorityBlockingQueue</code></p>
+                <p><strong>2.</strong> Workers = fixed thread pool (number of burners)</p>
+                <p><strong>3.</strong> Dynamic re-scheduling = remove + re-insert</p>
+                <p><strong>4.</strong> Backpressure = bounded queues</p>
+                <p><strong>5.</strong> This pattern used by Swiggy, Zomato, Rebel Foods</p>
+                <p><strong>6.</strong> Perfect interview question: "Design a cloud kitchen scheduler"</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-8.4-doordash.html" style="color: var(--primary);">← 8.4 DoorDash</a> |
+            <a href="chapter-8.6-bookmyshow.html" style="color: var(--primary);">8.6 BookMyShow Ticketing →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#f59e0b',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#f59e0b',
+        lineColor: '#f59e0b',
+        secondaryColor: '#fcc419',
+        tertiaryColor: '#51cf66'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

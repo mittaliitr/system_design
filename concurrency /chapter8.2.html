@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>8.2 Project: Multi-Client Chat Server</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #7c3aed;
+          --secondary: #9333ea;
+          --accent: #c084fc;
+          --dark: #1e1b4b;
+          --light: #f8fafc;
+          --gray: #64748b;
+          --success: #10b981;
+          --warning: #f59e0b;
+          --danger: #ef4444;
+          --info: #3b82f6;
+          --code-bg: #0f0c29;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 4rem 2rem; text-align: center; }
+
+        header h1 { font-size: 3rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.8rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.3rem; opacity: 0.9; max-width: 1000px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.5rem 1.2rem; border-radius: 50px; font-size: 1rem; margin-top: 1.5rem; font-weight: 600; }
+
+        main { padding: 4rem 3rem; }
+
+        section { margin-bottom: 5rem; }
+
+        h2 {
+          font-size: 2.2rem;
+          color: var(--primary);
+          margin-bottom: 1.8rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #f3f0ff 0%, #e8e0ff 100%);
+          padding: 1.6rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2.5rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(124,58,237,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #e9d5ff;
+          padding: 1.6rem;
+          border-radius: 16px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2.5rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+        }
+
+        .code-block::before {
+          content: 'Java 21+';
+          position: absolute;
+          top: 0.8rem;
+          right: 1.4rem;
+          font-size: 0.9rem;
+          color: #a78bfa;
+          font-weight: 600;
+        }
+
+        .chat-demo {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 3rem;
+          flex-wrap: wrap;
+          margin: 3rem 0;
+          padding: 3rem;
+          background: #f8f9fa;
+          border-radius: 18px;
+        }
+
+        .client-terminal {
+          background: #0f0c29;
+          color: #e9d5ff;
+          padding: 2rem;
+          border-radius: 16px;
+          font-family: 'JetBrains Mono', monospace;
+          min-width: 300px;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+          border: 4px solid var(--primary);
+        }
+
+        .terminal-title {
+          text-align: center;
+          font-weight: 700;
+          margin-bottom: 1rem;
+          color: var(--accent);
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 3rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        .feature-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 2rem;
+          margin: 3rem 0;
+        }
+
+        .feature-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          text-align: center;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .feature-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(124,58,237,0.25);
+        }
+
+        .feature-icon {
+          font-size: 3.5rem;
+          margin-bottom: 1rem;
+        }
+
+        .feature-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 0.8rem;
+          color: var(--primary);
+        }
+
+        footer {
+          text-align: center;
+          padding: 3rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 1rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.4rem; }
+          header h2 { font-size: 1.4rem; }
+          .chat-demo { flex-direction: column; }
+          .feature-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>8.2 Project: Multi-Client Chat Server</h1>
+        <h2>Build a Real-Time Chat with 10,000+ Clients</h2>
+        <p>Virtual Threads + Structured Concurrency + Scoped Values</p>
+        <div class="badge">Chapter 8 – Real-World Projects</div>
+    </header>
+
+    <main>
+        <!-- Project Goal -->
+        <section>
+            <h2>Project Goal</h2>
+            <p>
+                Build a full-featured chat server that handles <strong>10,000+ concurrent clients</strong> with:
+            </p>
+            <div class="highlight">
+                <strong>Features:</strong><br>
+                • Public rooms + private messaging<br>
+                • User authentication & presence<br>
+                • Message history<br>
+                • Graceful shutdown<br>
+                • Live typing indicators (bonus)
+            </div>
+        </section>
+
+        <!-- Live Demo -->
+        <section>
+            <h2>Live Demo — 3 Clients Connected</h2>
+
+            <div class="chat-demo">
+                <div class="client-terminal">
+                    <div class="terminal-title">Client 1 — Alice</div>
+                    <pre style="color: #c084fc;">Connected as Alice
+[Global] Bob: Hey!
+[Global] Alice: Hi everyone!
+[PM] Charlie → Alice: Secret message!</pre>
+                </div>
+                <div class="client-terminal">
+                    <div class="terminal-title">Client 2 — Bob</div>
+                    <pre style="color: #10b981;">Connected as Bob
+[Global] Bob: Hey!
+[Global] Alice: Hi everyone!</pre>
+                </div>
+                <div class="client-terminal">
+                    <div class="terminal-title">Client 3 — Charlie</div>
+                    <pre style="color: #f59e0b;">Connected as Charlie
+[Global] Alice: Hi everyone!
+→ Alice: Secret message!</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture -->
+        <section>
+            <h2>Architecture: Virtual Threads Power Everything</h2>
+
+            <div class="mermaid">
+                sequenceDiagram
+                participant Client
+                participant Server
+                participant VT as Virtual Thread
+                participant Room
+                participant Broadcast
+
+                Client->>Server: Connect
+                Server->>VT: Thread.ofVirtual().start()
+                VT->>Room: join("global")
+                loop Every message
+                Client->>VT: send message
+                VT->>Broadcast: to all in room
+                Broadcast-->>Client: deliver
+                end
+                Client->>Server: Disconnect
+                VT->>Room: leave
+            </div>
+
+            <div class="highlight">
+                <strong>Key:</strong><br>
+                • One virtual thread per client<br>
+                • Blocking I/O → no wasted carrier threads<br>
+                • ScopedValue for user context<br>
+                • StructuredTaskScope for room broadcast
+            </div>
+        </section>
+
+        <!-- Core Code -->
+        <section>
+            <h2>Core Server with Virtual Threads (Java 21+)</h2>
+
+            <div class="code-block">
+          <pre>
+public class ChatServer {
+    private static final ScopedValue<User> CURRENT_USER = ScopedValue.newInstance();
+
+    public static void main(String[] args) throws IOException {
+        ServerSocket server = new ServerSocket(8080);
+
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            while (true) {
+                Socket client = server.accept();
+                executor.submit(() -> handleClient(client));
+            }
+        }
+    }
+
+    private static void handleClient(Socket client) {
+        try (client; var in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+             var out = new PrintWriter(client.getOutputStream(), true)) {
+
+            out.println("Welcome! Enter your name:");
+            String name = in.readLine();
+            User user = new User(name, client);
+
+            ScopedValue.where(CURRENT_USER, user)
+                .run(() -> {
+                    Room.join("global", user);
+                    out.println("Joined global chat!");
+
+                    String line;
+                    while ((line = in.readLine()) != null) {
+                        if (line.startsWith("/pm ")) {
+                            // private message
+                        } else {
+                            Room.broadcast("global", user.name() + ": " + line);
+                        }
+                    }
+                });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            Room.leave("global", CURRENT_USER.get());
+        }
+    }
+}
+          </pre>
+            </div>
+        </section>
+
+        <!-- Room Manager with Structured Concurrency -->
+        <section>
+            <h2>Room Broadcast with StructuredTaskScope</h2>
+
+            <div class="code-block">
+          <pre>
+static void broadcast(String room, String message) {
+    List<User> users = Room.getUsers(room);
+
+    try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+        for (User user : users) {
+            scope.fork(() -> {
+                user.send(message);
+                return null;
+            });
+        }
+        scope.join();
+        scope.throwIfFailed();
+    } catch (Exception e) {
+        // log error
+    }
+}
+          </pre>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section>
+            <h2>Features to Implement</h2>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">Rooms</div>
+                    <div class="feature-title">Public & Private Rooms</div>
+                    <div>/join #java, /pm bob hello</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">Presence</div>
+                    <div class="feature-title">Online Users List</div>
+                    <div>/users, join/leave notifications</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">History</div>
+                    <div class="feature-title">Message History</div>
+                    <div>Last 100 messages
