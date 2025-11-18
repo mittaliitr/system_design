@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>4.5 Fork/Join Framework</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #27ae60;
+          --secondary: #2ecc71;
+          --accent: #3498db;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+          --info: #00cec9;
+          --code-bg: #2d2d2d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 3.5rem 2rem; text-align: center; }
+
+        header h1 { font-size: 2.8rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.6rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.2rem; opacity: 0.9; max-width: 900px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.95rem; margin-top: 1.2rem; font-weight: 600; }
+
+        main { padding: 3.5rem 2.5rem; }
+
+        section { margin-bottom: 4.5rem; }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #f0fff4 0%, #e8fff0 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(39,174,96,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #f8f8f2;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #666;
+          font-weight: 600;
+        }
+
+        .forkjoin-demo {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 2rem;
+          flex-wrap: wrap;
+          margin: 3rem 0;
+          padding: 2rem;
+          background: #f8f9fa;
+          border-radius: 18px;
+        }
+
+        .tree-visual {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          text-align: center;
+        }
+
+        .tree-title {
+          font-weight: 700;
+          color: var(--primary);
+          margin-bottom: 1rem;
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        .performance-comparison {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2rem;
+          margin: 3rem 0;
+        }
+
+        .perf-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          text-align: center;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+        }
+
+        .perf-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 1rem;
+          color: var(--primary);
+        }
+
+        .perf-value {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 3rem;
+          font-weight: 700;
+          color: var(--success);
+        }
+
+        .perf-label {
+          color: #666;
+          margin-top: 0.5rem;
+        }
+
+        .work-stealing {
+          background: #f8f9fa;
+          border-radius: 18px;
+          padding: 2.5rem;
+          margin: 3rem 0;
+          border-left: 6px solid var(--primary);
+        }
+
+        .ws-title {
+          font-weight: 700;
+          color: var(--primary);
+          font-size: 1.4rem;
+          margin-bottom: 1.5rem;
+          text-align: center;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .performance-comparison { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>4.5 Fork/Join Framework</h1>
+        <h2>Divide-and-Conquer Parallelism</h2>
+        <p>The engine behind <code>parallel()</code> streams and massive speedup</p>
+        <div class="badge">Chapter 4 – Executors & Thread Pools</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>Divide et Impera — Divide and Conquer</h2>
+            <p>
+                The Fork/Join framework (Java 7+) is designed for <strong>recursive, divide-and-conquer</strong> algorithms.
+            </p>
+            <div class="highlight">
+                <strong>Core Idea:</strong><br>
+                Split task → solve sub-tasks in parallel → merge results<br>
+                <em>Work-stealing</em> keeps all cores busy
+            </div>
+        </section>
+
+        <!-- The Framework -->
+        <section>
+            <h2>ForkJoinPool + RecursiveTask/RecursiveAction</h2>
+
+            <div class="code-block">
+          <pre>
+// Extend RecursiveTask<V> for result
+class SumTask extends RecursiveTask<Long> {
+    private final long[] array;
+    private final int start, end;
+    private static final int THRESHOLD = 1000;
+
+    SumTask(long[] array, int start, int end) {
+        this.array = array; this.start = start; this.end = end;
+    }
+
+    @Override
+    protected Long compute() {
+        if (end - start <= THRESHOLD) {
+            // Base case — compute directly
+            long sum = 0;
+            for (int i = start; i < end; i++) sum += array[i];
+            return sum;
+        }
+
+        int mid = (start + end) / 2;
+        SumTask left = new SumTask(array, start, mid);
+        SumTask right = new SumTask(array, mid, end);
+
+        left.fork();                  // Async execute
+        long rightResult = right.compute();
+        long leftResult = left.join(); // Wait for result
+
+        return leftResult + rightResult;
+    }
+}
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Key Methods:</strong><br>
+                • <code>fork()</code> → submit to pool (async)<br>
+                • <code>join()</code> → wait for result<br>
+                • <code>compute()</code> → called directly or via fork
+            </div>
+        </section>
+
+        <!-- Work-Stealing Magic -->
+        <section>
+            <h2>Work-Stealing: Why Fork/Join Is So Fast</h2>
+
+            <div class="work-stealing">
+                <div class="ws-title">Each Worker Has Its Own Queue</div>
+                <div class="mermaid">
+                    graph TD
+                    W1[Worker 1<br>Queue: Task A1, A2] -->|steal| W2[Worker 2<br>Queue: empty]
+                    W3[Worker 3<br>Queue: Task C1] -->|steal| W4[Worker 4<br>Queue: empty]
+                    style W1 fill:#00b894,stroke:#00b894,color:white
+                    style W2 fill:#fdcb6e,stroke:#fdcb6e,color:#333
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>Work-Stealing:</strong><br>
+                Idle workers <strong>steal</strong> tasks from busy workers' queues → perfect load balancing
+            </div>
+        </section>
+
+        <!-- Performance Demo -->
+        <section>
+            <h2>Real Performance: Sum 1 Billion Numbers</h2>
+
+            <div class="performance-comparison">
+                <div class="perf-card">
+                    <div class="perf-title">Single Thread</div>
+                    <div class="perf-value">4.2s</div>
+                    <div class="perf-label">Sequential loop</div>
+                </div>
+                <div class="perf-card">
+                    <div class="perf-title">Fork/Join (8 cores)</div>
+                    <div class="perf-value">0.6s</div>
+                    <div class="perf-label">~7× speedup</div>
+                </div>
+                <div class="perf-card">
+                    <div class="perf-title">Parallel Stream</div>
+                    <div class="perf-value">0.58s</div>
+                    <div class="perf-label">Uses ForkJoinPool.commonPool()</div>
+                </div>
+            </div>
+
+            <div class="code-block">
+          <pre>
+// One-liner with parallel stream
+long sum = LongStream.range(0, 1_000_000_000)
+                     .parallel()
+                     .sum();
+          </pre>
+            </div>
+        </section>
+
+        <!-- When to Use -->
+        <section>
+            <h2>When to Use Fork/Join</h2>
+
+            <div class="highlight">
+                <strong>Perfect for:</strong><br>
+                • Merge sort, quicksort<br>
+                • Matrix multiplication<br>
+                • Image processing (blur, filters)<br>
+                • Large tree traversals<br>
+                • Any recursive divide-and-conquer
+            </div>
+
+            <div class="highlight">
+                <strong>Not for:</strong><br>
+                • I/O-bound tasks<br>
+                • Very small tasks (overhead)<br>
+                • Irregular workloads
+            </div>
+        </section>
+
+        <!-- Common ForkJoinPool -->
+        <section>
+            <h2>The Hidden Hero: commonPool()</h2>
+
+            <div class="code-block">
+          <pre>
+// Used by:
+stream.parallel()
+CompletableFuture.supplyAsync()
+Arrays.parallelSort()
+Parallel GC (G1, ZGC)
+
+// Size: Runtime.getRuntime().availableProcessors() - 1
+ForkJoinPool.commonPool().getParallelism(); // e.g., 7 on 8-core
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Never block inside commonPool!</strong><br>
+                No <code>Thread.sleep()</code>, no blocking I/O → starves parallel streams
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #f0fff4; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> Fork/Join = divide-and-conquer + work-stealing</p>
+                <p><strong>2.</strong> Extend <code>RecursiveTask<V></code> or <code>RecursiveAction</code></p>
+                <p><strong>3.</strong> <code>fork()</code> → async, <code>join()</code> → wait</p>
+                <p><strong>4.</strong> Work-stealing keeps all cores busy</p>
+                <p><strong>5.</strong> Powers <code>parallel()</code> streams and <code>CompletableFuture</code></p>
+                <p><strong>6.</strong> Never block in <code>commonPool()</code></p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-4.4-scheduled-executor.html" style="color: var(--primary);">← 4.4 ScheduledExecutorService</a> |
+            <a href="chapter-4.6-parallel-streams.html" style="color: var(--primary);">4.6 Parallel Streams →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#27ae60',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#27ae60',
+        lineColor: '#27ae60',
+        secondaryColor: '#2ecc71',
+        tertiaryColor: '#3498db'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

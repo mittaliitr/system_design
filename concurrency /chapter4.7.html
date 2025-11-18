@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>4.7 Real-World: Spring Boot + Thread Pools</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #1e3a8a;     /* indigo-900 */
+          --secondary: #3b82f6;   /* blue-500 */
+          --accent: #10b981;      /* emerald-500 */
+          --dark: #1e293b;
+          --light: #f8fafc;
+          --gray: #64748b;
+          --success: #10b981;
+          --warning: #f59e0b;
+          --danger: #ef4444;
+          --info: #3b82f6;
+          --code-bg: #0f172a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 3.5rem 2rem; text-align: center; }
+
+        header h1 { font-size: 2.8rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.6rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.2rem; opacity: 0.9; max-width: 900px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.95rem; margin-top: 1.2rem; font-weight: 600; }
+
+        main { padding: 3.5rem 2.5rem; }
+
+        section { margin-bottom: 4.5rem; }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #f0f9ff 0%, #e0f2fe 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(16,185,129,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #e2e8f0;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+        }
+
+        .code-block::before {
+          content: 'Java / Spring Boot';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #64748b;
+          font-weight: 600;
+        }
+
+        .spring-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+          gap: 2rem;
+          margin: 3rem 0;
+        }
+
+        .spring-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .spring-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(30,58,138,0.25);
+        }
+
+        .spring-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 0.8rem;
+          color: var(--primary);
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        .config-demo {
+          background: #f8f9fa;
+          border-radius: 18px;
+          padding: 2.5rem;
+          margin: 3rem 0;
+          border-left: 6px solid var(--primary);
+        }
+
+        .demo-title {
+          font-weight: 700;
+          color: var(--primary);
+          font-size: 1.4rem;
+          margin-bottom: 1.5rem;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .spring-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>4.7 Real-World: Spring Boot + Thread Pools</h1>
+        <h2>How 99% of Production Java Services Actually Work</h2>
+        <p>Tomcat, @Async, TaskExecutor, WebFlux — the full picture</p>
+        <div class="badge">Chapter 4 – Executors & Thread Pools</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>Spring Boot Runs on Thread Pools</h2>
+            <p>
+                Every Spring Boot web app is a <strong>highly concurrent server</strong>.<br>
+                One JVM process → one or more thread pools → thousands of requests.
+            </p>
+            <div class="highlight">
+                <strong>Default:</strong>
+                Tomcat + <code>max-threads=200</code> → handles 200 concurrent requests out of the box.
+            </div>
+        </section>
+
+        <!-- Embedded Servers -->
+        <section>
+            <h2>Embedded Web Servers & Their Pools</h2>
+
+            <div class="spring-grid">
+                <div class="spring-card">
+                    <div class="spring-title">Tomcat (Default)</div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+server.tomcat.max-threads=200
+server.tomcat.min-spare-threads=10
+              </pre>
+                    </div>
+                    <div class="highlight">
+                        Traditional servlet → blocking → one thread per request
+                    </div>
+                </div>
+
+                <div class="spring-card">
+                    <div class="spring-title">Undertow</div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+server.undertow.worker-threads=64
+server.undertow.io-threads=8
+              </pre>
+                    </div>
+                    <div class="highlight">
+                        Non-blocking I/O → fewer threads, higher throughput
+                    </div>
+                </div>
+
+                <div class="spring-card">
+                    <div class="spring-title">Netty (WebFlux)</div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+spring.webflux.reactor.event-loop-threads=8
+              </pre>
+                    </div>
+                    <div class="highlight">
+                        Reactive → event loop (not thread-per-request)
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- @Async -->
+        <section>
+            <h2>@Async — Fire-and-Forget Background Tasks</h2>
+
+            <div class="code-block">
+          <pre>
+@EnableAsync
+@Configuration
+class AsyncConfig implements AsyncConfigurer {
+    @Override
+    public Executor getAsyncExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(8);
+        executor.setMaxPoolSize(50);
+        executor.setQueueCapacity(1000);
+        executor.setThreadNamePrefix("Async-");
+        executor.initialize();
+        return executor;
+    }
+}
+
+@Service
+class EmailService {
+    @Async
+    public CompletableFuture<Void> sendEmail(User user) {
+        // Runs on Async- thread pool
+        emailSender.send(user);
+        return CompletableFuture.completedFuture(null);
+    }
+}
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Default:</strong> <code>SimpleAsyncTaskExecutor</code> → <strong>new thread per task!</strong><br>
+                <strong>Always configure your own ThreadPoolTaskExecutor</strong>
+            </div>
+        </section>
+
+        <!-- TaskExecutor Abstraction -->
+        <section>
+            <h2>TaskExecutor — The Spring Way</h2>
+
+            <div class="mermaid">
+                graph TD
+                A[Spring @Async] --> B[AsyncExecutor]
+                C[Web MVC Controller] --> D[TaskExecutor]
+                E[Scheduled Tasks] --> F[TaskScheduler]
+                B & D & F --> G[ThreadPoolTaskExecutor]
+                G --> H[java.util.concurrent.ExecutorService]
+
+                style G fill:#1e3a8a,stroke:#1e3a8a,color:white
+            </div>
+
+            <div class="highlight">
+                <strong>All Spring async features use <code>TaskExecutor</code></strong><br>
+                Implement once → use everywhere
+            </div>
+        </section>
+
+        <!-- WebFlux vs MVC -->
+        <section>
+            <h2>Web MVC (Blocking) vs WebFlux (Reactive)</h2>
+
+            <div class="spring-grid">
+                <div class="spring-card">
+                    <div class="spring-title">Spring Web MVC</div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+@GetMapping("/users/{id}")
+public User getUser(@PathVariable Long id) {
+    return userRepo.findById(id).block(); // Blocks thread!
+}
+              </pre>
+                    </div>
+                    <div class="highlight">
+                        Thread-per-request → 200 threads max
+                    </div>
+                </div>
+
+                <div class="spring-card">
+                    <div class="spring-title">Spring WebFlux</div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+@GetMapping("/users/{id}")
+public Mono<User> getUser(@PathVariable Long id) {
+    return userRepo.findById(id); // Non-blocking
+}
+              </pre>
+                    </div>
+                    <div class="highlight">
+                        Event loop → 10000+ requests with few threads
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Production Configuration -->
+        <section>
+            <h2>Production-Grade Thread Pool Config</h2>
+
+            <div class="code-block">
+          <pre>
+@Configuration
+public class ThreadPoolConfig {
+    @Bean("taskExecutor")
+    public TaskExecutor taskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(16);
+        executor.setMaxPoolSize(64);
+        executor.setQueueCapacity(1000);
+        executor.setThreadNamePrefix("app-");
+        executor.setRejectedExecutionHandler(new CallerRunsPolicy());
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(60);
+        return executor;
+    }
+}
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Rejection Policy:</strong> <code>CallerRunsPolicy</code> → backpressure<br>
+                <strong>Graceful shutdown:</strong> Wait for tasks to complete
+            </div>
+        </section>
+
+        <!-- Monitoring -->
+        <section>
+            <h2>Monitoring & Metrics</h2>
+
+            <div class="code-block">
+          <pre>
+// Micrometer + Prometheus
+@Bean
+public ThreadPoolTaskExecutor taskExecutor() {
+    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+    // ... config
+    executor.setThreadPoolMetricsEnabled(true);
+    return executor;
+}
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Key Metrics:</strong><br>
+                • <code>executor.active.count</code><br>
+                • <code>executor.queued.tasks</code><br>
+                • <code>executor.pool.size</code>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #f0f9ff; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> Spring Boot web apps = thread-per-request by default</p>
+                <p><strong>2.</strong> Tomcat default: <code>max-threads=200</code></p>
+                <p><strong>3.</strong> <code>@Async</code> without config = <strong>new thread per task!</strong></p>
+                <p><strong>4.</strong> Always configure <code>ThreadPoolTaskExecutor</code></p>
+                <p><strong>5.</strong> WebFlux = reactive → few threads, high throughput</p>
+                <p><strong>6.</strong> Use <code>CallerRunsPolicy</code> + graceful shutdown</p>
+                <p><strong>7.</strong> Monitor with Micrometer</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-4.6-parallel-streams.html" style="color: var(--primary);">← 4.6 Parallel Streams</a> |
+            <a href="chapter-5.1-blocking-queue.html" style="color: var(--primary);">Chapter 5: Blocking Queues →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#1e3a8a',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#1e3a8a',
+        lineColor: '#1e3a8a',
+        secondaryColor: '#3b82f6',
+        tertiaryColor: '#10b981'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>4.2 ExecutorService & Thread Pools</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #3498db;
+          --secondary: #2980b9;
+          --accent: #e74c3c;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+          --info: #00cec9;
+          --code-bg: #2d2d2d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 3.5rem 2rem; text-align: center; }
+
+        header h1 { font-size: 2.8rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.6rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.2rem; opacity: 0.9; max-width: 900px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.95rem; margin-top: 1.2rem; font-weight: 600; }
+
+        main { padding: 3.5rem 2.5rem; }
+
+        section { margin-bottom: 4.5rem; }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #ebf3fd 0%, #d6eaff 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(52,152,219,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #f8f8f2;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #666;
+          font-weight: 600;
+        }
+
+        .pool-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+          gap: 2rem;
+          margin: 3rem 0;
+        }
+
+        .pool-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .pool-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(52,152,219,0.25);
+        }
+
+        .pool-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 0.8rem;
+          color: var(--primary);
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        .pool-badge {
+          background: var(--primary);
+          color: white;
+          padding: 0.2rem 0.8rem;
+          border-radius: 20px;
+          font-size: 0.75rem;
+          font-weight: 600;
+        }
+
+        .pool-desc {
+          color: #555;
+          margin-bottom: 1rem;
+          font-size: 0.95rem;
+          line-height: 1.6;
+        }
+
+        .pool-use {
+          background: #f8f9fa;
+          padding: 1rem;
+          border-radius: 10px;
+          margin-top: 1rem;
+          font-size: 0.9rem;
+          font-family: 'JetBrains Mono', monospace;
+          border-left: 4px solid var(--primary);
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        .lifecycle-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 2.5rem 0;
+          font-size: 0.95rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+          border-radius: 14px;
+          overflow: hidden;
+        }
+
+        .lifecycle-table th {
+          background: var(--primary);
+          color: white;
+          padding: 1.2rem;
+          text-align: left;
+          font-weight: 600;
+        }
+
+        .lifecycle-table td {
+          padding: 1.2rem;
+          border-bottom: 1px solid #eee;
+          background: #f8f9fa;
+        }
+
+        .lifecycle-table tr:hover td {
+          background: #d6eaff;
+        }
+
+        .warning-box {
+          background: #fff5f5;
+          padding: 1.5rem;
+          border-radius: 12px;
+          border-left: 6px solid var(--danger);
+          margin: 2rem 0;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .pool-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>4.2 ExecutorService & Thread Pools</h1>
+        <h2>The Heart of Scalable Java Concurrency</h2>
+        <p>Fixed, Cached, Single, Scheduled — choose your weapon</p>
+        <div class="badge">Chapter 4 – Executors & Thread Pools</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>ExecutorService: The New Way</h2>
+            <p>
+                <code>ExecutorService</code> is an <strong>abstraction</strong> over thread management.<br>
+                You give it tasks — it decides how and when to run them.
+            </p>
+            <div class="highlight">
+                <strong>Core Interface:</strong><br>
+                <code>void execute(Runnable)</code> — fire and forget<br>
+                <code>Future&lt;?&gt; submit(Runnable/Callable)</code> — get result<br>
+                <code>void shutdown()</code> — clean exit
+            </div>
+        </section>
+
+        <!-- The Four Main Pools -->
+        <section>
+            <h2>The 4 Built-in Thread Pools</h2>
+
+            <div class="pool-grid">
+                <!-- Fixed -->
+                <div class="pool-card">
+                    <div class="pool-title">
+                        newFixedThreadPool(n)
+                        <span class="pool-badge">Most Common</span>
+                    </div>
+                    <div class="pool-desc">
+                        Fixed number of threads. Ideal for CPU-bound or controlled concurrency.
+                    </div>
+                    <div class="pool-use">
+                        Web servers, batch processing, bounded parallelism
+                    </div>
+                    <div class="code-block" style="margin: 1.5rem 0 0; box-shadow: none;">
+              <pre>
+ExecutorService pool = Executors.newFixedThreadPool(8);
+              </pre>
+                    </div>
+                </div>
+
+                <!-- Cached -->
+                <div class="pool-card">
+                    <div class="pool-title">
+                        newCachedThreadPool()
+                    </div>
+                    <div class="pool-desc">
+                        Unlimited threads (reused). Creates new if idle >60s.
+                    </div>
+                    <div class="pool-use">
+                        Short-lived async tasks (e.g., GUI apps)
+                    </div>
+                    <div class="code-block" style="margin: 1.5rem 0 0; box-shadow: none;">
+              <pre>
+ExecutorService pool = Executors.newCachedThreadPool();
+              </pre>
+                    </div>
+                </div>
+
+                <!-- Single -->
+                <div class="pool-card">
+                    <div class="pool-title">
+                        newSingleThreadExecutor()
+                    </div>
+                    <div class="pool-desc">
+                        Exactly one thread. Tasks run sequentially.
+                    </div>
+                    <div class="pool-use">
+                        Order-critical tasks, Swing workers
+                    </div>
+                    <div class="code-block" style="margin: 1.5rem 0 0; box-shadow: none;">
+              <pre>
+ExecutorService pool = Executors.newSingleThreadExecutor();
+              </pre>
+                    </div>
+                </div>
+
+                <!-- Scheduled -->
+                <div class="pool-card">
+                    <div class="pool-title">
+                        newScheduledThreadPool(n)
+                    </div>
+                    <div class="pool-desc">
+                        For delayed or periodic tasks (Timer replacement).
+                    </div>
+                    <div class="pool-use">
+                        Heartbeats, cleanup, retries
+                    </div>
+                    <div class="code-block" style="margin: 1.5rem 0 0; box-shadow: none;">
+              <pre>
+ScheduledExecutorService scheduler =
+    Executors.newScheduledThreadPool(4);
+              </pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Lifecycle -->
+        <section>
+            <h2>ExecutorService Lifecycle</h2>
+
+            <div class="mermaid">
+                graph TD
+                A[Running] -->|shutdown()| B[Shutdown<br>(no new tasks)]
+                A -->|shutdownNow()| C[Shutdown Now<br>(interrupt running)]
+                B --> D[Awaiting Termination]
+                C --> D
+                D -->|all tasks done| E[Terminated]
+
+                style A fill:#00b894,stroke:#00b894,color:white
+                style E fill:#d63031,stroke:#d63031,color:white
+            </div>
+
+            <div class="code-block">
+          <pre>
+// Graceful shutdown
+executor.shutdown();                    // No new tasks
+executor.awaitTermination(60, SECONDS); // Wait up to 60s
+
+// Forceful
+List<Runnable> pending = executor.shutdownNow();  // Returns unfinished
+          </pre>
+            </div>
+        </section>
+
+        <!-- submit() vs execute() -->
+        <section>
+            <h2>submit() vs execute()</h2>
+
+            <table class="lifecycle-table">
+                <tr>
+                    <th>Method</th>
+                    <th>Returns</th>
+                    <th>Exception Handling</th>
+                    <th>Use When</th>
+                </tr>
+                <tr>
+                    <td><code>execute(Runnable)</code></td>
+                    <td>void</td>
+                    <td>Exception in thread → uncaught</td>
+                    <td>Fire-and-forget</td>
+                </tr>
+                <tr>
+                    <td><code>submit(Runnable)</code></td>
+                    <td>Future&lt;?&gt;</td>
+                    <td>Exception wrapped in ExecutionException</td>
+                    <td>Need result or error handling</td>
+                </tr>
+                <tr>
+                    <td><code>submit(Callable)</code></td>
+                    <td>Future&lt;T&gt;</td>
+                    <td>Returns value</td>
+                    <td>Need return value</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- ForkJoinPool (Preview) -->
+        <section>
+            <h2>ForkJoinPool — The Default for Parallel Streams</h2>
+
+            <div class="highlight">
+                <strong>commonPool()</strong> = ForkJoinPool with <code>Runtime.getRuntime().availableProcessors() - 1</code> threads<br>
+                Used by <code>stream().parallel()</code>
+            </div>
+
+            <div class="code-block">
+          <pre>
+// Custom ForkJoinPool
+ForkJoinPool pool = new ForkJoinPool(8);
+pool.submit(() -> stream.parallel().forEach(...));
+          </pre>
+            </div>
+        </section>
+
+        <!-- Best Practices -->
+        <section>
+            <h2>Golden Rules</h2>
+
+            <div class="warning-box">
+                <strong>Never use Executors.newXXX() in libraries</strong> — they create unbounded queues<br>
+                <strong>Always create your own ThreadPoolExecutor</strong>
+            </div>
+
+            <div class="code-block">
+          <pre>
+// Production-ready
+ExecutorService executor = new ThreadPoolExecutor(
+    8, 8,                                 // core = max
+    60L, TimeUnit.SECONDS,                // idle timeout
+    new LinkedBlockingQueue<>(1000),      // bounded queue
+    new ThreadFactoryBuilder().setNameFormat("worker-%d").build(),
+    new ThreadPoolExecutor.CallerRunsPolicy()  // backpressure
+);
+          </pre>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #ebf3fd; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> <code>ExecutorService</code> = thread pool + lifecycle</p>
+                <p><strong>2.</strong> <code>newFixedThreadPool</code> = most common</p>
+                <p><strong>3.</strong> <code>submit()</code> > <code>execute()</code> (better error handling)</p>
+                <p><strong>4.</strong> Always <code>shutdown()</code> + <code>awaitTermination()</code></p>
+                <p><strong>5.</strong> <code>ForkJoinPool.commonPool()</code> powers parallel streams</p>
+                <p><strong>6.</strong> In libraries: <code>new ThreadPoolExecutor(...)</code>, not <code>Executors</code></p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-4.1-why-new-thread-wrong.html" style="color: var(--primary);">← 4.1 Why new Thread() Is Wrong</a> |
+            <a href="chapter-4.3-submit-vs-execute.html" style="color: var(--primary);">4.3 submit() vs execute() →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#3498db',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#3498db',
+        lineColor: '#3498db',
+        secondaryColor: '#2980b9',
+        tertiaryColor: '#e74c3c'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

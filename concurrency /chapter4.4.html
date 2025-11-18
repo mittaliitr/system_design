@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>4.4 ScheduledExecutorService</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #f39c12;
+          --secondary: #e67e22;
+          --accent: #3498db;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+          --info: #00cec9;
+          --code-bg: #2d2d2d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 3.5rem 2rem; text-align: center; }
+
+        header h1 { font-size: 2.8rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.6rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.2rem; opacity: 0.9; max-width: 900px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.95rem; margin-top: 1.2rem; font-weight: 600; }
+
+        main { padding: 3.5rem 2.5rem; }
+
+        section { margin-bottom: 4.5rem; }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #fffaf0 0%, #ffedd6 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(230,126,34,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #f8f8f2;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #666;
+          font-weight: 600;
+        }
+
+        .method-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 2rem;
+          margin: 3rem 0;
+        }
+
+        .method-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .method-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(230,126,34,0.25);
+        }
+
+        .method-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 0.8rem;
+          color: var(--primary);
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        .method-signature {
+          background: #f8f9fa;
+          padding: 0.8rem;
+          border-radius: 10px;
+          margin: 1rem 0;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 0.9rem;
+          color: #2d3436;
+          border-left: 4px solid var(--primary);
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        .demo-scenario {
+          background: #f8f9fa;
+          border-radius: 18px;
+          padding: 2.5rem;
+          margin: 3rem 0;
+          border-left: 6px solid var(--primary);
+        }
+
+        .scenario-title {
+          font-weight: 700;
+          color: var(--primary);
+          font-size: 1.4rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .pitfall {
+          background: #fff5f5;
+          padding: 1.5rem;
+          border-radius: 12px;
+          border-left: 6px solid var(--danger);
+          margin: 2rem 0;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .method-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>4.4 ScheduledExecutorService</h1>
+        <h2>Timers, Delays, and Periodic Tasks — Done Right</h2>
+        <p>The modern replacement for <code>java.util.Timer</code></p>
+        <div class="badge">Chapter 4 – Executors & Thread Pools</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>Goodbye Timer, Hello ScheduledExecutorService</h2>
+            <p>
+                <code>java.util.Timer</code> (1998) had fatal flaws:
+            </p>
+            <ul style="margin: 1.5rem 0; padding-left: 2rem; font-size: 1.1rem;">
+                <li>Single thread → one slow task blocks everything</li>
+                <li>Exception kills the timer</li>
+                <li>No thread pool, no control</li>
+            </ul>
+            <div class="highlight">
+                <strong>Java 5 fixed it forever:</strong><br>
+                <code>ScheduledExecutorService</code> = thread pool + scheduling
+            </div>
+        </section>
+
+        <!-- Core Methods -->
+        <section>
+            <h2>The 4 Scheduling Methods</h2>
+
+            <div class="method-grid">
+                <div class="method-card">
+                    <div class="method-title">schedule()</div>
+                    <div class="method-signature">
+                        schedule(Callable, delay, unit)
+                    </div>
+                    <div class="highlight">
+                        Run once after delay
+                    </div>
+                    <div class="code-block" style="margin: 1.5rem 0 0; box-shadow: none;">
+              <pre>
+scheduler.schedule(() -> cleanup(), 10, MINUTES);
+              </pre>
+                    </div>
+                </div>
+
+                <div class="method-card">
+                    <div class="method-title">scheduleAtFixedRate()</div>
+                    <div class="method-signature">
+                        scheduleAtFixedRate(Runnable, initial, period, unit)
+                    </div>
+                    <div class="highlight">
+                        Fixed period between start times<br>
+                        (overlapping possible)
+                    </div>
+                    <div class="code-block" style="margin: 1.5rem 0 0; box-shadow: none;">
+              <pre>
+scheduler.scheduleAtFixedRate(() -> heartbeat(), 0, 5, SECONDS);
+              </pre>
+                    </div>
+                </div>
+
+                <div class="method-card">
+                    <div class="method-title">scheduleWithFixedDelay()</div>
+                    <div class="method-signature">
+                        scheduleWithFixedDelay(Runnable, initial, delay, unit)
+                    </div>
+                    <div class="highlight">
+                        Fixed delay between end and next start<br>
+                        (never overlaps)
+                    </div>
+                    <div class="code-block" style="margin: 1.5rem 0 0; box-shadow: none;">
+              <pre>
+scheduler.scheduleWithFixedDelay(() -> backup(), 1, 1, HOURS);
+              </pre>
+                    </div>
+                </div>
+
+                <div class="method-card">
+                    <div class="method-title">scheduleAtFixedRate vs FixedDelay</div>
+                    <div class="mermaid" style="margin: 0; padding: 1rem;">
+                        sequenceDiagram
+                        Note over FixedRate: Task takes 3s, period 5s
+                        loop FixedRate
+                        Task->>Task: Run
+                        Note over Task: 3s work
+                        end
+                        Note over FixedDelay: Task takes 3s, delay 5s
+                        loop FixedDelay
+                        Task->>Task: Run
+                        Note over Task: 3s work
+                        Task->>Task: Wait 5s
+                        end
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Real-World Example -->
+        <section>
+            <h2>Real-World: Heartbeat + Cleanup + Retry</h2>
+
+            <div class="demo-scenario">
+                <div class="scenario-title">Microservice Health & Maintenance</div>
+                <div class="code-block">
+            <pre>
+ScheduledExecutorService scheduler =
+    Executors.newScheduledThreadPool(4);
+
+// 1. Heartbeat every 30s
+scheduler.scheduleAtFixedRate(
+    this::sendHeartbeat, 0, 30, SECONDS);
+
+// 2. Cleanup temp files every hour
+scheduler.scheduleWithFixedDelay(
+    this::cleanupTempFiles, 1, 1, HOURS);
+
+// 3. Exponential backoff retry
+AtomicInteger attempts = new AtomicInteger();
+scheduler.schedule(() -> {
+    if (!tryConnect() && attempts.getAndIncrement() < 5) {
+        long delay = (long) Math.pow(2, attempts.get()) * 1000;
+        scheduler.schedule(this, delay, MILLISECONDS);
+    }
+}, 1000, MILLISECONDS);
+            </pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pitfalls -->
+        <section>
+            <h2>Common Pitfalls & Fixes</h2>
+
+            <div class="method-grid">
+                <div class="method-card">
+                    <div class="method-title">Long-running tasks in fixedRate</div>
+                    <div class="pitfall">
+                        Task takes 10s, period 5s → overlapping → memory leak!
+                    </div>
+                    <div class="highlight">
+                        Fix: Use <code>scheduleWithFixedDelay</code>
+                    </div>
+                </div>
+
+                <div class="method-card">
+                    <div class="method-title">Exception kills the scheduler</div>
+                    <div class="pitfall">
+                        Uncaught exception → no more executions!
+                    </div>
+                    <div class="highlight">
+                        Fix: Wrap in try-catch or use <code>submit()</code> + Future
+                    </div>
+                </div>
+
+                <div class="method-card">
+                    <div class="method-title">Never shutdown</div>
+                    <div class="pitfall">
+                        Daemon threads → JVM won't exit cleanly
+                    </div>
+                    <div class="highlight">
+                        Fix: <code>scheduler.shutdownNow()</code> in finally
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Best Practices -->
+        <section>
+            <h2>Production Patterns</h2>
+
+            <div class="code-block">
+          <pre>
+// Graceful startup/shutdown
+public class SchedulerManager implements AutoCloseable {
+    private final ScheduledExecutorService scheduler =
+        Executors.newScheduledThreadPool(4);
+
+    public void start() {
+        scheduler.scheduleAtFixedRate(this::task, 0, 1, MINUTES);
+    }
+
+    @Override
+    public void close() {
+        scheduler.shutdown();
+        try {
+            if (!scheduler.awaitTermination(60, SECONDS)) {
+                scheduler.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            scheduler.shutdownNow();
+        }
+    }
+}
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Always:</strong><br>
+                • Use <code>newScheduledThreadPool()</code>, not <code>Executors</code> factory<br>
+                • Handle exceptions<br>
+                • Implement graceful shutdown<br>
+                • Prefer <code>scheduleWithFixedDelay</code> for maintenance tasks
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #fffaf0; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> <code>ScheduledExecutorService</code> = thread pool + scheduling</p>
+                <p><strong>2.</strong> <code>schedule()</code> = one-shot delay</p>
+                <p><strong>3.</strong> <code>scheduleAtFixedRate()</code> = fixed period (can overlap)</p>
+                <p><strong>4.</strong> <code>scheduleWithFixedDelay()</code> = fixed delay between tasks (no overlap)</p>
+                <p><strong>5.</strong> Never use <code>java.util.Timer</code></p>
+                <p><strong>6.</strong> Always handle exceptions and shutdown cleanly</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-4.3-submit-vs-execute.html" style="color: var(--primary);">← 4.3 submit() vs execute()</a> |
+            <a href="chapter-4.5-fork-join.html" style="color: var(--primary);">4.5 Fork/Join Framework →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#f39c12',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#f39c12',
+        lineColor: '#f39c12',
+        secondaryColor: '#e67e22',
+        tertiaryColor: '#3498db'
+      },
+      sequence: {
+        diagramMarginX: 50,
+        diagramMarginY: 30,
+        actorMargin: 80,
+        width: 160,
+        height: 70,
+        boxMargin: 15,
+        messageMargin: 50,
+        noteMargin: 15
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

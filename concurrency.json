@@ -168,35 +168,39 @@
     },
     {
       "name": "4. Concurrency Utilities in Java",
+      "url": "concurrency /chapter4.0.html",
       "children": [
         {
-          "name": "4.1 java.util.concurrent Package",
-          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/package-summary.html",
-          "tag": "package"
+          "name": "4.1 Why new Thread() Is Wrong",
+          "url": "concurrency /chapter4.1.html"
         },
         {
           "name": "4.2 ExecutorService & Thread Pools",
-          "url": "https://www.baeldung.com/thread-pool-java-and-guava",
-          "tag": "executor"
+          "url": "concurrency /chapter4.2.html"
         },
         {
-          "name": "4.3 Callable & Future",
-          "url": "https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/Callable.html",
-          "tag": "future"
+          "name": "4.3 submit() vs execute()",
+          "url": "concurrency /chapter4.3.html"
         },
         {
-          "name": "4.4 ReentrantLock, ReadWriteLock",
-          "url": "https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/locks/ReentrantLock.html",
-          "tag": "lock"
+          "name": "4.4 ScheduledExecutorService",
+          "url": "concurrency /chapter4.4.html"
         },
         {
-          "name": "4.5 Semaphore, CountDownLatch, CyclicBarrier",
-          "url": "https://www.baeldung.com/java-semaphore",
-          "tag": "sync"
+          "name": "4.5 Fork/Join Framework",
+          "url": "concurrency /chapter4.5.html"
         },
         {
-          "name": "4.6 Real-World: Web Server Handling 10K+ Requests",
-          "tag": "realworld"
+          "name": "4.6 Parallel Streams",
+          "url": "concurrency /chapter4.6.html"
+        },
+        {
+          "name": "4.7 Real-World: Spring Boot + Thread Pools",
+          "url": "concurrency /chapter4.7.html"
+        },
+        {
+          "name": "4.8 Best Practices & Anti-Patterns",
+          "url": "concurrency /chapter4.8.html"
         }
       ]
     },

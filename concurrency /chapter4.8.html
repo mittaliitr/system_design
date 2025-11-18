@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>4.8 Best Practices & Anti-Patterns</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #7c3aed;
+          --secondary: #9333ea;
+          --accent: #c084fc;
+          --dark: #1e1b4b;
+          --light: #f8fafc;
+          --gray: #64748b;
+          --success: #10b981;
+          --warning: #f59e0b;
+          --danger: #ef4444;
+          --info: #3b82f6;
+          --code-bg: #1e1b4b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 3.5rem 2rem; text-align: center; }
+
+        header h1 { font-size: 2.8rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.6rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.2rem; opacity: 0.9; max-width: 900px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.95rem; margin-top: 1.2rem; font-weight: 600; }
+
+        main { padding: 3.5rem 2.5rem; }
+
+        section { margin-bottom: 4.5rem; }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #f3f0ff 0%, #e8e0ff 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(124,58,237,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #e9d5ff;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #a78bfa;
+          font-weight: 600;
+        }
+
+        .practice-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+          gap: 2rem;
+          margin: 3rem 0;
+        }
+
+        .practice-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .practice-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(124,58,237,0.25);
+        }
+
+        .card-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 1rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        .badge-do { background: var(--success); color: white; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .badge-dont { background: var(--danger); color: white; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        .summary-box {
+          background: linear-gradient(120deg, #f3f0ff 0%, #e8e0ff 100%);
+          padding: 2.5rem;
+          border-radius: 18px;
+          border-left: 6px solid var(--primary);
+          margin: 3rem 0;
+        }
+
+        .summary-title {
+          font-weight: 700;
+          font-size: 1.6rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          text-align: center;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .practice-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>4.8 Best Practices & Anti-Patterns</h1>
+        <h2>The Dos and Don’ts of Production Concurrency</h2>
+        <p>Rules that separate junior from senior Java engineers</p>
+        <div class="badge">Chapter 4 – Executors & Thread Pools</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>Chapter 4 Capstone</h2>
+            <p>
+                You now know <em>how</em> to use executors, pools, and parallelism.<br>
+                This final section teaches you <strong>how to use them correctly in production</strong>.
+            </p>
+            <div class="highlight">
+                <strong>Golden Rule:</strong><br>
+                <em>Prefer high-level constructs. Never manage threads manually.</em>
+            </div>
+        </section>
+
+        <!-- Do vs Don't Grid -->
+        <section>
+            <h2>The Ultimate Do / Don’t Guide</h2>
+
+            <div class="practice-grid">
+                <!-- Do -->
+                <div class="practice-card">
+                    <div class="card-title">
+                        Do This
+                        <span class="badge-do">Best Practice</span>
+                    </div>
+                    <ul style="margin-top: 1rem; padding-left: 1.5rem; line-height: 1.8;">
+                        <li>Use <code>ExecutorService</code> from <code>Executors</code> or custom</li>
+                        <li>Always <code>shutdown()</code> + <code>awaitTermination()</code></li>
+                        <li>Prefer <code>submit()</code> + <code>Future</code> or <code>CompletableFuture</code></li>
+                        <li>Use bounded queues and rejection policies</li>
+                        <li>Size pools based on CPU vs I/O bound</li>
+                        <li>Monitor with Micrometer / JMX</li>
+                        <li>Use <code>parallelStream()</code> for CPU-bound data processing</li>
+                        <li>Never block <code>commonPool()</code></li>
+                    </ul>
+                </div>
+
+                <!-- Don't -->
+                <div class="practice-card">
+                    <div class="card-title">
+                        Never Do This
+                        <span class="badge-dont">Anti-Pattern</span>
+                    </div>
+                    <ul style="margin-top: 1rem; padding-left: 1.5rem; line-height: 1.8;">
+                        <li><code>new Thread(runnable).start()</code> in loops</li>
+                        <li><code>Executors.newCachedThreadPool()</code> in servers</li>
+                        <li>Unbounded queues (<code>LinkedBlockingQueue</code> without limit)</li>
+                        <li>Blocking I/O in <code>commonPool()</code> or parallel streams</li>
+                        <li>Creating thousands of short-lived threads</li>
+                        <li>Forgetting to shutdown executors</li>
+                        <li>Using <code>java.util.Timer</code></li>
+                        <li>Manual thread management in Spring</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pool Sizing Guide -->
+        <section>
+            <h2>Thread Pool Sizing Cheat Sheet</h2>
+
+            <div class="mermaid">
+                graph TD
+                A[Task Type?] --> B[CPU-bound]
+                A --> C[I/O-bound]
+                B --> D[N = CPU cores]
+                C --> E[N = CPU cores × (1 + Wait/Time)]
+                E --> F[Typical: 50–200 threads]
+                D --> G[Example: newFixedThreadPool(Runtime.getRuntime().availableProcessors())]
+
+                style B fill:#00b894,stroke:#00b894,color:white
+                style C fill:#3498db,stroke:#3498db,color:white
+            </div>
+
+            <div class="highlight">
+                <strong>CPU-bound:</strong> N = number of cores<br>
+                <strong>I/O-bound:</strong> N = cores × (1 + average wait / compute time)
+            </div>
+        </section>
+
+        <!-- Common Production Configurations -->
+        <section>
+            <h2>Production-Grade Configurations</h2>
+
+            <div class="practice-grid">
+                <div class="practice-card">
+                    <div class="card-title">Web Server Pool</div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+new ThreadPoolExecutor(
+    50, 200,
+    60L, TimeUnit.SECONDS,
+    new LinkedBlockingQueue<>(1000),
+    new ThreadFactoryBuilder().setNameFormat("web-%d").build(),
+    new CallerRunsPolicy()
+)
+              </pre>
+                    </div>
+                </div>
+
+                <div class="practice-card">
+                    <div class="card-title">@Async Pool</div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+@Bean
+public TaskExecutor asyncExecutor() {
+    ThreadPoolTaskExecutor e = new ThreadPoolTaskExecutor();
+    e.setCorePoolSize(8);
+    e.setMaxPoolSize(64);
+    e.setQueueCapacity(500);
+    e.setThreadNamePrefix("async-");
+    e.setRejectedExecutionHandler(new CallerRunsPolicy());
+    return e;
+}
+              </pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Shutdown Pattern -->
+        <section>
+            <h2>Graceful Shutdown Pattern</h2>
+
+            <div class="code-block">
+          <pre>
+@PreDestroy
+public void shutdown() {
+    executor.shutdown();
+    try {
+        if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+            executor.shutdownNow();
+            executor.awaitTermination(60, TimeUnit.SECONDS);
+        }
+    } catch (InterruptedException e) {
+        executor.shutdownNow();
+        Thread.currentThread().interrupt();
+    }
+}
+          </pre>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Final Chapter 4 Takeaways</h2>
+
+            <div class="summary-box">
+                <div class="summary-title">You Are Now Production-Ready</div>
+                <ul style="margin: 2rem 0; padding-left: 2rem; font-size: 1.1rem; line-height: 1.9;">
+                    <li><strong>Never</strong> use <code>new Thread()</code> — ever</li>
+                    <li><strong>Always</strong> use <code>ExecutorService</code> or higher-level APIs</li>
+                    <li>Size pools correctly: CPU-bound ≈ cores, I/O-bound ≈ 50–200</li>
+                    <li>Use bounded queues + <code>CallerRunsPolicy</code></li>
+                    <li>Always shutdown gracefully</li>
+                    <li>Never block <code>commonPool()</code> or parallel streams</li>
+                    <li>Monitor active threads, queue size, rejected tasks</li>
+                    <li>Prefer <code>CompletableFuture</code> and reactive for new code</li>
+                </ul>
+                <div style="text-align: center; margin-top: 2rem; font-size: 1.4rem; font-weight: 700; color: var(--primary);">
+                    Chapter 4 Complete — You now build scalable, robust Java systems.
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-4.7-spring-boot.html" style="color: var(--primary);">← 4.7 Spring Boot + Thread Pools</a> |
+            <a href="chapter-5.1-blocking-queues.html" style="color: var(--primary);">Chapter 5: Blocking Queues →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#7c3aed',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#7c3aed',
+        lineColor: '#7c3aed',
+        secondaryColor: '#9333ea',
+        tertiaryColor: '#c084fc'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>4.3 submit() vs execute() — Future, Callable, CompletableFuture</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #9b59b6;
+          --secondary: #8e44ad;
+          --accent: #e74c3c;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+          --info: #00cec9;
+          --code-bg: #2d2d2d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 3.5rem 2rem; text-align: center; }
+
+        header h1 { font-size: 2.8rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.6rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.2rem; opacity: 0.9; max-width: 900px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.95rem; margin-top: 1.2rem; font-weight: 600; }
+
+        main { padding: 3.5rem 2.5rem; }
+
+        section { margin-bottom: 4.5rem; }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #f5f0ff 0%, #e8e0ff 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(155,89,182,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #f8f8f2;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #666;
+          font-weight: 600;
+        }
+
+        .comparison-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+          gap: 2rem;
+          margin: 3rem 0;
+        }
+
+        .comparison-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .comparison-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(155,89,182,0.25);
+        }
+
+        .card-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 1rem;
+          color: var(--primary);
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        .badge-execute { background: #e74c3c; color: white; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .badge-submit { background: var(--success); color: white; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        .future-demo {
+          background: #f8f9fa;
+          border-radius: 18px;
+          padding: 2.5rem;
+          margin: 3rem 0;
+          border-left: 6px solid var(--primary);
+        }
+
+        .demo-title {
+          font-weight: 700;
+          color: var(--primary);
+          font-size: 1.4rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .completable-future {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 2rem;
+          margin: 3rem 0;
+        }
+
+        .cf-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .cf-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(155,89,182,0.25);
+        }
+
+        .cf-title {
+          font-weight: 700;
+          font-size: 1.3rem;
+          margin-bottom: 0.8rem;
+          color: var(--primary);
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .comparison-grid { grid-template-columns: 1fr; }
+          .completable-future { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>4.3 submit() vs execute()</h1>
+        <h2>Future, Callable, CompletableFuture</h2>
+        <p>From fire-and-forget to async/await-style programming</p>
+        <div class="badge">Chapter 4 – Executors & Thread Pools</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>Two Ways to Submit Tasks</h2>
+            <p>
+                <code>ExecutorService</code> gives you two methods:
+            </p>
+            <ul style="margin: 1.5rem 0; padding-left: 2rem; font-size: 1.1rem;">
+                <li><code>execute(Runnable)</code> → fire-and-forget</li>
+                <li><code>submit(...)</code> → returns <code>Future</code> (get result, cancel, etc.)</li>
+            </ul>
+            <div class="highlight">
+                <strong>Rule:</strong>
+                <em>Always prefer <code>submit()</code> — it’s strictly superior.</em>
+            </div>
+        </section>
+
+        <!-- Comparison -->
+        <section>
+            <h2>execute() vs submit()</h2>
+
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <div class="card-title">
+                        execute(Runnable)
+                        <span class="badge-execute">Legacy</span>
+                    </div>
+                    <div class="code-block" style="margin: 0; box-shadow: none;">
+              <pre>
+executor.execute(() -> {
+    // No way to get result
+    // Exception dies silently!
+});
+              </pre>
+                    </div>
+                    <div class="highlight">
+                        <strong>Problems:</strong><br>
+                        • No return value<br>
+                        • Exception swallowed<br>
+                        • Cannot cancel
+                    </div>
+                </div>
+
+                <div class="comparison-card">
+                    <div class="card-title">
+                        submit(Runnable/Callable)
+                        <span class="badge-submit">Recommended</span>
+                    </div>
+                    <div class="code-block" style="margin: 0; box-shadow: none;">
+              <pre>
+Future<?> f = executor.submit(() -> {
+    // Can throw checked exceptions
+});
+
+Future<String> f2 = executor.submit(() -> "Result");
+String result = f2.get();  // Blocks
+              </pre>
+                    </div>
+                    <div class="highlight">
+                        <strong>Benefits:</strong><br>
+                        • Get result<br>
+                        • Exception in ExecutionException<br>
+                        • Cancel task
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Callable vs Runnable -->
+        <section>
+            <h2>Callable — Runnable That Returns</h2>
+
+            <div class="code-block">
+          <pre>
+// Old way — no return
+Runnable task = () -> compute();
+
+// New way — returns value + throws checked
+Callable<String> task = () -> computeExpensive();
+
+Future<String> future = executor.submit(task);
+String result = future.get();  // Blocks until done
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Callable<V></strong> is the modern replacement for Runnable when you need results.
+            </div>
+        </section>
+
+        <!-- Future API -->
+        <section>
+            <h2>Future: The Promise of a Result</h2>
+
+            <div class="mermaid">
+                graph TD
+                A[submit(task)] --> B[Future Object]
+                B -->|get()| C[Result or Exception]
+                B -->|get(timeout)| D[TimeoutException]
+                B -->|cancel(true)| E[InterruptedException]
+                B -->|isDone()| F[true/false]
+                style B fill:#9b59b6,stroke:#9b59b6,color:white
+            </div>
+
+            <div class="code-block">
+          <pre>
+Future<String> future = executor.submit(() -> "Hello");
+
+try {
+    String result = future.get(10, TimeUnit.SECONDS);
+} catch (TimeoutException e) {
+    future.cancel(true);  // Interrupt if running
+}
+          </pre>
+            </div>
+        </section>
+
+        <!-- CompletableFuture: The Revolution -->
+        <section>
+            <h2>CompletableFuture — Async/Await for Java</h2>
+
+            <div class="completable-future">
+                <div class="cf-card">
+                    <div class="cf-title">Chaining</div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+CompletableFuture.supplyAsync(() -> fetchUser())
+    .thenApply(user -> enrich(user))
+    .thenAccept(System.out::println);
+              </pre>
+                    </div>
+                </div>
+                <div class="cf-card">
+                    <div class="cf-title">Combining</div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+var user = fetchUserAsync();
+var orders = fetchOrdersAsync(user.id);
+
+CompletableFuture.allOf(user, orders)
+    .thenRun(() -> render(user, orders));
+              </pre>
+                    </div>
+                </div>
+                <div class="cf-card">
+                    <div class="cf-title">Exception Handling</div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+fetchAsync()
+    .exceptionally(ex -> fallback())
+    .thenAccept(result -> use(result));
+              </pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>CompletableFuture</strong> = Future on steroids<br>
+                Non-blocking, composable, reactive-style
+            </div>
+        </section>
+
+        <!-- Best Practices -->
+        <section>
+            <h2>Golden Rules</h2>
+
+            <div class="highlight">
+                <strong>Never:</strong><br>
+                • Use <code>execute()</code> (swallows exceptions)<br>
+                • Block on <code>future.get()</code> in high-throughput code<br>
+                • Forget <code>finally { executor.shutdown() }</code>
+            </div>
+
+            <div class="highlight">
+                <strong>Always:</strong><br>
+                • Prefer <code>submit(Callable)</code> or <code>CompletableFuture</code><br>
+                • Use <code>thenApply/thenAccept</code> for non-blocking<br>
+                • Handle <code>ExecutionException</code> and <code>CancellationException</code>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #f5f0ff; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> <code>execute()</code> = fire-and-forget (dangerous)</p>
+                <p><strong>2.</strong> <code>submit()</code> = returns <code>Future</code> (get result, cancel)</p>
+                <p><strong>3.</strong> <code>Callable</code> = Runnable that returns value + throws</p>
+                <p><strong>4.</strong> <code>CompletableFuture</code> = async/await style</p>
+                <p><strong>5.</strong> Always handle exceptions and timeouts</p>
+                <p><strong>6.</strong> <strong>Never block the main thread</strong> — chain with <code>then...</code></p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-4.2-executor-service.html" style="color: var(--primary);">← 4.2 ExecutorService & Pools</a> |
+            <a href="chapter-4.4-scheduled-executor.html" style="color: var(--primary);">4.4 ScheduledExecutorService →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#9b59b6',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#9b59b6',
+        lineColor: '#9b59b6',
+        secondaryColor: '#8e44ad',
+        tertiaryColor: '#e74c3c'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

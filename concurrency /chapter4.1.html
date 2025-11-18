@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Chapter 4 – Executors, Thread Pools & Fork/Join</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #27ae60;
+          --secondary: #2ecc71;
+          --accent: #3498db;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+          --info: #00cec9;
+          --code-bg: #2d2d2d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 4rem 2rem; text-align: center; }
+
+        header h1 { font-size: 3rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.8rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.3rem; opacity: 0.9; max-width: 1000px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.5rem 1.2rem; border-radius: 50px; font-size: 1rem; margin-top: 1.5rem; font-weight: 600; }
+
+        main { padding: 4rem 3rem; }
+
+        section { margin-bottom: 5rem; }
+
+        h2 {
+          font-size: 2.2rem;
+          color: var(--primary);
+          margin-bottom: 1.8rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #f0fff4 0%, #e8fff0 100%);
+          padding: 1.6rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2.5rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(39,174,96,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #f8f8f2;
+          padding: 1.6rem;
+          border-radius: 16px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2.5rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.8rem;
+          right: 1.4rem;
+          font-size: 0.9rem;
+          color: #666;
+          font-weight: 600;
+        }
+
+        .toc-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 2rem;
+          margin: 4rem 0;
+        }
+
+        .toc-card {
+          background: white;
+          border-radius: 18px;
+          padding: 2rem;
+          text-align: center;
+          box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+          transition: all 0.4s ease;
+          border: 2px solid #eee;
+        }
+
+        .toc-card:hover {
+          transform: translateY(-12px);
+          border-color: var(--primary);
+          box-shadow: 0 20px 40px rgba(39,174,96,0.25);
+        }
+
+        .toc-number {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 3rem;
+          font-weight: 700;
+          color: var(--primary);
+          margin-bottom: 0.5rem;
+        }
+
+        .toc-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 0.8rem;
+          color: var(--dark);
+        }
+
+        .toc-desc {
+          color: #555;
+          font-size: 1rem;
+          line-height: 1.6;
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 3rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        footer {
+          text-align: center;
+          padding: 3rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 1rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.4rem; }
+          header h2 { font-size: 1.4rem; }
+          .toc-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Chapter 4</h1>
+        <h2>Executors, Thread Pools & Fork/Join</h2>
+        <p>The Real Way Java Manages Thousands of Tasks</p>
+        <div class="badge">Welcome to java.util.concurrent</div>
+    </header>
+
+    <main>
+        <section>
+            <h2>Chapter 4 – Table of Contents</h2>
+
+            <div class="toc-grid">
+                <div class="toc-card">
+                    <div class="toc-number">4.1</div>
+                    <div class="toc-title">Why new Thread() Is Wrong</div>
+                    <div class="toc-desc">The hidden cost of creating threads</div>
+                </div>
+                <div class="toc-card">
+                    <div class="toc-number">4.2</div>
+                    <div class="toc-title">ExecutorService & Thread Pools</div>
+                    <div class="toc-desc">Fixed, cached, single — choose wisely</div>
+                </div>
+                <div class="toc-card">
+                    <div class="toc-number">4.3</div>
+                    <div class="toc-title">submit() vs execute()</div>
+                    <div class="toc-desc">Future, Callable, CompletableFuture</div>
+                </div>
+                <div class="toc-card">
+                    <div class="toc-number">4.4</div>
+                    <div class="toc-title">ScheduledExecutorService</div>
+                    <div class="toc-desc">Timers, delays, periodic tasks</div>
+                </div>
+                <div class="toc-card">
+                    <div class="toc-number">4.5</div>
+                    <div class="toc-title">Fork/Join Framework</div>
+                    <div class="toc-desc">Divide-and-conquer parallelism</div>
+                </div>
+                <div class="toc-card">
+                    <div class="toc-number">4.6</div>
+                    <div class="toc-title">Parallel Streams</div>
+                    <div class="toc-desc">One line → massive parallelism</div>
+                </div>
+                <div class="toc-card">
+                    <div class="toc-number">4.7</div>
+                    <div class="toc-title">Real-World: Spring Boot + Thread Pools</div>
+                    <div class="toc-desc">Tomcat, @Async, TaskExecutor</div>
+                </div>
+                <div class="toc-card">
+                    <div class="toc-number">4.8</div>
+                    <div class="toc-title">Best Practices & Anti-Patterns</div>
+                    <div class="toc-desc">Shutdown, poisoning, sizing</div>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>By the end of Chapter 4:</strong><br>
+                • You will <strong>never</strong> call <code>new Thread()</code> again<br>
+                • You will build <strong>scalable, robust</strong> concurrent systems<br>
+                • You will understand <strong>how Netflix, Uber, and banks</strong> handle millions of tasks
+            </div>
+
+            <div class="mermaid">
+                graph TD
+                A[Chapter 4] --> B[Never use new Thread()]
+                A --> C[Master ExecutorService]
+                A --> D[Fork/Join & Parallel Streams]
+                A --> E[Production Patterns]
+                A --> F[Scale to Millions]
+
+                style B fill:#d63031,stroke:#d63031,color:white
+                style F fill:#00b894,stroke:#00b894,color:white
+            </div>
+        </section>
+
+        <section>
+            <h2>Ready?</h2>
+            <div style="text-align: center; padding: 3rem; background: #f0fff4; border-radius: 20px; border: 4px solid var(--primary);">
+                <p style="font-size: 1.8rem; font-weight: 700; color: var(--primary);">
+                    Chapter 4 begins now.<br>
+                    Say <strong>"4.1"</strong> to start with "Why new Thread() Is Wrong"
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-3.7-bank-transfers.html" style="color: var(--primary);">← Chapter 3: Synchronization</a> |
+            <a href="#" style="color: var(--primary);">Chapter 4: Executors →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#27ae60',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#27ae60',
+        lineColor: '#27ae60',
+        secondaryColor: '#2ecc71',
+        tertiaryColor: '#3498db'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>
