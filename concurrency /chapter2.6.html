@@ -21,11 +21,7 @@
           --code-bg: #2d2d2d;
         }
 
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
           font-family: 'Inter', sans-serif;
@@ -35,58 +31,19 @@
           padding: 2rem;
         }
 
-        .container {
-          max-width: 1300px;
-          margin: 0 auto;
-          background: white;
-          border-radius: 20px;
-          box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-          overflow: hidden;
-        }
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
 
-        header {
-          background: linear-gradient(120deg, var(--primary), var(--secondary));
-          color: white;
-          padding: 3.5rem 2rem;
-          text-align: center;
-        }
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 3.5rem 2rem; text-align: center; }
 
-        header h1 {
-          font-size: 2.8rem;
-          margin-bottom: 0.5rem;
-          font-weight: 700;
-        }
+        header h1 { font-size: 2.8rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.6rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.2rem; opacity: 0.9; max-width: 900px; margin: 0 auto; }
 
-        header h2 {
-          font-size: 1.6rem;
-          margin-bottom: 0.5rem;
-          opacity: 0.95;
-        }
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.95rem; margin-top: 1.2rem; font-weight: 600; }
 
-        header p {
-          font-size: 1.2rem;
-          opacity: 0.9;
-          max-width: 900px;
-          margin: 0 auto;
-        }
+        main { padding: 3.5rem 2.5rem; }
 
-        .badge {
-          display: inline-block;
-          background: rgba(255,255,255,0.2);
-          padding: 0.4rem 1rem;
-          border-radius: 50px;
-          font-size: 0.95rem;
-          margin-top: 1.2rem;
-          font-weight: 600;
-        }
-
-        main {
-          padding: 3.5rem 2.5rem;
-        }
-
-        section {
-          margin-bottom: 4.5rem;
-        }
+        section { margin-bottom: 4.5rem; }
 
         h2 {
           font-size: 2rem;
@@ -98,32 +55,7 @@
           align-items: center;
           gap: 0.6rem;
         }
-
-        h2::before {
-          content: '';
-          position: absolute;
-          left: 0;
-          top: 0;
-          bottom: 0;
-          width: 6px;
-          background: var(--primary);
-          border-radius: 3px;
-        }
-
-        h3 {
-          font-size: 1.5rem;
-          color: var(--dark);
-          margin: 2rem 0 1rem;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-        }
-
-        p {
-          margin-bottom: 1.3rem;
-          color: #444;
-          font-size: 1.05rem;
-        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
 
         .highlight {
           background: linear-gradient(120deg, #f5f0ff 0%, #e8e0ff 100%);
@@ -154,7 +86,6 @@
           right: 1.2rem;
           font-size: 0.85rem;
           color: #666;
-          font-family: 'Inter', sans-serif;
           font-weight: 600;
         }
 
@@ -164,7 +95,6 @@
           padding: 2.5rem;
           margin: 3rem 0;
           border-left: 6px solid var(--primary);
-          position: relative;
         }
 
         .scenario-title {
@@ -199,12 +129,7 @@
           justify-content: space-between;
         }
 
-        .status-bar {
-          font-size: 0.7rem;
-          color: #666;
-          text-align: left;
-          padding: 0.5rem 1rem;
-        }
+        .status-bar { font-size: 0.7rem; color: #666; text-align: left; padding: 0.5rem 1rem; }
 
         .app-content {
           flex: 1;
@@ -214,14 +139,7 @@
           gap: 1rem;
         }
 
-        .sync-status {
-          font-weight: 600;
-          color: var(--success);
-        }
-
-        .sync-error {
-          color: var(--danger);
-        }
+        .sync-status { font-weight: 600; color: var(--success); }
 
         .mermaid {
           background: white;
@@ -234,11 +152,7 @@
           overflow: visible !important;
         }
 
-        .mermaid svg {
-          width: 100% !important;
-          height: auto !important;
-          max-width: none !important;
-        }
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
 
         .architecture-grid {
           display: grid;
@@ -263,10 +177,7 @@
           box-shadow: 0 16px 32px rgba(155,89,182,0.25);
         }
 
-        .arch-icon {
-          font-size: 2.5rem;
-          margin-bottom: 1rem;
-        }
+        .arch-icon { font-size: 2.5rem; margin-bottom: 1rem; }
 
         .arch-title {
           font-weight: 700;
@@ -275,11 +186,7 @@
           color: var(--primary);
         }
 
-        .arch-desc {
-          color: #555;
-          font-size: 0.95rem;
-          line-height: 1.6;
-        }
+        .arch-desc { color: #555; font-size: 0.95rem; line-height: 1.6; }
 
         .code-comparison {
           display: grid;
@@ -288,13 +195,8 @@
           margin: 3rem 0;
         }
 
-        .bad-code {
-          border-left: 6px solid var(--danger);
-        }
-
-        .good-code {
-          border-left: 6px solid var(--success);
-        }
+        .bad-code { border-left: 6px solid var(--danger); }
+        .good-code { border-left: 6px solid var(--success); }
 
         .takeaway {
           background: #f0e8ff;
@@ -386,20 +288,20 @@
             </div>
         </section>
 
-        <!-- Architecture -->
+        <!-- Architecture - FIXED Mermaid -->
         <section>
             <h2>System Architecture</h2>
 
             <div class="mermaid">
                 graph TD
-                A[Main UI Thread] --> B[SyncManager]
-                B --> C[Daemon Sync Thread<br>(Priority 3)]
-                C --> D[Local DB<br>(Room/SQLite)]
-                C --> E[Network API<br>(Retrofit/OkHttp)]
-                F[Network Monitor] -->|WiFi + Charging| C
-                G[App Lifecycle] -->|onDestroy()| B
-                B -->|interrupt()| C
-                C -->|finally| H[Flush + Close]
+                A["Main UI Thread"] --> B["SyncManager"]
+                B --> C["Daemon Sync Thread\n(Priority 3)"]
+                C --> D["Local DB\n(Room/SQLite)"]
+                C --> E["Network API\n(Retrofit/OkHttp)"]
+                F["Network Monitor"] -->|"WiFi + Charging"| C
+                G["App Lifecycle"] -->|"onDestroy()"| B
+                B -->|"interrupt()"| C
+                C -->|"finally"| H["Flush + Close"]
 
                 style C fill:#d63031,stroke:#d63031,color:white
                 style H fill:#00b894,stroke:#00b894,color:white
