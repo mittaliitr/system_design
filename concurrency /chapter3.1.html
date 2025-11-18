@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>3.1 The synchronized Keyword</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #c0392b;
+          --secondary: #e74c3c;
+          --accent: #f39c12;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+          --info: #00cec9;
+          --code-bg: #2d2d2d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 3.5rem 2rem; text-align: center; }
+
+        header h1 { font-size: 2.8rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.6rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.2rem; opacity: 0.9; max-width: 900px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.95rem; margin-top: 1.2rem; font-weight: 600; }
+
+        main { padding: 3.5rem 2.5rem; }
+
+        section { margin-bottom: 4.5rem; }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #fff5f5 0%, #ffe8e8 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(231,76,60,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #f8f8f2;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #666;
+          font-weight: 600;
+        }
+
+        .race-demo {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2rem;
+          margin: 3rem 0;
+          padding: 2rem;
+          background: #f8f9fa;
+          border-radius: 18px;
+        }
+
+        .race-thread {
+          background: white;
+          padding: 1.8rem;
+          border-radius: 14px;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+        }
+
+        .race-thread h4 {
+          color: var(--danger);
+          margin-bottom: 1rem;
+          font-size: 1.2rem;
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .race-demo { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>3.1 The synchronized Keyword</h1>
+        <h2>Your First Line of Defense Against Race Conditions</h2>
+        <p>The most important 11 letters in concurrent Java</p>
+        <div class="badge">Chapter 3 – Synchronization & Thread Safety</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>Welcome to the War on Race Conditions</h2>
+            <p>
+                You now know how to create threads.
+                Now the real challenge begins: <strong>making them play nicely together</strong>.
+            </p>
+            <div class="highlight">
+                <strong>The Problem:</strong> Multiple threads reading/writing shared mutable state → unpredictable results.<br>
+                <strong>The Solution:</strong> <code>synchronized</code> — Java’s built-in mutual exclusion.
+            </div>
+        </section>
+
+        <!-- The Classic Race Condition -->
+        <section>
+            <h2>The Classic Example: Broken Counter</h2>
+
+            <div class="race-demo">
+                <div class="race-thread">
+                    <h4>Without synchronized (Broken)</h4>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+class Counter {
+    int count = 0;
+
+    void increment() {
+        count++;  // Not atomic!
+    }
+}
+
+// 100 threads × 1000 increments → should be 100,000
+// Actual result? 73,421 (lost updates!)
+              </pre>
+                    </div>
+                </div>
+                <div class="race-thread">
+                    <h4>With synchronized (Fixed)</h4>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+class Counter {
+    int count = 0;
+
+    synchronized void increment() {
+        count++;  // Now atomic!
+    }
+}
+
+// Result: exactly 100,000
+              </pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>One word — <code>synchronized</code> — saves you from chaos.</strong>
+            </div>
+        </section>
+
+        <!-- How synchronized Works - FIXED Mermaid -->
+        <section>
+            <h2>How synchronized Actually Works</h2>
+
+            <div class="mermaid">
+                graph TD
+                A["Thread 1"] -->|"acquire monitor"| B["Object Monitor\n(intrinsic lock)"]
+                A -->|"enter synchronized"| C["Critical Section"]
+                D["Thread 2"] -->|"try acquire"| B
+                D -->|"blocked"| E["Waiting Queue"]
+                A -->|"exit synchronized"| F["release monitor"]
+                F -->|"wake one"| D
+
+                style B fill:#c0392b,stroke:#c0392b,color:white
+                style C fill:#00b894,stroke:#00b894,color:white
+                style E fill:#fdcb6e,stroke:#fdcb6e,color:#333
+            </div>
+
+            <div class="highlight">
+                <strong>Every Java object has one monitor (intrinsic lock)</strong><br>
+                <code>synchronized</code> = acquire monitor → execute → release monitor
+            </div>
+        </section>
+
+        <!-- Two Forms -->
+        <section>
+            <h2>Two Ways to Use synchronized</h2>
+
+            <div class="race-demo">
+                <div class="race-thread">
+                    <h4>1. Synchronized Method</h4>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+class Counter {
+    private int count = 0;
+
+    // Locks on 'this'
+    public synchronized void increment() {
+        count++;
+    }
+
+    // Static locks on Class object
+    public static synchronized void incStatic() {
+        staticCount++;
+    }
+}
+              </pre>
+                    </div>
+                </div>
+                <div class="race-thread">
+                    <h4>2. Synchronized Block (Preferred)</h4>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+class Counter {
+    private final Object lock = new Object();
+    private int count = 0;
+
+    public void increment() {
+        synchronized(lock) {  // Fine-grained
+            count++;
+        }
+    }
+}
+              </pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>Prefer synchronized blocks</strong> — more control, better performance, avoids accidental locking on <code>this</code>
+            </div>
+        </section>
+
+        <!-- What synchronized Guarantees -->
+        <section>
+            <h2>What synchronized Actually Guarantees</h2>
+
+            <table class="priority-table" style="width: 100%; margin: 2.5rem 0;">
+                <tr>
+                    <th>Guarantee</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><strong>Mutual Exclusion</strong></td>
+                    <td>Only one thread in the monitor at a time</td>
+                </tr>
+                <tr>
+                    <td><strong>Visibility</strong></td>
+                    <td>Writes before <code>unlock</code> visible after <code>lock</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Happens-Before</strong></td>
+                    <td>Unlock → Lock ordering guaranteed</td>
+                </tr>
+                <tr>
+                    <td><strong>Atomicity</strong></td>
+                    <td>For the block/method — no interleaving</td>
+                </tr>
+            </table>
+
+            <div class="highlight">
+                <strong>synchronized = lock + memory barrier</strong><br>
+                It’s <code>volatile</code> on steroids.
+            </div>
+        </section>
+
+        <!-- Common Pitfalls -->
+        <section>
+            <h2>Top 5 synchronized Pitfalls</h2>
+
+            <div class="race-demo">
+                <div class="race-thread">
+                    <h4>1. Locking on wrong object</h4>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+Integer count = 0;  // Boxing creates new object!
+synchronized(count) { ... }  // Race condition!
+              </pre>
+                    </div>
+                </div>
+                <div class="race-thread">
+                    <h4>2. Locking on this in public API</h4>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+public synchronized void bad() { ... }
+// Client can lock on your instance → deadlock risk
+              </pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>Best Practice:</strong>
+                Always lock on <code>private final Object lock = new Object();</code>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #fff5f5; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> <code>synchronized</code> = mutual exclusion + visibility</p>
+                <p><strong>2.</strong> Every object has one monitor (intrinsic lock)</p>
+                <p><strong>3.</strong> Prefer <code>synchronized(block)</code> over method</p>
+                <p><strong>4.</strong> Never lock on <code>this</code>, <code>String</code>, <code>Integer</code></p>
+                <p><strong>5.</strong> Use <code>private final Object lock</code> for safety</p>
+                <p><strong>6.</strong> <code>synchronized</code> is your first weapon — master it before locks</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-2.6-background-sync.html" style="color: var(--primary);">← 2.6 Background Sync</a> |
+            <a href="chapter-3.2-synchronized-blocks.html" style="color: var(--primary);">3.2 Synchronized Blocks Deep Dive →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#c0392b',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#c0392b',
+        lineColor: '#c0392b',
+        secondaryColor: '#e74c3c',
+        tertiaryColor: '#f39c12'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>3.5 ReadWriteLock & StampedLock</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #e67e22;
+          --secondary: #f39c12;
+          --accent: #3498db;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+          --info: #00cec9;
+          --code-bg: #2d2d2d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #e67e22 0%, #f39c12 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 3.5rem 2rem; text-align: center; }
+
+        header h1 { font-size: 2.8rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.6rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.2rem; opacity: 0.9; max-width: 900px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.95rem; margin-top: 1.2rem; font-weight: 600; }
+
+        main { padding: 3.5rem 2.5rem; }
+
+        section { margin-bottom: 4.5rem; }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #fffaf0 0%, #ffedd6 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(230,126,34,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #f8f8f2;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #666;
+          font-weight: 600;
+        }
+
+        .comparison-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 2rem;
+          margin: 3rem 0;
+          padding: 2rem;
+          background: #f8f9fa;
+          border-radius: 18px;
+        }
+
+        .comparison-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .comparison-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(230,126,34,0.25);
+        }
+
+        .card-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 1rem;
+          color: var(--primary);
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        .badge-rw { background: var(--success); color: white; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .badge-stamped { background: #9b59b6; color: white; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        .performance-chart {
+          display: flex;
+          justify-content: center;
+          gap: 2rem;
+          flex-wrap: wrap;
+          margin: 3rem 0;
+          padding: 2rem;
+          background: #f8f9fa;
+          border-radius: 18px;
+        }
+
+        .chart-bar {
+          text-align: center;
+          flex: 1;
+          min-width: 180px;
+          padding: 1.5rem;
+          background: white;
+          border-radius: 14px;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+        }
+
+        .bar-value {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 2.5rem;
+          font-weight: 700;
+          color: var(--primary);
+        }
+
+        .bar-label {
+          color: #666;
+          margin-top: 0.5rem;
+        }
+
+        .stamped-demo {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2rem;
+          margin: 3rem 0;
+        }
+
+        .demo-code {
+          background: white;
+          padding: 1.8rem;
+          border-radius: 14px;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+        }
+
+        .demo-title {
+          font-weight: 600;
+          color: var(--primary);
+          margin-bottom: 1rem;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .comparison-grid { grid-template-columns: 1fr; }
+          .performance-chart { flex-direction: column; }
+          .stamped-demo { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>3.5 ReadWriteLock & StampedLock</h1>
+        <h2>Optimizing for Read-Heavy Workloads</h2>
+        <p>When "readers" outnumber "writers" by 100:1</p>
+        <div class="badge">Chapter 3 – Synchronization & Thread Safety</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>The Problem with Regular Locks</h2>
+            <p>
+                <code>ReentrantLock</code> and <code>synchronized</code> are <strong>exclusive</strong>.<br>
+                Even <strong>readers</strong> block each other → unnecessary contention.
+            </p>
+            <div class="highlight">
+                <strong>Use Case:</strong>
+                Cache, configuration, analytics dashboard — <em>thousands of reads, rare writes</em>
+            </div>
+        </section>
+
+        <!-- ReadWriteLock -->
+        <section>
+            <h2>ReentrantReadWriteLock: Multiple Readers, Single Writer</h2>
+
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <div class="card-title">
+                        ReentrantLock / synchronized
+                    </div>
+                    <div class="mermaid" style="margin: 0; padding: 1rem;">
+                        graph TD
+                        R1[Reader 1] --> L[Lock]
+                        R2[Reader 2] --> L
+                        W[Writer] --> L
+                        style L fill:#d63031,stroke:#d63031,color:white
+                    </div>
+                    <div class="highlight">
+                        Only <strong>one</strong> thread at a time
+                    </div>
+                </div>
+
+                <div class="comparison-card">
+                    <div class="card-title">
+                        ReentrantReadWriteLock
+                        <span class="badge-rw">Recommended</span>
+                    </div>
+                    <div class="mermaid" style="margin: 0; padding: 1rem;">
+                        graph TD
+                        R1[Reader 1] --> RL[Read Lock]
+                        R2[Reader 2] --> RL
+                        R3[Reader 3] --> RL
+                        W[Writer] --> WL[Write Lock]
+                        style RL fill:#00b894,stroke:#00b894,color:white
+                        style WL fill:#d63031,stroke:#d63031,color:white
+                    </div>
+                    <div class="highlight">
+                        <strong>Many readers</strong> OR <strong>one writer</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-block">
+          <pre>
+ReadWriteLock rw = new ReentrantReadWriteLock();
+Lock readLock = rw.readLock();
+Lock writeLock = rw.writeLock();
+
+public String get() {
+    readLock.lock();
+    try {
+        return cache.get(key);
+    } finally {
+        readLock.unlock();
+    }
+}
+
+public void put(String value) {
+    writeLock.lock();
+    try {
+        cache.put(key, value);
+    } finally {
+        writeLock.unlock();
+    }
+}
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Performance:</strong>
+                10–100× higher throughput for read-heavy workloads
+            </div>
+        </section>
+
+        <!-- Performance Impact -->
+        <section>
+            <h2>Real Performance Gains</h2>
+
+            <div class="performance-chart">
+                <div class="chart-bar">
+                    <div class="bar-value">1×</div>
+                    <div class="bar-label">ReentrantLock</div>
+                </div>
+                <div class="chart-bar">
+                    <div class="bar-value">50×</div>
+                    <div class="bar-label">ReadWriteLock<br>(99% reads)</div>
+                </div>
+                <div class="chart-bar">
+                    <div class="bar-value">200×</div>
+                    <div class="bar-label">StampedLock<br>(optimistic read)</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- StampedLock: The Nuclear Option -->
+        <section>
+            <h2>StampedLock: Lock-Free Reads (Java 8+)</h2>
+
+            <div class="code-block">
+          <pre>
+StampedLock sl = new StampedLock();
+
+public Point getPosition() {
+    long stamp = sl.tryOptimisticRead();
+    int x = this.x, y = this.y;
+
+    if (!sl.validate(stamp)) {
+        stamp = sl.readLock();   // Fallback to pessimistic
+        try {
+            x = this.x; y = this.y;
+        } finally {
+            sl.unlockRead(stamp);
+        }
+    }
+    return new Point(x, y);
+}
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Optimistic read:</strong>
+                No lock → zero contention<br>
+                <strong>Validate:</strong> Check if write occurred<br>
+                <strong>Fallback:</strong> Upgrade to real read lock if needed
+            </div>
+
+            <div class="highlight">
+                <strong>Use StampedLock when:</strong><br>
+                to Reads are 99.9%+ of operations<br>
+                to You can tolerate occasional retry<br>
+                to Maximum performance is critical
+            </div>
+        </section>
+
+        <!-- Comparison Table -->
+        <section>
+            <h2>Which Lock to Use?</h2>
+
+            <table class="api-table" style="width: 100%; margin: 2.5rem 0;">
+                <tr>
+                    <th>Lock Type</th>
+                    <th>Readers</th>
+                    <th>Writers</th>
+                    <th>Performance</th>
+                    <th>Complexity</th>
+                    <th>Use When</th>
+                </tr>
+                <tr>
+                    <td><code>synchronized</code> / <code>ReentrantLock</code></td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>Good</td>
+                    <td>Low</td>
+                    <td>Simple cases</td>
+                </tr>
+                <tr>
+                    <td><code>ReentrantReadWriteLock</code></td>
+                    <td>Many</td>
+                    <td>1</td>
+                    <td>Excellent</td>
+                    <td>Medium</td>
+                    <td>Read-heavy</td>
+                </tr>
+                <tr>
+                    <td><code>StampedLock</code></td>
+                    <td>Many (optimistic)</td>
+                    <td>1</td>
+                    <td>Best</td>
+                    <td>High</td>
+                    <td>Extreme performance</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #fffaf0; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> Regular locks = exclusive → readers block readers</p>
+                <p><strong>2.</strong> <code>ReentrantReadWriteLock</code> = many readers OR one writer</p>
+                <p><strong>3.</strong> <code>StampedLock</code> = lock-free optimistic reads + validate</p>
+                <p><strong>4.</strong> Use <code>ReadWriteLock</code> for caches, configs, dashboards</p>
+                <p><strong>5.</strong> Use <code>StampedLock</code> only when you measure contention</p>
+                <p><strong>6.</strong> <code>ConcurrentHashMap</code> uses StampedLock internally!</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-3.4-reentrantlock-condition.html" style="color: var(--primary);">← 3.4 ReentrantLock & Condition</a> |
+            <a href="chapter-4.1-executors-thread-pools.html" style="color: var(--primary);">Chapter 4: Executors & Thread Pools →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#e67e22',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#e67e22',
+        lineColor: '#e67e22',
+        secondaryColor: '#f39c12',
+        tertiaryColor: '#3498db'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>3.2 Synchronized Blocks & Monitors Deep Dive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #8e44ad;
+          --secondary: #9b59b6;
+          --accent: #e74c3c;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+          --info: #00cec9;
+          --code-bg: #2d2d2d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 3.5rem 2rem; text-align: center; }
+
+        header h1 { font-size: 2.8rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.6rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.2rem; opacity: 0.9; max-width: 900px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.95rem; margin-top: 1.2rem; font-weight: 600; }
+
+        main { padding: 3.5rem 2.5rem; }
+
+        section { margin-bottom: 4.5rem; }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #f5f0ff 0%, #e8e0ff 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(155,89,182,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #f8f8f2;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #666;
+          font-weight: 600;
+        }
+
+        .comparison-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2rem;
+          margin: 3rem 0;
+          padding: 2rem;
+          background: #f8f9fa;
+          border-radius: 18px;
+        }
+
+        .comparison-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .comparison-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(155,89,182,0.25);
+        }
+
+        .card-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 1rem;
+          color: var(--primary);
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        .badge-method { background: var(--primary); color: white; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .badge-block { background: var(--success); color: white; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        .lock-object {
+          display: flex;
+          justify-content: center;
+          gap: 2rem;
+          flex-wrap: wrap;
+          margin: 3rem 0;
+          padding: 2rem;
+          background: #f0e8ff;
+          border-radius: 18px;
+        }
+
+        .lock-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          text-align: center;
+          min-width: 200px;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .lock-card:hover {
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(155,89,182,0.25);
+        }
+
+        .lock-icon { font-size: 3rem; margin-bottom: 1rem; }
+
+        .lock-title { font-weight: 700; color: var(--primary); margin-bottom: 0.5rem; }
+
+        .pitfall {
+          background: #fff5f5;
+          padding: 1.5rem;
+          border-radius: 12px;
+          border-left: 6px solid var(--danger);
+          margin: 2rem 0;
+          font-weight: 600;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .comparison-grid { grid-template-columns: 1fr; }
+          .lock-object { flex-direction: column; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>3.2 Synchronized Blocks & Monitors Deep Dive</h1>
+        <h2>Fine-Grained Control, Reentrancy, and Best Practices</h2>
+        <p>Why <code>synchronized(this)</code> is almost always wrong</p>
+        <div class="badge">Chapter 3 – Synchronization & Thread Safety</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>synchronized Methods vs. Blocks</h2>
+            <p>
+                <code>synchronized</code> methods are convenient — but they lock on the <strong>wrong object</strong> most of the time.
+            </p>
+            <div class="highlight">
+                <strong>Rule #1:</strong>
+                <em>Never use <code>synchronized</code> methods in real code.</em><br>
+                <em>Always use <code>synchronized(lock)</code> blocks with a private lock object.</em>
+            </div>
+        </section>
+
+        <!-- Comparison -->
+        <section>
+            <h2>Method vs. Block: The Difference</h2>
+
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <div class="card-title">
+                        Synchronized Method
+                        <span class="badge-method">Avoid</span>
+                    </div>
+                    <div class="code-block" style="margin: 0; box-shadow: none;">
+              <pre>
+public synchronized void increment() {
+    count++;
+}
+
+// Static method locks on Class object
+public static synchronized void incStatic() {
+    staticCount++;
+}
+              </pre>
+                    </div>
+                    <div class="highlight">
+                        Locks on <code>this</code> (instance) or <code>MyClass.class</code> (static)
+                    </div>
+                </div>
+
+                <div class="comparison-card">
+                    <div class="card-title">
+                        Synchronized Block
+                        <span class="badge-block">Recommended</span>
+                    </div>
+                    <div class="code-block" style="margin: 0; box-shadow: none;">
+              <pre>
+private final Object lock = new Object();
+
+public void increment() {
+    synchronized(lock) {   // Fine-grained
+        count++;
+    }
+}
+              </pre>
+                    </div>
+                    <div class="highlight">
+                        You choose the lock object → full control
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why Blocks Win -->
+        <section>
+            <h2>Why Synchronized Blocks Are Superior</h2>
+
+            <div class="lock-object">
+                <div class="lock-card">
+                    <div class="lock-icon">this</div>
+                    <div class="lock-title">Locking on this</div>
+                    <div class="highlight">
+                        <strong>Dangerous!</strong> Any code can acquire your lock → deadlock risk
+                    </div>
+                </div>
+                <div class="lock-card">
+                    <div class="lock-icon">Class</div>
+                    <div class="lock-title">Locking on Class</div>
+                    <div class="highlight">
+                        <strong>Dangerous!</strong> Static methods lock globally
+                    </div>
+                </div>
+                <div class="lock-card">
+                    <div class="lock-icon">private lock</div>
+                    <div class="lock-title">Private final Object</div>
+                    <div class="highlight">
+                        <strong>Safe!</strong> Only you can access the lock
+                    </div>
+                </div>
+            </div>
+
+            <div class="mermaid">
+                graph TD
+                A["synchronized(this)"] --> B["Exposed to clients"]
+                B --> C["Client can lock your object → Deadlock!"]
+                D["private final Object lock = new Object()"] --> E["Only your class can lock"]
+                E --> F["Safe + Fine-grained"]
+
+                style C fill:#d63031,stroke:#d63031,color:white
+                style F fill:#00b894,stroke:#00b894,color:white
+            </div>
+        </section>
+
+        <!-- Reentrancy Explained -->
+        <section>
+            <h2>Reentrancy: The Hidden Superpower</h2>
+
+            <div class="code-block">
+          <pre>
+private final Object lock = new Object();
+
+public void outer() {
+    synchronized(lock) {
+        System.out.println("Outer acquired");
+        inner();  // Re-acquires the same lock!
+    }
+}
+
+public void inner() {
+    synchronized(lock) {
+        System.out.println("Inner acquired");  // Works!
+    }
+}
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>ReentrantLock:</strong>
+                Monitor keeps a <strong>counter</strong> + <strong>owner thread</strong><br>
+                Same thread can re-enter → no self-deadlock
+            </div>
+
+            <div class="mermaid">
+                sequenceDiagram
+                participant T as Thread
+                participant M as Monitor
+                T->>M: acquire() → count=1, owner=T
+                T->>M: acquire() → count=2 (reentrant!)
+                T->>M: release() → count=1
+                T->>M: release() → count=0
+            </div>
+        </section>
+
+        <!-- Common Pitfalls -->
+        <section>
+            <h2>Top 5 Pitfalls (and Fixes)</h2>
+
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <div class="card-title">Locking on this / Class</div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+public synchronized void bad() { ... }  // Exposed!
+              </pre>
+                    </div>
+                    <div class="highlight">Fix: private final Object lock</div>
+                </div>
+                <div class="comparison-card">
+                    <div class="card-title">Locking on String / Integer</div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+synchronized("LOCK") { ... }  // Interned → global lock!
+              </pre>
+                    </div>
+                    <div class="highlight">Fix: new Object()</div>
+                </div>
+                <div class="comparison-card">
+                    <div class="card-title">Changing lock object</div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+private Object lock = new Object();
+lock = new Object();  // Breaks synchronization!
+              </pre>
+                    </div>
+                    <div class="highlight">Fix: final Object lock</div>
+                </div>
+                <div class="comparison-card">
+                    <div class="card-title">Locking on null</div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+private Object lock;
+synchronized(lock) { ... }  // NPE!
+              </pre>
+                    </div>
+                    <div class="highlight">Fix: initialize lock</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Best Practice Pattern -->
+        <section>
+            <h2>The Gold Standard Pattern</h2>
+
+            <div class="code-block">
+          <pre>
+public class SafeCounter {
+    private long count = 0;
+    private final Object lock = new Object();  // Private + final
+
+    public void increment() {
+        synchronized(lock) {
+            count++;
+        }
+    }
+
+    public long get() {
+        synchronized(lock) {
+            return count;
+        }
+    }
+}
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Why this wins:</strong><br>
+                to Private → no external locking<br>
+                to Final → never changes<br>
+                to Fine-grained → only when needed<br>
+                to Reentrant → safe for nested calls
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #f5f0ff; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> <strong>Never</strong> use <code>synchronized</code> methods in production</p>
+                <p><strong>2.</strong> Always use <code>private final Object lock = new Object()</code></p>
+                <p><strong>3.</strong> Monitors are <strong>reentrant</strong> — same thread can re-enter</p>
+                <p><strong>4.</strong> <code>synchronized</code> = acquire → execute → release</p>
+                <p><strong>5.</strong> Provides <strong>mutual exclusion + visibility</strong></p>
+                <p><strong>6.</strong> Next: <code>wait()</code>, <code>notify()</code>, <code>notifyAll()</code></p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-3.1-synchronized-keyword.html" style="color: var(--primary);">← 3.1 The synchronized Keyword</a> |
+            <a href="chapter-3.3-wait-notify.html" style="color: var(--primary);">3.3 wait(), notify(), notifyAll() →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#8e44ad',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#8e44ad',
+        lineColor: '#8e44ad',
+        secondaryColor: '#9b59b6',
+        tertiaryColor: '#e74c3c'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

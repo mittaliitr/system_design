@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>3.7 Real-World: Concurrent Bank Transfers</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #c0392b;
+          --secondary: #e74c3c;
+          --accent: #f39c12;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+          --info: #00cec9;
+          --code-bg: #2d2d2d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 3.5rem 2rem; text-align: center; }
+
+        header h1 { font-size: 2.8rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.6rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.2rem; opacity: 0.9; max-width: 900px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.95rem; margin-top: 1.2rem; font-weight: 600; }
+
+        main { padding: 3.5rem 2.5rem; }
+
+        section { margin-bottom: 4.5rem; }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #fff5f5 0%, #ffe8e8 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(231,76,60,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #f8f8f2;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #666;
+          font-weight: 600;
+        }
+
+        .bank-demo {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2rem;
+          margin: 3rem 0;
+          padding: 2rem;
+          background: #f8f9fa;
+          border-radius: 18px;
+        }
+
+        .account-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          text-align: center;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .account-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(231,76,60,0.25);
+        }
+
+        .account-name {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 0.8rem;
+          color: var(--primary);
+        }
+
+        .balance {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 2.5rem;
+          font-weight: 700;
+          color: var(--dark);
+        }
+
+        .transfer-flow {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 2rem;
+          margin: 3rem 0;
+          flex-wrap: wrap;
+        }
+
+        .transfer-arrow {
+          font-size: 3rem;
+          color: var(--primary);
+          animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.2); }
+          100% { transform: scale(1); }
+        }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        .solution-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 2rem;
+          margin: 3rem 0;
+        }
+
+        .solution-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .solution-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(231,76,60,0.25);
+        }
+
+        .solution-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 1rem;
+          color: var(--primary);
+        }
+
+        .solution-badge {
+          background: var(--success);
+          color: white;
+          padding: 0.2rem 0.8rem;
+          border-radius: 20px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          margin-left: 0.5rem;
+        }
+
+        .pitfall {
+          background: #fff5f5;
+          padding: 1.5rem;
+          border-radius: 12px;
+          border-left: 6px solid var(--danger);
+          margin: 2rem 0;
+        }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .bank-demo { grid-template-columns: 1fr; }
+          .transfer-flow { flex-direction: column; }
+          .solution-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>3.7 Real-World: Concurrent Bank Transfers</h1>
+        <h2>The Ultimate Test of Thread Safety</h2>
+        <p>How to move money safely between accounts under massive concurrency</p>
+        <div class="badge">Chapter 3 – Synchronization & Thread Safety</div>
+    </header>
+
+    <main>
+        <!-- The Problem -->
+        <section>
+            <h2>The Challenge: Money Must Never Disappear</h2>
+            <p>
+                Two threads transfer money between the same accounts at the same time.<br>
+                <strong>Requirements:</strong>
+            </p>
+            <ul style="margin: 1.5rem 0; padding-left: 2rem; font-size: 1.1rem;">
+                <li>Total money in system must remain constant</li>
+                <li>No overdrafts allowed</li>
+                <li>1000+ concurrent transfers</li>
+                <li>Zero lost or duplicated money</li>
+            </ul>
+            <div class="highlight">
+                <strong>This is the gold standard test of correct synchronization.</strong>
+            </div>
+        </section>
+
+        <!-- Broken Version -->
+        <section>
+            <h2>Broken: Race Conditions = Lost Money</h2>
+
+            <div class="bank-demo">
+                <div class="account-card">
+                    <div class="account-name">Alice</div>
+                    <div class="balance">$1000</div>
+                </div>
+                <div class="account-card">
+                    <div class="account-name">Bob</div>
+                    <div class="balance">$1000</div>
+                </div>
+            </div>
+
+            <div class="transfer-flow">
+                <div>Thread 1: Alice → Bob $500</div>
+                <div class="transfer-arrow">→</div>
+                <div>Thread 2: Bob → Alice $400</div>
+            </div>
+
+            <div class="code-block">
+          <pre>
+// DANGEROUS — Race condition!
+public void transfer(Account from, Account to, int amount) {
+    from.balance -= amount;   // Read-modify-write
+    to.balance += amount;     // Race!
+}
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Result:</strong> Total money can become $1900 or $2100 instead of $2000<br>
+                <strong>Lost or duplicated dollars!</strong>
+            </div>
+        </section>
+
+        <!-- Solution 1: Coarse-Grained Lock -->
+        <section>
+            <h2>Solution 1: Global Lock (Simple but Slow)</h2>
+
+            <div class="code-block">
+          <pre>
+private static final Object globalLock = new Object();
+
+public void transfer(Account from, Account to, int amount) {
+    synchronized(globalLock) {
+        from.balance -= amount;
+        to.balance += amount;
+    }
+}
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Pros:</strong> Correct, simple<br>
+                <strong>Cons:</strong> Only one transfer at a time → terrible throughput
+            </div>
+        </section>
+
+        <!-- Solution 2: Fine-Grained Locks (Correct Pattern) -->
+        <section>
+            <h2>Solution 2: Per-Account Locks + Ordering</h2>
+
+            <div class="code-block">
+          <pre>
+public class Account {
+    private final Object lock = new Object();
+    private long balance;
+
+    public void transfer(Account to, long amount) {
+        Account first = this.id < to.id ? this : to;
+        Account second = this.id < to.id ? to : this;
+
+        synchronized(first.lock) {
+            synchronized(second.lock) {
+                if (balance >= amount) {
+                    balance -= amount;
+                    to.balance += amount;
+                }
+            }
+        }
+    }
+}
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Why ordering?</strong> Prevents deadlock (always lock in global order)
+            </div>
+        </section>
+
+        <!-- Solution 3: TryLock (Advanced) -->
+        <section>
+            <h2>Solution 3: ReentrantLock with tryLock() — No Deadlock</h2>
+
+            <div class="code-block">
+          <pre>
+private final Lock lock = new ReentrantLock();
+
+public boolean transfer(Account to, long amount) {
+    if (!lock.tryLock()) return false;
+    if (!to.lock.tryLock()) {
+        lock.unlock();
+        return false;
+    }
+    try {
+        if (balance >= amount) {
+            balance -= amount;
+            to.balance += amount;
+            return true;
+        }
+        return false;
+    } finally {
+        to.lock.unlock();
+        lock.unlock();
+    }
+}
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Avoids deadlock</strong> by trying both locks<br>
+                <strong>Fallback:</strong> retry or queue
+            </div>
+        </section>
+
+        <!-- Best Practice: Transfer Manager -->
+        <section>
+            <h2>Production Pattern: Transfer Service</h2>
+
+            <div class="code-block">
+          <pre>
+@Service
+public class TransferService {
+    private final ExecutorService executor = Executors.newFixedThreadPool(16);
+
+    public CompletableFuture<Boolean> transfer(Account from, Account to, long amount) {
+        return CompletableFuture.supplyAsync(() -> {
+            // Ordered locking
+            Account a = from.id < to.id ? from : to;
+            Account b = from.id < to.id ? to : from;
+
+            synchronized(a) {
+                synchronized(b) {
+                    if (from.balance >= amount) {
+                        from.balance -= amount;
+                        to.balance += amount;
+                        return true;
+                    }
+                    return false;
+                }
+            }
+        }, executor);
+    }
+}
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Real bank systems use:</strong><br>
+                • Ordered locking<br>
+                • Retry on failure<br>
+                • Distributed transactions (XA, Saga)<br>
+                • Eventual consistency
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #fff5f5; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> Bank transfers = ultimate thread-safety test</p>
+                <p><strong>2.</strong> Never do <code>balance -= amount</code> without proper locking</p>
+                <p><strong>3.</strong> Global lock = correct but slow</p>
+                <p><strong>4.</strong> Per-account lock + ordering = correct + scalable</p>
+                <p><strong>5.</strong> <code>tryLock()</code> = deadlock-free</p>
+                <p><strong>6.</strong> Production: ordered locking + async + retry</p>
+                <p><strong>7.</strong> <strong>Chapter 3 Complete:</strong> You now write bulletproof concurrent code</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-3.6-volatile.html" style="color: var(--primary);">← 3.6 volatile Keyword</a> |
+            <a href="chapter-4.1-executors-thread-pools.html" style="color: var(--primary);">Chapter 4: Executors & Thread Pools →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#c0392b',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#c0392b',
+        lineColor: '#c0392b',
+        secondaryColor: '#e74c3c',
+        tertiaryColor: '#f39c12'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>

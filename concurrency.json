@@ -131,36 +131,37 @@
       "children": [
         {
           "name": "3.1 Race Conditions & Data Races",
-          "url": "https://en.wikipedia.org/wiki/Race_condition",
+          "url": "concurrency /chapter3.1.html",
           "tag": "issue"
         },
         {
-          "name": "3.2 synchronized Keyword & Blocks",
-          "url": "https://docs.oracle.com/javase/tutorial/essential/concurrency/sync.html",
+          "name": "3.2 synchronized-blocks",
+          "url": "concurrency /chapter3.2.html",
           "tag": "sync"
         },
         {
-          "name": "3.3 Intrinsic Locks & Monitors",
-          "url": "https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html#jls-17.1",
+          "name": "3.3 wait(), notify(), notifyAll()",
+          "url": "concurrency /chapter3.3.html",
           "tag": "monitor"
         },
         {
-          "name": "3.4 wait(), notify(), notifyAll()",
-          "url": "https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html#wait--",
+          "name": " 3.4 ReentrantLock & Condition ",
+          "url": "concurrency /chapter3.4.html",
           "tag": "comm"
         },
         {
-          "name": "3.5 Deadlock, Livelock, Starvation",
-          "url": "https://www.baeldung.com/java-deadlock-livelock-starvation",
+          "name": "3.5 ReadWriteLock & StampedLock",
+          "url": "concurrency /chapter3.5.html",
           "tag": "pitfall"
         },
         {
           "name": "3.6 volatile Keyword",
-          "url": "https://docs.oracle.com/javase/tutorial/essential/concurrency/volatile.html",
+          "url": "concurrency /chapter3.6.html",
           "tag": "visibility"
         },
         {
           "name": "3.7 Real-World: Concurrent Bank Transfers",
+          "url": "concurrency /chapter3.7.html",
           "tag": "realworld"
         }
       ]

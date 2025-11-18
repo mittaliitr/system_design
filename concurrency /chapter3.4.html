@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>1.4 ReentrantLock & Condition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+          --primary: #27ae60;
+          --secondary: #2ecc71;
+          --accent: #3498db;
+          --dark: #2d3436;
+          --light: #f8f9fa;
+          --gray: #b2bec3;
+          --success: #00b894;
+          --warning: #fdcb6e;
+          --danger: #d63031;
+          --info: #00cec9;
+          --code-bg: #2d2d2d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+          color: var(--dark);
+          line-height: 1.7;
+          padding: 2rem;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; }
+
+        header { background: linear-gradient(120deg, var(--primary), var(--secondary)); color: white; padding: 3.5rem 2rem; text-align: center; }
+
+        header h1 { font-size: 2.8rem; margin-bottom: 0.5rem; font-weight: 700; }
+        header h2 { font-size: 1.6rem; margin-bottom: 0.5rem; opacity: 0.95; }
+        header p { font-size: 1.2rem; opacity: 0.9; max-width: 900px; margin: 0 auto; }
+
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.95rem; margin-top: 1.2rem; font-weight: 600; }
+
+        main { padding: 3.5rem 2.5rem; }
+
+        section { margin-bottom: 4.5rem; }
+
+        h2 {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-bottom: 1.5rem;
+          position: relative;
+          padding-left: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+        h2::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary); border-radius: 3px; }
+
+        .highlight {
+          background: linear-gradient(120deg, #f0fff4 0%, #e8fff0 100%);
+          padding: 1.4rem;
+          border-left: 6px solid var(--accent);
+          border-radius: 0 12px 12px 0;
+          margin: 2rem 0;
+          font-style: italic;
+          box-shadow: 0 4px 12px rgba(39,174,96,0.08);
+        }
+
+        .code-block {
+          background: var(--code-bg);
+          color: #f8f8f2;
+          padding: 1.4rem;
+          border-radius: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          overflow-x: auto;
+          margin: 2rem 0;
+          position: relative;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .code-block::before {
+          content: 'Java';
+          position: absolute;
+          top: 0.6rem;
+          right: 1.2rem;
+          font-size: 0.85rem;
+          color: #666;
+          font-weight: 600;
+        }
+
+        .comparison-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2rem;
+          margin: 3rem 0;
+          padding: 2rem;
+          background: #f8f9fa;
+          border-radius: 18px;
+        }
+
+        .comparison-card {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          border: 2px solid #eee;
+          transition: all 0.4s ease;
+        }
+
+        .comparison-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--primary);
+          box-shadow: 0 16px 32px rgba(39,174,96,0.25);
+        }
+
+        .card-title {
+          font-weight: 700;
+          font-size: 1.4rem;
+          margin-bottom: 1rem;
+          color: var(--primary);
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        .badge-sync { background: #e74c3c; color: white; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .badge-lock { background: var(--success); color: white; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+
+        .mermaid {
+          background: white;
+          padding: 2rem;
+          border-radius: 16px;
+          border: 1px solid #eee;
+          margin: 2.5rem 0;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          overflow: visible !important;
+        }
+
+        .mermaid svg { width: 100% !important; height: auto !important; max-width: none !important; }
+
+        .condition-demo {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2rem;
+          margin: 3rem 0;
+          padding: 2rem;
+          background: #f8f9fa;
+          border-radius: 18px;
+        }
+
+        .demo-role {
+          background: white;
+          padding: 1.8rem;
+          border-radius: 14px;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+        }
+
+        .demo-title {
+          font-weight: 600;
+          color: var(--primary);
+          margin-bottom: 1rem;
+          font-size: 1.3rem;
+        }
+
+        .api-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 2.5rem 0;
+          font-size: 0.95rem;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+          border-radius: 14px;
+          overflow: hidden;
+        }
+
+        .api-table th {
+          background: var(--primary);
+          color: white;
+          padding: 1.2rem;
+          text-align: left;
+          font-weight: 600;
+        }
+
+        .api-table td {
+          padding: 1.2rem;
+          border-bottom: 1px solid #eee;
+          background: #f8f9fa;
+        }
+
+        .api-table tr:hover td {
+          background: #e8fff0;
+        }
+
+        .check { color: var(--success); font-weight: bold; text-align: center; }
+        .cross { color: var(--danger); font-weight: bold; text-align: center; }
+
+        footer {
+          text-align: center;
+          padding: 2.5rem;
+          background: #f8f9fa;
+          color: #7f8c8d;
+          font-size: 0.95rem;
+          border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+          header h1 { font-size: 2.2rem; }
+          header h2 { font-size: 1.3rem; }
+          .comparison-grid { grid-template-columns: 1fr; }
+          .condition-demo { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>3.4 ReentrantLock & Condition</h1>
+        <h2>The Modern, Flexible Replacement for synchronized + wait/notify</h2>
+        <p>From intrinsic locks to explicit, powerful concurrency</p>
+        <div class="badge">Chapter 3 – Synchronization & Thread Safety</div>
+    </header>
+
+    <main>
+        <!-- Introduction -->
+        <section>
+            <h2>Why ReentrantLock Exists</h2>
+            <p>
+                <code>synchronized</code> is simple but limited:
+            </p>
+            <ul style="margin: 1.5rem 0; padding-left: 2rem; font-size: 1.1rem;">
+                <li>No timeout on lock acquisition</li>
+                <li>No fairness control</li>
+                <li>No multiple conditions per lock</li>
+                <li>No tryLock()</li>
+            </ul>
+            <div class="highlight">
+                <strong>ReentrantLock</strong> = <code>synchronized</code> on steroids<br>
+                Same performance (or better) + massive flexibility
+            </div>
+        </section>
+
+        <!-- Comparison -->
+        <section>
+            <h2>ReentrantLock vs synchronized</h2>
+
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <div class="card-title">
+                        synchronized
+                        <span class="badge-sync">Built-in</span>
+                    </div>
+                    <div class="code-block" style="margin: 0; box-shadow: none;">
+              <pre>
+synchronized(lock) {
+    while (!ready) lock.wait();
+}
+lock.notifyAll();
+              </pre>
+                    </div>
+                </div>
+
+                <div class="comparison-card">
+                    <div class="card-title">
+                        ReentrantLock + Condition
+                        <span class="badge-lock">java.util.concurrent</span>
+                    </div>
+                    <div class="code-block" style="margin: 0; box-shadow: none;">
+              <pre>
+Lock lock = new ReentrantLock();
+Condition ready = lock.newCondition();
+
+lock.lock();
+try {
+    while (!ready) ready.await();
+} finally {
+    lock.unlock();
+}
+ready.signalAll();
+              </pre>
+                    </div>
+                </div>
+            </div>
+
+            <table class="api-table">
+                <tr>
+                    <th>Feature</th>
+                    <th>synchronized</th>
+                    <th>ReentrantLock</th>
+                </tr>
+                <tr>
+                    <td>Timeout</td>
+                    <td class="cross">No</td>
+                    <td class="check">tryLock(5, SECONDS)</td>
+                </tr>
+                <tr>
+                    <td>Fairness</td>
+                    <td class="cross">No (unfair)</td>
+                    <td class="check">new ReentrantLock(true)</td>
+                </tr>
+                <tr>
+                    <td>Multiple Conditions</td>
+                    <td class="cross">One per object</td>
+                    <td class="check">lock.newCondition()</td>
+                </tr>
+                <tr>
+                    <td>Interruptible</td>
+                    <td class="cross">No</td>
+                    <td class="check">lockInterruptibly()</td>
+                </tr>
+                <tr>
+                    <td>Performance</td>
+                    <td class="check">Excellent (biased locking)</td>
+                    <td class="check">Same or better</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Reentrancy -->
+        <section>
+            <h2>ReentrantLock is Reentrant</h2>
+
+            <div class="code-block">
+          <pre>
+Lock lock = new ReentrantLock();
+
+public void outer() {
+    lock.lock();
+    System.out.println("Outer");
+    inner();  // Re-acquires same lock!
+    lock.unlock();
+}
+
+public void inner() {
+    lock.lock();
+    System.out.println("Inner");
+    lock.unlock();
+}
+          </pre>
+            </div>
+
+            <div class="highlight">
+                <strong>Hold count:</strong> Same thread can lock multiple times<br>
+                Must unlock same number of times
+            </div>
+        </section>
+
+        <!-- Condition: The Real Power -->
+        <section>
+            <h2>Condition: Multiple Wait Sets Per Lock</h2>
+
+            <div class="mermaid">
+                graph TD
+                A[ReentrantLock] --> B[Condition notEmpty]
+                A --> C[Condition notFull]
+                A --> D[Condition special]
+
+                P[Producer] --> B
+                C1[Consumer 1] --> B
+                C2[Consumer 2] --> C
+
+                style A fill:#27ae60,stroke:#27ae60,color:white
+            </div>
+
+            <div class="condition-demo">
+                <div class="demo-role">
+                    <div class="demo-title">Producer</div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+lock.lock();
+try {
+    while (buffer.full())
+        notFull.await();
+    buffer.add(item);
+    notEmpty.signalAll();
+} finally {
+    lock.unlock();
+}
+              </pre>
+                    </div>
+                </div>
+                <div class="demo-role">
+                    <div class="demo-title">Consumer</div>
+                    <div class="code-block" style="margin: 0;">
+              <pre>
+lock.lock();
+try {
+    while (buffer.empty())
+        notEmpty.await();
+    item = buffer.remove();
+    notFull.signalAll();
+} finally {
+    lock.unlock();
+}
+              </pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>One lock, multiple conditions</strong> → precise signaling<br>
+                No spurious wakeups issue with proper loop
+            </div>
+        </section>
+
+        <!-- Advanced Features -->
+        <section>
+            <h2>Advanced Features</h2>
+
+            <div class="code-block">
+          <pre>
+// 1. Try with timeout
+if (lock.tryLock(5, TimeUnit.SECONDS)) {
+    try { ... } finally { lock.unlock(); }
+}
+
+// 2. Fair lock (FIFO)
+Lock fairLock = new ReentrantLock(true);
+
+// 3. Interruptible
+lock.lockInterruptibly();  // Responds to interrupt()
+
+// 4. ReadWriteLock for read-heavy
+ReadWriteLock rw = new ReentrantReadWriteLock();
+rw.readLock().lock();
+rw.writeLock().lock();
+          </pre>
+            </div>
+        </section>
+
+        <!-- Best Practices -->
+        <section>
+            <h2>When to Use Which?</h2>
+
+            <table class="api-table">
+                <tr>
+                    <th>Scenario</th>
+                    <th>Use synchronized</th>
+                    <th>Use ReentrantLock</th>
+                </tr>
+                <tr>
+                    <td>Simple mutual exclusion</td>
+                    <td class="check">Yes</td>
+                    <td class="cross">Overkill</td>
+                </tr>
+                <tr>
+                    <td>Need timeout / fairness</td>
+                    <td class="cross">No</td>
+                    <td class="check">Yes</td>
+                </tr>
+                <tr>
+                    <td>Multiple conditions</td>
+                    <td class="cross">No</td>
+                    <td class="check">Yes</td>
+                </tr>
+                <tr>
+                    <td>Performance critical</td>
+                    <td class="check">Often faster</td>
+                    <td class="check">Comparable</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Summary -->
+        <section>
+            <h2>Key Takeaways</h2>
+            <div style="background: #f0fff4; padding: 2rem; border-radius: 16px; border-left: 6px solid var(--primary);">
+                <p><strong>1.</strong> <code>ReentrantLock</code> = explicit, powerful, modern lock</p>
+                <p><strong>2.</strong> <code>Condition</code> = multiple wait sets per lock</p>
+                <p><strong>3.</strong> Features: timeout, fairness, interruptible, tryLock</p>
+                <p><strong>4.</strong> Always <code>lock()</code> in <code>try</code>, <code>unlock()</code> in <code>finally</code></p>
+                <p><strong>5.</strong> Use for advanced scenarios — <code>synchronized</code> for simple</p>
+                <p><strong>6.</strong> <code>ReadWriteLock</code> for read-heavy data</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Mastering Multithreading in Java |
+            <a href="chapter-3.3-wait-notify.html" style="color: var(--primary);">← 3.3 wait(), notify(), notifyAll()</a> |
+            <a href="chapter-3.5-readwritelock-stampedlock.html" style="color: var(--primary);">3.5 ReadWriteLock & StampedLock →</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#27ae60',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#27ae60',
+        lineColor: '#27ae60',
+        secondaryColor: '#2ecc71',
+        tertiaryColor: '#3498db'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    window.addEventListener('load', () => {
+      mermaid.contentLoaded();
+    });
+</script>
+</body>
+</html>
