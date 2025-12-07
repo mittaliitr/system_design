@@ -3,208 +3,152 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>The Birth of Java and the JVM (1995–2025)</title>
-    <meta name="description" content="A visual, readable timeline and explainer about Java and the Java Virtual Machine from 1995 to 2025." />
+    <title>invokedynamic & The Lambda Revolution</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root{
-          --bg:#0f172a; --card:#0b1220; --muted:#9aa4bf; --accent:#7c3aed; --glass: rgba(255,255,255,0.04);
-          --max-width:1100px;
-        }
-        *{box-sizing:border-box}
-        html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,-apple-system,"Helvetica Neue",Arial;color:#e6eef8;background:linear-gradient(180deg,var(--bg),#071026);}
-        .container{max-width:var(--max-width);margin:36px auto;padding:28px}
-        header{display:flex;align-items:center;gap:18px;margin-bottom:22px}
-        .logo{width:72px;height:72px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#3b82f6);display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:18px;box-shadow:0 8px 30px rgba(0,0,0,.6)}
-        h1{margin:0;font-size:28px}
+        :root{--bg:#ffffff;--text:#0b1220;--muted:#4b5563;--accent:#ec4899;--card:#ffffff;--max-width:980px}
+        body{margin:0;font-family:Inter,system-ui,Segoe UI;background:#fbfdff;color:var(--text)}
+        .wrap{max-width:var(--max-width);margin:28px auto;padding:22px}
+        header{display:flex;align-items:center;gap:14px}
+        .badge{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,#ec4899,#8b5cf6);display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
+        h1{margin:0;font-size:24px}
         p.lead{color:var(--muted);margin-top:6px}
-
-        main{display:grid;grid-template-columns:1fr 360px;gap:24px}
-        .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:20px;border-radius:12px;box-shadow:0 6px 30px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
-
-        /* timeline */
-        .timeline{padding:10px 6px}
-        .era{margin-bottom:20px}
-        .era h2{margin:6px 0 8px 0;font-size:18px}
-        .era .period{color:var(--muted);font-size:13px;margin-bottom:6px}
-        .event{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:10px;background:var(--glass);border:1px solid rgba(255,255,255,0.02)}
-        .event + .event{margin-top:10px}
-        .dot{width:12px;height:12px;border-radius:50%;background:var(--accent);flex:0 0 12px;margin-top:6px}
-        .evt-body{font-size:14px}
-        .evt-title{font-weight:600;margin:0 0 4px 0}
-        .evt-desc{color:var(--muted);margin:0}
-
-        /* side */
-        aside .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
-        .stat{background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;text-align:center}
-        .stat strong{display:block;font-size:18px}
-        .resources ul{padding-left:18px;margin:6px 0;color:var(--muted)}
-
-        footer{margin-top:20px;color:var(--muted);font-size:13px;text-align:center}
-
-        /* responsive */
-        @media (max-width:900px){main{grid-template-columns:1fr}aside{order:2}header{gap:12px}.logo{width:56px;height:56px}}
+        .grid{display:grid;grid-template-columns:1fr 320px;gap:20px;margin-top:22px}
+        .card{background:var(--card);padding:20px;border-radius:14px;box-shadow:0 6px 20px rgba(0,0,0,0.05)}
+        pre.code{background:#0b1220;color:#f0f4fa;padding:12px;border-radius:8px;overflow:auto;font-family:ui-monospace}
+        ul,li{margin:0;padding-left:18px}
+        table{width:100%;border-collapse:collapse;margin-top:12px}
+        th,td{padding:8px;border-bottom:1px solid #eef2f6;text-align:left}
+        .mini{font-size:13px;color:var(--muted)}
+        footer{text-align:center;margin-top:16px;color:var(--muted);font-size:13px}
+        @media(max-width:900px){.grid{grid-template-columns:1fr}}
     </style>
 </head>
 <body>
-<div class="container">
+<div class="wrap">
     <header>
-        <div class="logo">JVM</div>
+        <div class="badge">indy</div>
         <div>
-            <h1>The Birth of Java and the JVM (1995–2025)</h1>
-            <p class="lead">A concise timeline tracing major language, platform, and ecosystem milestones — from Java's public debut to modern JVM innovations.</p>
+            <h1>invokedynamic & The Lambda Revolution</h1>
+            <p class="lead">How a single JVM instruction reshaped Java, powering lambdas, method handles, JRuby, Groovy, and all modern dynamic features.</p>
         </div>
     </header>
 
-    <main>
-        <section class="card">
-            <article class="timeline">
+    <div class="grid">
+        <main class="card">
 
-                <div class="era">
-                    <h2>Origins & Java 1.x (1991–2000)</h2>
-                    <div class="period">1991 — 2000</div>
+            <section>
+                <h2>1 — The Problem: Java needed flexible call sites</h2>
+                <p class="mini">Historically, the JVM supported only four invocation bytecodes: <code>invokestatic</code>, <code>invokevirtual</code>, <code>invokespecial</code>, <code>invokeinterface</code>. These were rigid and assumed Java-style typing, dispatching, and class hierarchy rules. Dynamic languages on the JVM (JRuby, Groovy, Clojure) struggled—and Java itself couldn’t evolve to support closures or functional constructs cleanly.</p>
+            </section>
 
-                    <div class="event">
-                        <div class="dot" aria-hidden></div>
-                        <div class="evt-body">
-                            <div class="evt-title">1991: Project "Oak" begins</div>
-                            <p class="evt-desc">James Gosling and team at Sun Microsystems design a platform-independent language for embedded devices — Oak eventually renamed to Java.</p>
-                        </div>
-                    </div>
+            <section>
+                <h2>2 — Enter <code>invokedynamic</code> (Java 7)</h2>
+                <p class="mini">The <code>invokedynamic</code> instruction delegates call-site linkage to a <strong>Bootstrap Method</strong> that returns a <strong>CallSite</strong> object. It allows language implementers (and Java itself) to define custom dispatch logic.</p>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">1995: Java 1.0 public release</div>
-                            <p class="evt-desc">Sun announces Java 1.0 and the slogan "Write Once, Run Anywhere" — the JVM becomes the portability layer between bytecode and native machines.</p>
-                        </div>
-                    </div>
+                <pre class="code">// Bytecode form
+invokedynamic bootstrap_index // args
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">Late 1990s: Applets and early adoption</div>
-                            <p class="evt-desc">Java applets, server-side servlets, and the emerging ecosystem push Java into enterprise and web backends.</p>
-                        </div>
-                    </div>
-                </div>
+// Bootstrap method signature:
+MethodHandle bootstrap(MethodHandles.Lookup lookup,
+                        String name,
+                        MethodType type,
+                        ... additional args ...)
+</pre>
+            </section>
 
-                <div class="era">
-                    <h2>Enterprise dominance & the JVM matures (2000–2010)</h2>
-                    <div class="period">2000 — 2010</div>
+            <section>
+                <h2>3 — CallSite + MethodHandle = dynamic power</h2>
+                <p class="mini">A <code>CallSite</code> acts like a mutable function pointer. <code>MethodHandle</code> is a type-safe, low-level function reference with optional transformations (bind, dropArguments, filterArguments, foldArguments, etc.). JVM inlines and optimizes these aggressively using the JIT.</p>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2004–2006: Java Community Process (JCP) and language stabilization</div>
-                            <p class="evt-desc">Community stewardship grows. Java 5 brings generics, annotations, enhanced for-loop and other major language features.</p>
-                        </div>
-                    </div>
+                <table>
+                    <thead><tr><th>Concept</th><th>Meaning</th></tr></thead>
+                    <tbody>
+                    <tr><td>MethodHandle</td><td>Typed, direct reference to a method/field/constructor</td></tr>
+                    <tr><td>CallSite</td><td>Holds a target MethodHandle used when invokedynamic executes</td></tr>
+                    <tr><td>Bootstrap method</td><td>Factory invoked once to bind the call site</td></tr>
+                    </tbody>
+                </table>
+            </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">Late 2000s: JVM for other languages</div>
-                            <p class="evt-desc">Languages like Scala, Groovy, Clojure, and JRuby compile to JVM bytecode — the JVM becomes a language runtime, not just Java's VM.</p>
-                        </div>
-                    </div>
-                </div>
+            <section>
+                <h2>4 — How Lambdas are compiled (Java 8+)</h2>
+                <p class="mini">Java <strong>does not generate anonymous inner classes</strong> for lambdas anymore. Instead, <code>invokedynamic</code> + a bootstrap method in <code>LambdaMetafactory</code> build the lambda instance at runtime.</p>
 
-                <div class="era">
-                    <h2>Open sourcing & tooling (2010–2018)</h2>
-                    <div class="period">2010 — 2018</div>
+                <pre class="code">// Java
+Runnable r = () -> System.out.println("Hi");
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2010: OpenJDK becomes the reference</div>
-                            <p class="evt-desc">Sun (then Oracle) places OpenJDK at the heart of the Java ecosystem — accelerated contributions and wide vendor builds follow.</p>
-                        </div>
-                    </div>
+// Conceptual bytecode
+invokedynamic "run" ()Ljava/lang/Runnable;
+  Bootstrap: LambdaMetafactory.metafactory
+</pre>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2014–2016: Modularization discussions</div>
-                            <p class="evt-desc">Work on JVM performance, GC options (G1, CMS improvements), and the beginnings of Project Jigsaw (module system in Java 9).</p>
-                        </div>
-                    </div>
-                </div>
+                <p class="mini">The JVM creates a synthetic class (lazily), binds captured variables, and returns an instance—fully optimized by JIT with escape analysis + inlining.</p>
+            </section>
 
-                <div class="era">
-                    <h2>Rapid release cadence & modern JVM (2018–2025)</h2>
-                    <div class="period">2018 — 2025</div>
+            <section>
+                <h2>5 — Why invokedynamic made lambdas fast</h2>
+                <ul class="mini">
+                    <li>No per-lambda class files → dramatically reduced class-file bloat</li>
+                    <li>JIT inlines dynamic call sites efficiently</li>
+                    <li>Captured variables optimized via escape analysis</li>
+                    <li>No overhead of anonymous inner classes</li>
+                </ul>
+            </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2017–2018: 6-month release cadence</div>
-                            <p class="evt-desc">Java moves to a time-driven release model. Smaller, faster feature delivery becomes the norm; long-term support (LTS) versions appear every few years.</p>
-                        </div>
-                    </div>
+            <section>
+                <h2>6 — Beyond lambdas: Dynamic languages love indy</h2>
+                <p class="mini">invokedynamic enables efficient dispatch for:</p>
+                <ul class="mini">
+                    <li>JRuby dynamic method lookup</li>
+                    <li>Groovy method invocation</li>
+                    <li>Clojure function invocation</li>
+                    <li>Dynamic proxies and frameworks</li>
+                    <li>Pattern matching (future Java features)</li>
+                </ul>
+            </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2020s: GraalVM, native images, and polyglot runtimes</div>
-                            <p class="evt-desc">New JVM-derived runtimes like GraalVM offer ahead-of-time compilation to native images, improved polyglot interop, and better startup times for cloud-native apps.</p>
-                        </div>
-                    </div>
+            <section>
+                <h2>7 — Example: writing a tiny indy bootstrap</h2>
+                <pre class="code">static CallSite bootstrap(Lookup lookup, String name, MethodType type)
+        throws Throwable {
+    MethodHandle target = lookup.findStatic(MyTargets.class, name, type);
+    return new ConstantCallSite(target);
+}
+</pre>
+                <p class="mini">Now your bytecode’s <code>invokedynamic</code> call will link directly to the chosen method at runtime.</p>
+            </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2023–2025: Performance & productivity</div>
-                            <p class="evt-desc">Ongoing work in JVM improvements (JIT, JFR, GC), language features (records, sealed types, pattern matching) and better ergonomics for modern development.</p>
-                        </div>
-                    </div>
+            <section>
+                <h2>8 — Performance tips</h2>
+                <ul class="mini">
+                    <li>Use <code>ConstantCallSite</code> if the target never changes</li>
+                    <li>Use <code>MutableCallSite</code> for polymorphic call sites</li>
+                    <li>Avoid unnecessary adapters on MethodHandles</li>
+                    <li>Use <code>MethodHandles.Lookup</code> sparingly and cache results</li>
+                </ul>
+            </section>
 
-                </div>
-
-                <div class="era">
-                    <h2>Why the JVM still matters</h2>
-                    <div class="period">Platform strengths</div>
-                    <div style="margin-top:8px;display:grid;gap:8px">
-                        <div class="event"><div class="dot"></div><div class="evt-body"><div class="evt-title">Portability & compatibility</div><p class="evt-desc">Bytecode portability and strong backwards compatibility helped Java survive decades of platform change.</p></div></div>
-                        <div class="event"><div class="dot"></div><div class="evt-body"><div class="evt-title">Ecosystem & tools</div><p class="evt-desc">Rich tooling (JVM profilers, build tools, testing frameworks), mature libraries and enterprise adoption.</p></div></div>
-                        <div class="event"><div class="dot"></div><div class="evt-body"><div class="evt-title">Language diversity</div><p class="evt-desc">The JVM hosts many languages — each benefiting from GC, threading model, and mature runtime services.</p></div></div>
-                    </div>
-                </div>
-
-            </article>
-
-            <footer class="card" style="margin-top:16px;display:flex;justify-content:space-between;align-items:center">
-                <div style="font-size:13px;color:var(--muted)">Last updated: 2025</div>
-                <div style="font-size:13px;color:var(--muted)">Made with ❤️ — timeline summary</div>
-            </footer>
-        </section>
+        </main>
 
         <aside class="card">
-            <div class="stats">
-                <div class="stat"><strong>1995</strong><div style="font-size:12px;color:var(--muted)">Java 1.0 released</div></div>
-                <div class="stat"><strong>2004–5</strong><div style="font-size:12px;color:var(--muted)">Generics & annotations</div></div>
-                <div class="stat"><strong>2010</strong><div style="font-size:12px;color:var(--muted)">OpenJDK</div></div>
-                <div class="stat"><strong>2018+</strong><div style="font-size:12px;color:var(--muted)">6-month cadence</div></div>
-            </div>
+            <h3 style="margin-top:0">Quick cheatsheet</h3>
+            <p class="mini"><strong>Key APIs:</strong> MethodHandle, MethodType, CallSite, LambdaMetafactory, Lookup.</p>
+            <p class="mini"><strong>invokedynamic = custom dispatch</strong> that the JVM can still inline + optimize.</p>
 
-            <div class="resources" style="margin-top:8px">
-                <h3 style="margin:0 0 8px 0">Further reading</h3>
-                <ul>
-                    <li>Java language & JVM official docs</li>
-                    <li>OpenJDK project pages</li>
-                    <li>GraalVM and native-image docs</li>
-                    <li>Books: "Java: The Complete Reference", "Programming Java Virtual Machine Internals"</li>
-                </ul>
-            </div>
+            <h4 style="margin-top:12px">Debugging tips</h4>
+            <ul class="mini">
+                <li><code>javap -v -c</code> to inspect indy call sites</li>
+                <li>Enable <code>-XX:+UnlockDiagnosticVMOptions -XX:+PrintAssembly</code> for JIT insights</li>
+                <li>Use <code>ASMifier</code> to visualize generated bootstrap args</li>
+            </ul>
 
-            <div style="margin-top:12px">
-                <h3 style="margin:0 0 8px 0">Share / Export</h3>
-                <p style="color:var(--muted);font-size:13px;margin:0">Copy this page into your site or export as a single HTML file for printing.</p>
-            </div>
+            <h4 style="margin-top:12px">Want deeper?</h4>
+            <p class="mini">I can add: a lambda call-site animation, a diagram of bootstrap linking, a performance story, or a PDF export.</p>
         </aside>
+    </div>
 
-    </main>
-
+    <footer>HTML explainer generated — let me know if you want diagrams or a dark theme.</footer>
 </div>
 </body>
 </html>
