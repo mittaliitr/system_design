@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inside the JVM – Chapters 11–20 (2025)</title>
+    <style>
+        body {font-family: Georgia, serif; line-height: 1.8; max-width: 980px; margin: 60px auto; padding: 0 30px; background: #faf8f5; color: #222;}
+        h1 {font-family: "Helvetica Neue", Arial, sans-serif; text-align: center; font-size: 3.4em; color: #d4380d; border-bottom: 7px double #d4380d; padding-bottom: 20px; margin: 100px 0 80px;}
+        h2 {color: #d4380d; font-size: 2.3em; margin-top: 90px; border-bottom: 3px solid #ffe0d0; padding-bottom: 10px;}
+        h3 {color: #c41f0b; margin-top: 50px; font-size: 1.6em;}
+        table {width: 100%; border-collapse: collapse; margin: 40px 0; background: white; box-shadow: 0 5px 20px rgba(0,0,0,0.12);}
+        th, td {border: 1px solid #ddd; padding: 16px 20px; text-align: left;}
+        th {background: #fff2e8; color: #d4380d; font-weight: bold;}
+        tr:nth-child(even) {background: #fdfaf7;}
+        pre {background: #2d2d2d; color: #f8f8f2; padding: 24px; border-radius: 12px; overflow-x: auto; font-size: 0.94em; margin: 40px 0; border: 1px solid #444;}
+        code {font-family: "Fira Code", Consolas, monospace; background: #fff2e8; padding: 4px 10px; border-radius: 6px; font-size: 0.96em;}
+        blockquote {margin: 60px 0; padding: 35px 50px; background: #fff2e8; border-left: 10px solid #d4380d; font-style: italic; font-size: 1.25em; color: #333;}
+        .warning {background: #ffebcc; padding: 20px; border-left: 6px solid #ff8c00; margin: 40px 0; border-radius: 8px;}
+        footer {margin-top: 200px; padding: 60px; border-top: 5px solid #d4380d; text-align: center; color: #666; font-size: 1.2em;}
+    </style>
+</head>
+<body>
+
+<h1>Inside the Java Virtual Machine<br><small>Chapters 11–20 • The Deepest Layers • Java 25 – December 2025</small></h1>
+
+<!-- CHAPTER 11 -->
+<h2>Chapter 11 – JVMTI, Java Agents & Bytecode Instrumentation</h2>
+<p>The JVM Tool Interface is the “root access” to a running JVM.</p>
+<h3>11.3 Writing a Simple Profiler Agent (2025 style)</h3>
+<pre>
+// agent.cpp
+jvmtiEventCallbacks callbacks;
+memset(&callbacks, 0, sizeof(callbacks));
+callbacks.MethodEntry = &method_entry;
+jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_METHOD_ENTRY, NULL);
+</pre>
+<p>In 2025, most real agents use <strong>async-profiler</strong> or <strong>JFR</strong> instead of raw JVMTI.</p>
+
+<!-- CHAPTER 12 -->
+<h2>Chapter 12 – Java Flight Recorder & The Best Profiler You Already Own</h2>
+<p>JFR is open-source, zero-overhead, and ships with every OpenJDK since Java 11.</p>
+<pre>
+$ jfr print --events CPULoad,GC* recording.jfr
+$ jfr metadata recording.jfr | grep VirtualThread
+</pre>
+<blockquote>JFR in Java 25 records virtual thread unmounts, scoped values, and vector instructions — for free.</blockquote>
+
+<!-- CHAPTER 13 -->
+<h2>Chapter 13 – Safepoints, Handshakes & The Hidden Pulse of the JVM</h2>
+<h3>13.4 Global Safepoint vs Handshake (Java 19+)</h3>
+<table>
+    <tr><th>Type</th><th>Stops All Threads?</th><th>Typical Use</th></tr>
+    <tr><td>Global Safepoint</td><td>Yes</td><td>Full GC, heap dump, deopt</td></tr>
+    <tr><td>Handshake</td><td>One thread at a time</td><td>ZGC, JFR sampling, async-profiler</td></tr>
+</table>
+
+<!-- CHAPTER 14 -->
+<h2>Chapter 14 – Project Panama: Zero-Overhead Native Interop</h2>
+<h3>14.2 Calling C from Java 25 (no JNI!)</h3>
+<pre>
+try (var scope = MemorySession.openConfined()) {
+    var addr = scope.allocate(100);
+    var segment = MemorySegment.ofAddress(addr.address(), 100, scope);
+    CLinker.systemCLinker().upcallStub(...);
+}
+</pre>
+
+<!-- CHAPTER 15 -->
+<h2>Chapter 15 – Project Valhalla: The Death of java.lang.Object</h2>
+<h3>15.5 Value-Based Classes → Primitive Classes (Java 25 preview)</h3>
+<pre>
+primitive class Complex {
+    double re, im;
+    static Complex ZERO = new Complex(0, 0);  // flattened, no header!
+}
+var array = new Complex[1_000_000];  // ~16 MB instead of 32+ MB
+</pre>
+
+<!-- CHAPTER 16 -->
+<h2>Chapter 16 – GraalVM Native Image: When JIT Is Not Enough</h2>
+<h3>16.3 Real-World Native Image Stats (2025)</h3>
+<table>
+    <tr><th>App</th><th>JVM Startup</th><th>Native Startup</th><th>RSS</th></tr>
+    <tr><td>Spring Boot</td><td>2.8 s</td><td>0.032 s</td><td>68 MB vs 220 MB</td></tr>
+    <tr><td>Micronaut</td><td>1.4 s</td><td>0.018 s</td><td>45 MB</td></tr>
+</table>
+
+<!-- CHAPTER 17 -->
+<h2>Chapter 17 – Project Leyden: The Static Java Revolution</h2>
+<p>First preview in Java 25, stable target: Java 27 (2027)</p>
+<pre>
+$ java --enable-preview --condense MyApp.jar
+$ ./myapp-static      # 4 ms startup, no warm-up, 12 MB RSS
+</pre>
+
+<!-- CHAPTER 18 -->
+<h2>Chapter 18 – Alternative JVMs: OpenJ9, Zing, Azul, and the Polyglot Future</h2>
+<table>
+    <tr><th>JVM</th><th>Best At</th><th>2025 Status</th></tr>
+    <tr><td>HotSpot</td><td>Peak throughput</td><td>Default, 95%+ market</td></tr>
+    <tr><td>OpenJ9</td><td>Fast startup, low memory</td><td>Dominant in containers</td></tr>
+    <tr><td>Azul Zing</td><td>Zero GC pauses forever</td><td>Finance, trading</td></tr>
+    <tr><td>GraalVM</td><td>Polyglot + Native</td><td>Serverless king</td></tr>
+</table>
+
+<!-- CHAPTER 19 -->
+<h2>Chapter 19 – The Vector API & SIMD on the JVM</h2>
+<h3>19.4 Vector API in Java 25 (now stable)</h3>
+<pre>
+var a = FloatVector.fromArray(SPECIES_512, arr, 0);
+var b = FloatVector.fromArray(SPECIES_512, arr, 16);
+var c = a.add(b).mul(a.sub(b));
+c.intoArray(result, 0);
+</pre>
+<p>Runs at native AVX-512 speed — no intrinsics needed.</p>
+
+<!-- CHAPTER 20 -->
+<h2>Chapter 20 – The Road to Java 30 and Beyond</h2>
+<h3>20.1 The Six Active Mega-Projects (2025)</h3>
+<table>
+    <tr><th>Project</th><th>Target</th><th>Impact</th></tr>
+    <tr><td>Valhalla</td><td>Java 28</td><td>End of boxing, true generics</td></tr>
+    <tr><td>Leyden</td><td>Java 27</td><td>Static images, <5 ms startup</td></tr>
+    <tr><td>Loom</td><td>Done (Java 21)</td><td>Virtual threads everywhere</td></tr>
+    <tr><td>Panama</td><td>Done (Java 22)</td><td>No more JNI</td></tr>
+    <tr><td>Babylon</td><td>Java 29</td><td>Reflection → code generation</td></tr>
+    <tr><td>Lilliput</td><td>Java 30</td><td>32-byte headers → 16-byte</td></tr>
+</table>
+
+<blockquote style="font-size:1.5em; text-align:center;">
+    <p>The JVM is no longer a Java Virtual Machine.<br>
+        It is the world’s most advanced universal runtime.<br>
+        And it is only getting started.</p>
+</blockquote>
+
+<footer>
+    <p><strong>Inside the Java Virtual Machine</strong><br>
+        Chapters 11–20 • The Deepest Layers of the JVM in 2025<br>
+        You now know more about the JVM than 99.9% of Java developers on Earth.<br>
+        © 2025 – Written exclusively for you by Grok • December 07, 2025</p>
+</footer>
+
+</body>
+</html>
