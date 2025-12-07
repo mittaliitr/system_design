@@ -3,208 +3,179 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>The Birth of Java and the JVM (1995–2025)</title>
-    <meta name="description" content="A visual, readable timeline and explainer about Java and the Java Virtual Machine from 1995 to 2025." />
+    <title>JIT Compilation — From Interpreter to Machine Code</title>
+    <meta name="description" content="An accessible deep-dive into how the JVM goes from interpreting bytecode to producing highly-optimized machine code: tiers, profiling, inlining, deoptimization, and tools." />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root{
-          --bg:#0f172a; --card:#0b1220; --muted:#9aa4bf; --accent:#7c3aed; --glass: rgba(255,255,255,0.04);
-          --max-width:1100px;
-        }
+        :root{--bg:#0b1220;--card:#071027;--muted:#9aa4bf;--accent:#8b5cf6;--glass:rgba(255,255,255,0.02);--max:1100px}
         *{box-sizing:border-box}
-        html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,-apple-system,"Helvetica Neue",Arial;color:#e6eef8;background:linear-gradient(180deg,var(--bg),#071026);}
-        .container{max-width:var(--max-width);margin:36px auto;padding:28px}
-        header{display:flex;align-items:center;gap:18px;margin-bottom:22px}
-        .logo{width:72px;height:72px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#3b82f6);display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:18px;box-shadow:0 8px 30px rgba(0,0,0,.6)}
-        h1{margin:0;font-size:28px}
+        body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:#e6eef8;background:linear-gradient(180deg,#020617,#071026);}
+        .wrap{max-width:var(--max);margin:28px auto;padding:22px}
+        header{display:flex;gap:14px;align-items:center}
+        .logo{width:64px;height:64px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#06b6d4);display:flex;align-items:center;justify-content:center;font-weight:700}
+        h1{margin:0;font-size:22px}
         p.lead{color:var(--muted);margin-top:6px}
-
-        main{display:grid;grid-template-columns:1fr 360px;gap:24px}
-        .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:20px;border-radius:12px;box-shadow:0 6px 30px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
-
-        /* timeline */
-        .timeline{padding:10px 6px}
-        .era{margin-bottom:20px}
-        .era h2{margin:6px 0 8px 0;font-size:18px}
-        .era .period{color:var(--muted);font-size:13px;margin-bottom:6px}
-        .event{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:10px;background:var(--glass);border:1px solid rgba(255,255,255,0.02)}
-        .event + .event{margin-top:10px}
-        .dot{width:12px;height:12px;border-radius:50%;background:var(--accent);flex:0 0 12px;margin-top:6px}
-        .evt-body{font-size:14px}
-        .evt-title{font-weight:600;margin:0 0 4px 0}
-        .evt-desc{color:var(--muted);margin:0}
-
-        /* side */
-        aside .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
-        .stat{background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;text-align:center}
-        .stat strong{display:block;font-size:18px}
-        .resources ul{padding-left:18px;margin:6px 0;color:var(--muted)}
-
-        footer{margin-top:20px;color:var(--muted);font-size:13px;text-align:center}
-
-        /* responsive */
-        @media (max-width:900px){main{grid-template-columns:1fr}aside{order:2}header{gap:12px}.logo{width:56px;height:56px}}
+        .grid{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:18px}
+        .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+        .diagram{background:linear-gradient(180deg,rgba(255,255,255,0.015),transparent);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02)}
+        pre.code{background:#071026;padding:12px;border-radius:8px;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+        table{width:100%;border-collapse:collapse;margin-top:8px}
+        th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.02);text-align:left}
+        th{color:var(--muted)}
+        .chip{display:inline-block;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.02);font-size:13px;margin-right:8px}
+        footer{margin-top:14px;color:var(--muted);font-size:13px;text-align:center}
+        @media (max-width:980px){.grid{grid-template-columns:1fr}}
     </style>
 </head>
 <body>
-<div class="container">
+<div class="wrap">
     <header>
-        <div class="logo">JVM</div>
+        <div class="logo">JIT</div>
         <div>
-            <h1>The Birth of Java and the JVM (1995–2025)</h1>
-            <p class="lead">A concise timeline tracing major language, platform, and ecosystem milestones — from Java's public debut to modern JVM innovations.</p>
+            <h1>JIT Compilation — From Interpreter to Machine Code</h1>
+            <p class="lead">How the JVM transforms portable bytecode into fast native code: tiers, profiling, optimizations, and the lifecycle of compiled code.</p>
         </div>
     </header>
 
-    <main>
-        <section class="card">
-            <article class="timeline">
+    <div class="grid">
+        <main class="card">
 
-                <div class="era">
-                    <h2>Origins & Java 1.x (1991–2000)</h2>
-                    <div class="period">1991 — 2000</div>
+            <section>
+                <h2>Why JIT exists</h2>
+                <p style="color:var(--muted)">The JVM starts by interpreting bytecode for fast startup and low memory overhead. Over time it profiles running code to find hot spots and compiles those to optimized native code — combining portability with high performance.</p>
+            </section>
 
-                    <div class="event">
-                        <div class="dot" aria-hidden></div>
-                        <div class="evt-body">
-                            <div class="evt-title">1991: Project "Oak" begins</div>
-                            <p class="evt-desc">James Gosling and team at Sun Microsystems design a platform-independent language for embedded devices — Oak eventually renamed to Java.</p>
-                        </div>
-                    </div>
+            <section>
+                <h2>High-level flow</h2>
+                <div class="diagram" aria-hidden>
+                    <svg width="100%" height="180" viewBox="0 0 1000 180" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="10" y="10" width="980" height="160" rx="12" fill="#071026" stroke="rgba(255,255,255,0.03)"/>
+                        <rect x="40" y="28" width="180" height="44" rx="8" fill="#072536"/>
+                        <text x="70" y="56" fill="#bfeaf5" font-size="12" font-weight="600">Bytecode (Class files)</text>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">1995: Java 1.0 public release</div>
-                            <p class="evt-desc">Sun announces Java 1.0 and the slogan "Write Once, Run Anywhere" — the JVM becomes the portability layer between bytecode and native machines.</p>
-                        </div>
-                    </div>
+                        <rect x="260" y="28" width="160" height="44" rx="8" fill="#072536"/>
+                        <text x="290" y="56" fill="#bfeaf5" font-size="12" font-weight="600">Interpreter</text>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">Late 1990s: Applets and early adoption</div>
-                            <p class="evt-desc">Java applets, server-side servlets, and the emerging ecosystem push Java into enterprise and web backends.</p>
-                        </div>
-                    </div>
+                        <rect x="480" y="28" width="160" height="44" rx="8" fill="#072536"/>
+                        <text x="510" y="56" fill="#bfeaf5" font-size="12" font-weight="600">Profiler (Hotness)</text>
+
+                        <rect x="700" y="28" width="180" height="44" rx="8" fill="#072536"/>
+                        <text x="740" y="56" fill="#bfeaf5" font-size="12" font-weight="600">JIT Compiler (C1/C2/Graal)</text>
+
+                        <path d="M220 50 L260 50" stroke="url(#g)" stroke-width="3"/>
+                        <path d="M420 50 L480 50" stroke="url(#g)" stroke-width="3"/>
+                        <path d="M640 50 L700 50" stroke="url(#g)" stroke-width="3"/>
+
+                        <defs>
+                            <linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset="1" stop-color="#06b6d4"/></linearGradient>
+                        </defs>
+
+                        <rect x="480" y="88" width="400" height="72" rx="8" fill="#072536"/>
+                        <text x="520" y="112" fill="#bfeaf5" font-size="12">Optimized Native Code (Code Cache)</text>
+                        <text x="520" y="130" fill="#9aa4bf" font-size="11">Inlined, specialized, deoptimized when assumptions break</text>
+                    </svg>
                 </div>
+            </section>
 
-                <div class="era">
-                    <h2>Enterprise dominance & the JVM matures (2000–2010)</h2>
-                    <div class="period">2000 — 2010</div>
+            <section>
+                <h2>Tiered compilation</h2>
+                <p style="color:var(--muted)">Most HotSpot JVMs use multiple tiers: interpreter → C1 (client) → C2 (server). Tiered compilation combines quick, low-optimizing compilation for startup with slower, high-optimizing compilation for long-running hot methods.</p>
+                <ul style="color:var(--muted)">
+                    <li><strong>Interpreter:</strong> Executes bytecode directly; cheap to start.</li>
+                    <li><strong>C1 (Client):</strong> Fast compilation, modest optimizations (good for startup).</li>
+                    <li><strong>C2 (Server):</strong> Slower compile, aggressive optimizations (inlining, escape analysis, loop unrolling).</li>
+                    <li><strong>Graal:</strong> Alternative JIT/AOT with advanced optimizations and polyglot support.</li>
+                </ul>
+            </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2004–2006: Java Community Process (JCP) and language stabilization</div>
-                            <p class="evt-desc">Community stewardship grows. Java 5 brings generics, annotations, enhanced for-loop and other major language features.</p>
-                        </div>
-                    </div>
+            <section>
+                <h2>Profiling & Hotspot detection</h2>
+                <p style="color:var(--muted)">The JVM profiles execution to discover hot methods/loops using counters and sampling. When a method's invocation count crosses thresholds, it becomes a candidate for compilation.</p>
+                <p style="color:var(--muted)">Important flags: <code>-XX:CompileThreshold</code>, <code>-XX:+TieredCompilation</code>, <code>-XX:FreqInlineSize</code>.</p>
+            </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">Late 2000s: JVM for other languages</div>
-                            <p class="evt-desc">Languages like Scala, Groovy, Clojure, and JRuby compile to JVM bytecode — the JVM becomes a language runtime, not just Java's VM.</p>
-                        </div>
-                    </div>
-                </div>
+            <section>
+                <h2>Key optimizations performed by JIT</h2>
+                <table>
+                    <thead><tr><th>Optimization</th><th>What it does</th></tr></thead>
+                    <tbody>
+                    <tr><td>Inlining</td><td>Replace a call with the callee's body to expose further optimizations.</td></tr>
+                    <tr><td>Escape analysis</td><td>Detect objects that don't escape a method/thread and allocate them on the stack or eliminate them.</td></tr>
+                    <tr><td>Scalar replacement</td><td>Break an object into primitive fields when it's stack-allocated.</td></tr>
+                    <tr><td>Loop unrolling & vectorization</td><td>Transform loops for better throughput and CPU utilization.</td></tr>
+                    <tr><td>Speculative optimization</td><td>Assume certain conditions (class shapes, monomorphic call sites) and optimize; will deopt if assumption fails.</td></tr>
+                    </tbody>
+                </table>
+            </section>
 
-                <div class="era">
-                    <h2>Open sourcing & tooling (2010–2018)</h2>
-                    <div class="period">2010 — 2018</div>
+            <section>
+                <h2>Deoptimization & Safepoints</h2>
+                <p style="color:var(--muted)">When speculative assumptions become invalid (e.g., a new class is loaded that changes a virtual dispatch), the JVM can deoptimize — revert optimized code back to interpreted frames. Safepoints are global pauses where the JVM can perform GC, deopt, and class unloading safely.</p>
+            </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2010: OpenJDK becomes the reference</div>
-                            <p class="evt-desc">Sun (then Oracle) places OpenJDK at the heart of the Java ecosystem — accelerated contributions and wide vendor builds follow.</p>
-                        </div>
-                    </div>
+            <section>
+                <h2>Code Cache & Limits</h2>
+                <p style="color:var(--muted)">Compiled native code is stored in the code cache. Monitor via <code>-XX:+PrintCompilation</code> and <code>-XX:+PrintCodeCache</code>. If the code cache fills, compilation can stall — flags like <code>-XX:ReservedCodeCacheSize</code> matter.</p>
+            </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2014–2016: Modularization discussions</div>
-                            <p class="evt-desc">Work on JVM performance, GC options (G1, CMS improvements), and the beginnings of Project Jigsaw (module system in Java 9).</p>
-                        </div>
-                    </div>
-                </div>
+            <section>
+                <h2>AOT (Ahead-Of-Time) & Graal Native Image</h2>
+                <p style="color:var(--muted)">GraalVM supports AOT compilation into native images (fast startup, small footprint) at the cost of many dynamic features. HotSpot also supports limited AOT. Choose AOT for short-lived cloud functions or strict startup constraints.</p>
+            </section>
 
-                <div class="era">
-                    <h2>Rapid release cadence & modern JVM (2018–2025)</h2>
-                    <div class="period">2018 — 2025</div>
+            <section>
+                <h2>Observability & Tools</h2>
+                <ul style="color:var(--muted)">
+                    <li><strong>Verbose compilation:</strong> <code>-XX:+PrintCompilation</code>, <code>-XX:+LogCompilation</code></li>
+                    <li><strong>Assembly:</strong> <code>-XX:+UnlockDiagnosticVMOptions -XX:+PrintAssembly</code> (requires hsdis)</li>
+                    <li><strong>Profilers:</strong> Java Flight Recorder (JFR), Java Mission Control, async-profiler</li>
+                    <li><strong>Graal tooling:</strong> VisualVM plugins, Graal compiler logs</li>
+                </ul>
+            </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2017–2018: 6-month release cadence</div>
-                            <p class="evt-desc">Java moves to a time-driven release model. Smaller, faster feature delivery becomes the norm; long-term support (LTS) versions appear every few years.</p>
-                        </div>
-                    </div>
+            <section>
+                <h2>Performance tips</h2>
+                <ul style="color:var(--muted)">
+                    <li>Keep hot paths small and stable to allow inlining.</li>
+                    <li>Avoid excessive class loading during steady-state to reduce deopts.</li>
+                    <li>Use escape-analysis-friendly code (favor immutable small objects).</li>
+                    <li>Measure with JFR + async-profiler before tuning.</li>
+                    <li>Consider Graal native-image for startup-sensitive workloads, but test reflection/service-loader use.</li>
+                </ul>
+            </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2020s: GraalVM, native images, and polyglot runtimes</div>
-                            <p class="evt-desc">New JVM-derived runtimes like GraalVM offer ahead-of-time compilation to native images, improved polyglot interop, and better startup times for cloud-native apps.</p>
-                        </div>
-                    </div>
-
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2023–2025: Performance & productivity</div>
-                            <p class="evt-desc">Ongoing work in JVM improvements (JIT, JFR, GC), language features (records, sealed types, pattern matching) and better ergonomics for modern development.</p>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="era">
-                    <h2>Why the JVM still matters</h2>
-                    <div class="period">Platform strengths</div>
-                    <div style="margin-top:8px;display:grid;gap:8px">
-                        <div class="event"><div class="dot"></div><div class="evt-body"><div class="evt-title">Portability & compatibility</div><p class="evt-desc">Bytecode portability and strong backwards compatibility helped Java survive decades of platform change.</p></div></div>
-                        <div class="event"><div class="dot"></div><div class="evt-body"><div class="evt-title">Ecosystem & tools</div><p class="evt-desc">Rich tooling (JVM profilers, build tools, testing frameworks), mature libraries and enterprise adoption.</p></div></div>
-                        <div class="event"><div class="dot"></div><div class="evt-body"><div class="evt-title">Language diversity</div><p class="evt-desc">The JVM hosts many languages — each benefiting from GC, threading model, and mature runtime services.</p></div></div>
-                    </div>
-                </div>
-
-            </article>
-
-            <footer class="card" style="margin-top:16px;display:flex;justify-content:space-between;align-items:center">
-                <div style="font-size:13px;color:var(--muted)">Last updated: 2025</div>
-                <div style="font-size:13px;color:var(--muted)">Made with ❤️ — timeline summary</div>
-            </footer>
-        </section>
+        </main>
 
         <aside class="card">
-            <div class="stats">
-                <div class="stat"><strong>1995</strong><div style="font-size:12px;color:var(--muted)">Java 1.0 released</div></div>
-                <div class="stat"><strong>2004–5</strong><div style="font-size:12px;color:var(--muted)">Generics & annotations</div></div>
-                <div class="stat"><strong>2010</strong><div style="font-size:12px;color:var(--muted)">OpenJDK</div></div>
-                <div class="stat"><strong>2018+</strong><div style="font-size:12px;color:var(--muted)">6-month cadence</div></div>
-            </div>
+            <h3 style="margin-top:0">Quick flags cheat-sheet</h3>
+            <pre class="code"># Tiered compilation (default)
+-XX:+TieredCompilation
 
-            <div class="resources" style="margin-top:8px">
-                <h3 style="margin:0 0 8px 0">Further reading</h3>
-                <ul>
-                    <li>Java language & JVM official docs</li>
-                    <li>OpenJDK project pages</li>
-                    <li>GraalVM and native-image docs</li>
-                    <li>Books: "Java: The Complete Reference", "Programming Java Virtual Machine Internals"</li>
-                </ul>
-            </div>
+# Compilation verbosity
+-XX:+PrintCompilation
+-XX:+LogCompilation -XX:LogFile=compile.log
 
-            <div style="margin-top:12px">
-                <h3 style="margin:0 0 8px 0">Share / Export</h3>
-                <p style="color:var(--muted);font-size:13px;margin:0">Copy this page into your site or export as a single HTML file for printing.</p>
-            </div>
+# Code cache
+-XX:ReservedCodeCacheSize=240m
+
+# Profiling
+-XX:CompileThreshold=10000
+</pre>
+
+            <h4 style="margin-top:12px">Common commands</h4>
+            <pre class="code"># Record runtime (JFR)
+java -XX:StartFlightRecording=duration=60s,name=run1 -jar app.jar
+
+# View compiled methods
+jcmd &lt;pid&gt; Compiler.print_native_code_cache
+</pre>
+
+            <h4 style="margin-top:12px">Want extras?</h4>
+            <p style="color:var(--muted)">I can add an animated tiered-compilation flow, assembly snippets for a sample method, or convert this into slides/PDF.</p>
         </aside>
+    </div>
 
-    </main>
-
+    <footer>JIT explainer saved — tell me which deep-dive you'd like next: inlining internals, escape-analysis case studies, or Graal optimization pipelines.</footer>
 </div>
 </body>
 </html>
