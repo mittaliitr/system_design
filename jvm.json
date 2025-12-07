@@ -1,124 +1,143 @@
 {
-  "name": "Mastering Multithreading in Java: From Basics to Advanced Concepts Including Project Loom",
+  "name": "JVM",
   "children": [
     {
       "chapter": 1,
       "name": "The Birth of Java and the JVM (1995–2025)",
-      "url": "chapters/chapter-01.html",
+      "url": "jvm/chapter-01.html",
+
       "tags": ["history", "fundamentals"]
     },
     {
       "chapter": 2,
       "name": "Java vs JVM vs JDK vs JRE – Clearing the Eternal Confusion",
-      "url": "chapters/chapter-02.html",
+      "url": "jvm/chapter-02.html",
+
       "tags": ["basics", "ecosystem"]
     },
     {
       "chapter": 3,
       "name": "JVM Architecture – The Big Picture",
-      "url": "chapters/chapter-03.html",
+      "url": "jvm/chapter-03.html",
+
       "tags": ["architecture", "core", "diagram"]
     },
     {
       "chapter": 4,
       "name": "The Class File Format & Bytecode: The Eternal DNA of Java",
-      "url": "chapters/chapter-04.html",
+      "url": "jvm/chapter-04.html",
+
       "tags": ["bytecode", "class-file", "advanced"]
     },
     {
       "chapter": 5,
       "name": "invokedynamic & The Lambda Revolution",
-      "url": "chapters/chapter-05.html",
+      "url": "jvm/chapter-05.html",
+
       "tags": ["java8", "lambdas", "jvm"]
     },
     {
       "chapter": 6,
       "name": "Class Loading & The Module System (JPMS)",
-      "url": "chapters/chapter-06.html",
+      "url": "jvm/chapter-06.html",
+
       "tags": ["java9", "modules", "jigsaw"]
     },
     {
       "chapter": 7,
       "name": "Memory Management: From PermGen to Metaspace and Beyond",
-      "url": "chapters/chapter-07.html",
+      "url": "jvm/chapter-07.html",
+
       "tags": ["gc", "memory", "metaspace"]
     },
     {
       "chapter": 8,
       "name": "JIT Compilation: From Interpreter to Machine Code",
-      "url": "chapters/chapter-08.html",
+      "url": "jvm/chapter-08.html",
+
       "tags": ["jit", "c1", "c2", "performance"]
     },
     {
       "chapter": 9,
       "name": "Project Loom: Virtual Threads Are Not Threads",
-      "url": "chapters/chapter-09.html",
+      "url": "jvm/chapter-09.html",
+
       "tags": ["loom", "virtual-threads", "java21", "concurrency"]
     },
     {
       "chapter": 10,
       "name": "The Future Is Already Here: Valhalla, Panama, Leyden",
-      "url": "chapters/chapter-10.html",
+      "url": "jvm/chapter-10.html",
+
       "tags": ["future", "valhalla", "panama", "leyden"]
     },
     {
       "chapter": 11,
       "name": "JVMTI, Java Agents & Bytecode Instrumentation",
-      "url": "chapters/chapter-11.html",
+      "url": "jvm/chapter-11.html",
+
       "tags": ["jvmti", "agents", "instrumentation"]
     },
     {
       "chapter": 12,
       "name": "Java Flight Recorder & The Best Profiler You Already Own",
-      "url": "chapters/chapter-12.html",
+      "url": "jvm/chapter-12.html",
+
       "tags": ["jfr", "profiling", "monitoring"]
     },
     {
       "chapter": 13,
       "name": "Safepoints, Handshakes & The Hidden Pulse of the JVM",
-      "url": "chapters/chapter-13.html",
+      "url": "jvm/chapter-13.html",
+
       "tags": ["safepoints", "internals", "advanced"]
     },
     {
       "chapter": 14,
       "name": "Project Panama: Zero-Overhead Native Interop",
-      "url": "chapters/chapter-14.html",
+      "url": "jvm/chapter-14.html",
+
       "tags": ["panama", "native", "java22", "ffi"]
     },
     {
       "chapter": 15,
       "name": "Project Valhalla: The Death of java.lang.Object",
-      "url": "chapters/chapter-15.html",
+      "url": "jvm/chapter-15.html",
+
       "tags": ["valhalla", "value-types", "future"]
     },
     {
       "chapter": 16,
       "name": "GraalVM Native Image: When JIT Is Not Enough",
-      "url": "chapters/chapter-16.html",
+      "url": "jvm/chapter-16.html",
+
       "tags": ["graalvm", "native-image", "aot"]
     },
     {
       "chapter": 17,
       "name": "Project Leyden: The Static Java Revolution",
-      "url": "chapters/chapter-17.html",
+      "url": "jvm/chapter-17.html",
+
       "tags": ["leyden", "static", "startup", "future"]
     },
     {
       "chapter": 18,
       "name": "Alternative JVMs: OpenJ9, Zing, Azul, and the Polyglot Future",
-      "url": "chapters/chapter-18.html",
+      "url": "jvm/chapter-18.html",
+
       "tags": ["openj9", "zing", "graalvm", "comparison"]
     },
     {
       "chapter": 19,
       "name": "The Vector API & SIMD on the JVM",
-      "url": "chapters/chapter-19.html",
+      "url": "jvm/chapter-19.html",
+
       "tags": ["vector-api", "simd", "performance", "java25"]
     },
     {
       "chapter": 20,
       "name": "The Road to Java 30 and Beyond",
-      "url": "chapters/chapter-20.html",
+      "url": "jvm/chapter-20.html",
       "tags": ["future", "java30", "vision"]
     }
   ]}
