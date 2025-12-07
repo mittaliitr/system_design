@@ -3,208 +3,151 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>The Birth of Java and the JVM (1995–2025)</title>
-    <meta name="description" content="A visual, readable timeline and explainer about Java and the Java Virtual Machine from 1995 to 2025." />
+    <title>Class Loading & The Module System (JPMS)</title>
+    <meta name="description" content="Explainer of JVM class loading (delegation model, custom loaders) and Java Platform Module System (JPMS): modules, module-info, encapsulation, and migration tips." />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root{
-          --bg:#0f172a; --card:#0b1220; --muted:#9aa4bf; --accent:#7c3aed; --glass: rgba(255,255,255,0.04);
-          --max-width:1100px;
-        }
+        :root{--bg:#0b1220;--card:#071027;--muted:#9aa4bf;--accent:#06b6d4;--glass:rgba(255,255,255,0.02);--max:1100px}
         *{box-sizing:border-box}
-        html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,-apple-system,"Helvetica Neue",Arial;color:#e6eef8;background:linear-gradient(180deg,var(--bg),#071026);}
-        .container{max-width:var(--max-width);margin:36px auto;padding:28px}
-        header{display:flex;align-items:center;gap:18px;margin-bottom:22px}
-        .logo{width:72px;height:72px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#3b82f6);display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:18px;box-shadow:0 8px 30px rgba(0,0,0,.6)}
-        h1{margin:0;font-size:28px}
+        body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:#e6eef8;background:linear-gradient(180deg,#020617,#071026);}
+        .wrap{max-width:var(--max);margin:28px auto;padding:22px}
+        header{display:flex;gap:14px;align-items:center}
+        .logo{width:64px;height:64px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:700}
+        h1{margin:0;font-size:22px}
         p.lead{color:var(--muted);margin-top:6px}
-
-        main{display:grid;grid-template-columns:1fr 360px;gap:24px}
-        .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:20px;border-radius:12px;box-shadow:0 6px 30px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
-
-        /* timeline */
-        .timeline{padding:10px 6px}
-        .era{margin-bottom:20px}
-        .era h2{margin:6px 0 8px 0;font-size:18px}
-        .era .period{color:var(--muted);font-size:13px;margin-bottom:6px}
-        .event{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:10px;background:var(--glass);border:1px solid rgba(255,255,255,0.02)}
-        .event + .event{margin-top:10px}
-        .dot{width:12px;height:12px;border-radius:50%;background:var(--accent);flex:0 0 12px;margin-top:6px}
-        .evt-body{font-size:14px}
-        .evt-title{font-weight:600;margin:0 0 4px 0}
-        .evt-desc{color:var(--muted);margin:0}
-
-        /* side */
-        aside .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
-        .stat{background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;text-align:center}
-        .stat strong{display:block;font-size:18px}
-        .resources ul{padding-left:18px;margin:6px 0;color:var(--muted)}
-
-        footer{margin-top:20px;color:var(--muted);font-size:13px;text-align:center}
-
-        /* responsive */
-        @media (max-width:900px){main{grid-template-columns:1fr}aside{order:2}header{gap:12px}.logo{width:56px;height:56px}}
+        .grid{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:18px}
+        .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+        pre.code{background:#071026;padding:12px;border-radius:8px;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+        table{width:100%;border-collapse:collapse;margin-top:8px}
+        th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.02);text-align:left}
+        th{color:var(--muted)}
+        .chip{display:inline-block;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.02);font-size:13px;margin-right:8px}
+        footer{margin-top:14px;color:var(--muted);font-size:13px;text-align:center}
+        @media (max-width:980px){.grid{grid-template-columns:1fr}}
     </style>
 </head>
 <body>
-<div class="container">
+<div class="wrap">
     <header>
-        <div class="logo">JVM</div>
+        <div class="logo">CL</div>
         <div>
-            <h1>The Birth of Java and the JVM (1995–2025)</h1>
-            <p class="lead">A concise timeline tracing major language, platform, and ecosystem milestones — from Java's public debut to modern JVM innovations.</p>
+            <h1>Class Loading & The Module System (JPMS)</h1>
+            <p class="lead">How classes get discovered, linked, and initialized in the JVM — and how JPMS (Java 9+) changes packaging, encapsulation, and runtime composition.</p>
         </div>
     </header>
 
-    <main>
-        <section class="card">
-            <article class="timeline">
+    <div class="grid">
+        <main class="card">
 
-                <div class="era">
-                    <h2>Origins & Java 1.x (1991–2000)</h2>
-                    <div class="period">1991 — 2000</div>
+            <section>
+                <h2>Class Loading Fundamentals</h2>
+                <p style="color:var(--muted)">Class loading is the process of locating binary class data (usually from .class files or jars), defining Class objects, linking (verification, preparation, resolution), and initializing static state before use.</p>
 
-                    <div class="event">
-                        <div class="dot" aria-hidden></div>
-                        <div class="evt-body">
-                            <div class="evt-title">1991: Project "Oak" begins</div>
-                            <p class="evt-desc">James Gosling and team at Sun Microsystems design a platform-independent language for embedded devices — Oak eventually renamed to Java.</p>
-                        </div>
-                    </div>
+                <h3 style="margin-top:8px">The delegation model</h3>
+                <p style="color:var(--muted)">A typical JVM uses a parent-first delegation model: each ClassLoader delegates to its parent to load a class before attempting to load it itself. Common loaders:</p>
+                <ul style="color:var(--muted)">
+                    <li><strong>Bootstrap ClassLoader</strong> — loads core JDK classes (rt.jar / modules).</li>
+                    <li><strong>Platform (Extension) ClassLoader</strong> — loads platform classes and extensions.</li>
+                    <li><strong>Application (System) ClassLoader</strong> — loads application classes from the classpath.</li>
+                </ul>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">1995: Java 1.0 public release</div>
-                            <p class="evt-desc">Sun announces Java 1.0 and the slogan "Write Once, Run Anywhere" — the JVM becomes the portability layer between bytecode and native machines.</p>
-                        </div>
-                    </div>
+                <h3 style="margin-top:8px">Custom ClassLoaders</h3>
+                <p style="color:var(--muted)">Custom loaders (URLClassLoader or custom implementations) allow isolation, dynamic reloading, plugin systems, and per-appclassloader sandboxing. Important concerns: visibility edges, resource lookup, and avoiding memory leaks (unreleased references preventing GC of classes).</p>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">Late 1990s: Applets and early adoption</div>
-                            <p class="evt-desc">Java applets, server-side servlets, and the emerging ecosystem push Java into enterprise and web backends.</p>
-                        </div>
-                    </div>
-                </div>
+                <h3 style="margin-top:8px">Lifecycle: Load → Link → Initialize</h3>
+                <ol style="color:var(--muted)">
+                    <li><strong>Load:</strong> Obtain binary and create a Class object.</li>
+                    <li><strong>Link:</strong> Verify bytecode, prepare static fields, and resolve symbolic refs.</li>
+                    <li><strong>Initialize:</strong> Run static initializers & assign explicit values.</li>
+                </ol>
+            </section>
 
-                <div class="era">
-                    <h2>Enterprise dominance & the JVM matures (2000–2010)</h2>
-                    <div class="period">2000 — 2010</div>
+            <section style="margin-top:12px">
+                <h2>Problems in the Wild</h2>
+                <ul style="color:var(--muted)">
+                    <li><strong>NoClassDefFoundError</strong> — class missing at runtime (different from ClassNotFoundException thrown by loaders).</li>
+                    <li><strong>ClassCastException across classloaders</strong> — same class name loaded by different loaders is not the same runtime type.</li>
+                    <li><strong>Memory leaks:</strong> long-lived classloader references (threads, static caches, JNI) prevent unloading.</li>
+                </ul>
+            </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2004–2006: Java Community Process (JCP) and language stabilization</div>
-                            <p class="evt-desc">Community stewardship grows. Java 5 brings generics, annotations, enhanced for-loop and other major language features.</p>
-                        </div>
-                    </div>
+            <section style="margin-top:12px">
+                <h2>Java Platform Module System (JPMS)</h2>
+                <p style="color:var(--muted)">Introduced in Java 9, JPMS introduces modules as units of encapsulation and reliable configuration. A module explicitly declares which packages it exports and which modules it requires.</p>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">Late 2000s: JVM for other languages</div>
-                            <p class="evt-desc">Languages like Scala, Groovy, Clojure, and JRuby compile to JVM bytecode — the JVM becomes a language runtime, not just Java's VM.</p>
-                        </div>
-                    </div>
-                </div>
+                <h3 style="margin-top:8px">module-info.java basics</h3>
+                <pre class="code">module com.example.app {
+  requires java.sql;
+  requires com.fasterxml.jackson.databind;
+  exports com.example.api;
+  opens com.example.internal to com.example.tools; // reflective access
+}
+</pre>
 
-                <div class="era">
-                    <h2>Open sourcing & tooling (2010–2018)</h2>
-                    <div class="period">2010 — 2018</div>
+                <h3 style="margin-top:8px">Key concepts</h3>
+                <ul style="color:var(--muted)">
+                    <li><strong>Strong encapsulation:</strong> packages not exported are inaccessible at compile-time and runtime (reflection blocked unless opened).</li>
+                    <li><strong>Module path vs Classpath:</strong> modules live on module-path; classpath is still supported but treated as an automatic unnamed module.</li>
+                    <li><strong>Automatic modules:</strong> jars on module-path without module-info become automatic modules (exports all packages, reads all unnamed modules).</li>
+                    <li><strong>Services:</strong> `uses` / `provides ... with` for service loader declarations and implementations.</li>
+                </ul>
+            </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2010: OpenJDK becomes the reference</div>
-                            <p class="evt-desc">Sun (then Oracle) places OpenJDK at the heart of the Java ecosystem — accelerated contributions and wide vendor builds follow.</p>
-                        </div>
-                    </div>
+            <section style="margin-top:12px">
+                <h2>Class Loading under JPMS</h2>
+                <p style="color:var(--muted)">Modules change visibility and resolution: the module system performs graph-based readability checks at link time. The runtime maps modules to classloader spaces; unnamed modules (classpath) are readable by default, but modular jars are isolated unless explicit readability edges exist.</p>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2014–2016: Modularization discussions</div>
-                            <p class="evt-desc">Work on JVM performance, GC options (G1, CMS improvements), and the beginnings of Project Jigsaw (module system in Java 9).</p>
-                        </div>
-                    </div>
-                </div>
+                <p style="color:var(--muted)"><strong>Note:</strong> JPMS is not a classloader replacement — it complements classloaders with a higher-level graph of module readability and encapsulation which the runtime enforces.</p>
+            </section>
 
-                <div class="era">
-                    <h2>Rapid release cadence & modern JVM (2018–2025)</h2>
-                    <div class="period">2018 — 2025</div>
+            <section style="margin-top:12px">
+                <h2>Migration tips (to modules)</h2>
+                <ul style="color:var(--muted)">
+                    <li>Start by modularizing leaf modules with clear APIs (`exports`) and no reflective access.</li>
+                    <li>Use `--patch-module` for gradual migration and `--add-exports`/`--add-opens` only as stopgaps.</li>
+                    <li>Prefer `jlink` to create small runtime images containing only required modules (great for containers).</li>
+                    <li>Third-party libraries without module-info can be placed on the classpath or module-path as automatic modules — beware split packages.</li>
+                </ul>
+            </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2017–2018: 6-month release cadence</div>
-                            <p class="evt-desc">Java moves to a time-driven release model. Smaller, faster feature delivery becomes the norm; long-term support (LTS) versions appear every few years.</p>
-                        </div>
-                    </div>
+            <section style="margin-top:12px">
+                <h2>Tools & debugging</h2>
+                <ul style="color:var(--muted)">
+                    <li><strong>jdeps</strong> — analyze dependencies and detect JDK internal API usage.</li>
+                    <li><strong>jcmd VM.class_hierarchy</strong> — inspect class and module relationships (vendor-specific).</li>
+                    <li><strong>--describe-module</strong> and <strong>--list-modules</strong> JVM flags to inspect resolved modules at runtime.</li>
+                </ul>
+            </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2020s: GraalVM, native images, and polyglot runtimes</div>
-                            <p class="evt-desc">New JVM-derived runtimes like GraalVM offer ahead-of-time compilation to native images, improved polyglot interop, and better startup times for cloud-native apps.</p>
-                        </div>
-                    </div>
-
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2023–2025: Performance & productivity</div>
-                            <p class="evt-desc">Ongoing work in JVM improvements (JIT, JFR, GC), language features (records, sealed types, pattern matching) and better ergonomics for modern development.</p>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="era">
-                    <h2>Why the JVM still matters</h2>
-                    <div class="period">Platform strengths</div>
-                    <div style="margin-top:8px;display:grid;gap:8px">
-                        <div class="event"><div class="dot"></div><div class="evt-body"><div class="evt-title">Portability & compatibility</div><p class="evt-desc">Bytecode portability and strong backwards compatibility helped Java survive decades of platform change.</p></div></div>
-                        <div class="event"><div class="dot"></div><div class="evt-body"><div class="evt-title">Ecosystem & tools</div><p class="evt-desc">Rich tooling (JVM profilers, build tools, testing frameworks), mature libraries and enterprise adoption.</p></div></div>
-                        <div class="event"><div class="dot"></div><div class="evt-body"><div class="evt-title">Language diversity</div><p class="evt-desc">The JVM hosts many languages — each benefiting from GC, threading model, and mature runtime services.</p></div></div>
-                    </div>
-                </div>
-
-            </article>
-
-            <footer class="card" style="margin-top:16px;display:flex;justify-content:space-between;align-items:center">
-                <div style="font-size:13px;color:var(--muted)">Last updated: 2025</div>
-                <div style="font-size:13px;color:var(--muted)">Made with ❤️ — timeline summary</div>
-            </footer>
-        </section>
+        </main>
 
         <aside class="card">
-            <div class="stats">
-                <div class="stat"><strong>1995</strong><div style="font-size:12px;color:var(--muted)">Java 1.0 released</div></div>
-                <div class="stat"><strong>2004–5</strong><div style="font-size:12px;color:var(--muted)">Generics & annotations</div></div>
-                <div class="stat"><strong>2010</strong><div style="font-size:12px;color:var(--muted)">OpenJDK</div></div>
-                <div class="stat"><strong>2018+</strong><div style="font-size:12px;color:var(--muted)">6-month cadence</div></div>
-            </div>
+            <h3 style="margin-top:0">Quick reference</h3>
+            <table>
+                <tr><th>Term</th><th>Notes</th></tr>
+                <tr><td>Classpath</td><td>Legacy application classpath; classes on it are in the unnamed module.</td></tr>
+                <tr><td>Module path</td><td>Place modular jars here for JPMS; enforces module boundaries.</td></tr>
+                <tr><td>Exports</td><td>Expose packages to other modules at compile & runtime.</td></tr>
+                <tr><td>Opens</td><td>Allow reflective access (e.g., for frameworks) at runtime.</td></tr>
+            </table>
 
-            <div class="resources" style="margin-top:8px">
-                <h3 style="margin:0 0 8px 0">Further reading</h3>
-                <ul>
-                    <li>Java language & JVM official docs</li>
-                    <li>OpenJDK project pages</li>
-                    <li>GraalVM and native-image docs</li>
-                    <li>Books: "Java: The Complete Reference", "Programming Java Virtual Machine Internals"</li>
-                </ul>
-            </div>
+            <h4 style="margin-top:12px">Common commands</h4>
+            <pre class="code"># Analyze dependencies
+jdeps --multi-release 11 --recursive myapp.jar
 
-            <div style="margin-top:12px">
-                <h3 style="margin:0 0 8px 0">Share / Export</h3>
-                <p style="color:var(--muted);font-size:13px;margin:0">Copy this page into your site or export as a single HTML file for printing.</p>
-            </div>
+# List modules
+java --list-modules
+
+# Run with module-path
+java --module-path mods -m com.example.app/com.example.Main
+</pre>
+
+            <h4 style="margin-top:12px">Want extras?</h4>
+            <p style="color:var(--muted)">I can add diagrams showing delegation flow, module graph visuals, migration checklist, or a printable PDF version.</p>
         </aside>
+    </div>
 
-    </main>
-
+    <footer>Saved as HTML — tell me if you want a light theme, slides, or deeper diagnostics for a specific app.</footer>
 </div>
 </body>
 </html>
