@@ -3,36 +3,36 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Project Loom: Virtual Threads Are Not Threads</title>
-    <meta name="description" content="Explainer of Project Loom, virtual threads, continuations, and structured concurrency — why virtual threads behave differently from platform threads and how to use them." />
+    <title>The Future Is Already Here: Valhalla, Panama, Leyden</title>
+    <meta name="description" content="Overview of Project Valhalla (value types), Project Panama (foreign memory & interop), and Project Leyden (Java on the JVM -- compact, fast startup)." />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root{--bg:#0b1220;--card:#071027;--muted:#9aa4bf;--accent:#f97316;--glass:rgba(255,255,255,0.02);--max:1100px}
+        :root{--bg:#ffffff;--text:#0b1220;--muted:#4b5563;--accent:#10b981;--card:#ffffff;--max-width:1100px}
         *{box-sizing:border-box}
-        body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:#e6eef8;background:linear-gradient(180deg,#020617,#071026);}
-        .wrap{max-width:var(--max);margin:28px auto;padding:22px}
+        body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,#fbfdff,#f3f6fb);color:var(--text)}
+        .wrap{max-width:var(--max-width);margin:28px auto;padding:22px}
         header{display:flex;gap:14px;align-items:center}
-        .logo{width:64px;height:64px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#06b6d4);display:flex;align-items:center;justify-content:center;font-weight:700}
-        h1{margin:0;font-size:22px}
+        .badge{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#7c3aed);display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
+        h1{margin:0;font-size:24px}
         p.lead{color:var(--muted);margin-top:6px}
-        .grid{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:18px}
-        .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
-        pre.code{background:#071026;padding:12px;border-radius:8px;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
-        table{width:100%;border-collapse:collapse;margin-top:8px}
-        th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.02);text-align:left}
-        th{color:var(--muted)}
-        .chip{display:inline-block;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.02);font-size:13px;margin-right:8px}
-        footer{margin-top:14px;color:var(--muted);font-size:13px;text-align:center}
-        @media (max-width:980px){.grid{grid-template-columns:1fr}}
+        .grid{display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-top:18px}
+        .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 6px 20px rgba(11,17,32,0.04);border:1px solid rgba(11,17,32,0.04)}
+        pre.code{background:#0b1220;color:#e6eef8;padding:12px;border-radius:8px;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+        table{width:100%;border-collapse:collapse;margin-top:12px}
+        th,td{padding:8px;border-bottom:1px solid #eef2f6;text-align:left}
+        th{background:#fbfdff}
+        .mini{font-size:13px;color:var(--muted)}
+        footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
+        @media (max-width:900px){.grid{grid-template-columns:1fr}}
     </style>
 </head>
 <body>
 <div class="wrap">
     <header>
-        <div class="logo">Loom</div>
+        <div class="badge">未来</div>
         <div>
-            <h1>Project Loom: Virtual Threads Are Not Threads</h1>
-            <p class="lead">A clear explanation of virtual threads, continuations, structured concurrency, and the practical changes they bring to writing concurrent Java code.</p>
+            <h1>The Future Is Already Here: Valhalla, Panama, Leyden</h1>
+            <p class="lead">A practical tour of the JVM-era projects reshaping Java: value types (Valhalla), foreign interop & memory (Panama), and compact fast-start Java runtimes (Leyden).</p>
         </div>
     </header>
 
@@ -40,123 +40,129 @@
         <main class="card">
 
             <section>
-                <h2>1 — The core idea</h2>
-                <p style="color:var(--muted)">Project Loom introduces <strong>virtual threads</strong> — lightweight, user-mode threads that map many logical threads onto a smaller number of platform (OS) threads. They make blocking I/O cheap again by eliminating the need for complex asynchronous APIs for many workloads.</p>
+                <h2>Why these projects matter</h2>
+                <p class="mini">Valhalla, Panama, and Leyden address three complementary pain points: representation and performance of data, safe and efficient foreign interop, and fast startup + small footprints for cloud-native Java. Together they push Java closer to systems-level languages while retaining safety and productivity.</p>
             </section>
 
-            <section>
-                <h2>2 — Virtual threads vs platform threads</h2>
-                <table>
-                    <thead><tr><th></th><th>Platform thread</th><th>Virtual thread</th></tr></thead>
-                    <tbody>
-                    <tr><td>Representation</td><td>Mapped 1:1 to OS threads</td><td>User-mode, scheduled by the JVM onto carrier threads</td></tr>
-                    <tr><td>Cost</td><td>High (stack, OS resources, expensive creation)</td><td>Low (smaller default stack, cheap creation)</td></tr>
-                    <tr><td>Blocking</td><td>Blocks OS thread</td><td>Blocks virtual thread; carrier thread is freed to run others</td></tr>
-                    <tr><td>Use cases</td><td>Long-running, pinned tasks interacting with native code</td><td>High-concurrency server tasks, per-request handlers, background tasks</td></tr>
-                    </tbody>
-                </table>
-            </section>
+            <section style="margin-top:12px">
+                <h2>Project Valhalla — Value Types & Generics improvements</h2>
+                <p class="mini">Valhalla introduces <strong>value types</strong> (also called inline classes or value objects) that behave like primitives with identity-free semantics but can have fields and methods. Goals:</p>
+                <ul class="mini">
+                    <li>Flattened memory layout (no object header per value), reducing allocation pressure.</li>
+                    <li>Enable <strong>specialized generics</strong> (avoid boxing of primitives) and improve cache locality.</li>
+                    <li>Better performance for data-centric code (collections, numerics, VMs, games).</li>
+                </ul>
 
-            <section>
-                <h2>3 — How blocking becomes cheap</h2>
-                <p style="color:var(--muted)">When a virtual thread performs a blocking call (e.g., socket read, Thread.sleep), the JVM parks the virtual thread and un-maps it from the carrier (OS) thread, which can continue running other virtual threads. This requires the JVM to manage continuations-style snapshots of execution state efficiently.</p>
-            </section>
-
-            <section>
-                <h2>4 — Continuations & scheduling</h2>
-                <p style="color:var(--muted)">Continuations capture the point of execution so the runtime can suspend and resume fiber-like units. Loom uses continuations under the hood to implement virtual threads; developers rarely interact with continuations directly but benefit from their semantics.</p>
-            </section>
-
-            <section>
-                <h2>5 — Structured Concurrency</h2>
-                <p style="color:var(--muted)">Structured concurrency provides a discipline for composing concurrent tasks so lifetimes are bound to lexical scopes. Loom promotes APIs like <code>StructuredTaskScope</code> that make concurrent code easier to reason about and to handle exceptions and cancellations deterministically.</p>
-                <pre class="code">try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
-  var f1 = scope.fork(() -> fetchUser());
-  var f2 = scope.fork(() -> fetchOrders());
-  scope.join();           // wait for tasks
-  scope.throwIfFailed();  // propagate first failure
-  return new Result(f1.resultNow(), f2.resultNow());
+                <pre class="code">// example sketch (preview syntax)
+public inline class Point {
+  private final int x;
+  private final int y;
+  public Point(int x, int y){ this.x = x; this.y = y; }
 }
+
+// Used in arrays or generics without per-element object headers
+Point[] points = new Point[100_000];
 </pre>
+
+                <p class="mini">Value types bring challenges: identity semantics, synchronization, and interop with existing APIs. Valhalla's roadmap includes careful design for boxing, equality, and generics specialization.</p>
             </section>
 
-            <section>
-                <h2>6 — Practical examples</h2>
-                <p style="color:var(--muted)"><strong>Replacing thread-per-request in servers:</strong></p>
-                <pre class="code">// old: create platform thread
-new Thread(() -> handleRequest(req)).start();
+            <section style="margin-top:12px">
+                <h2>Project Panama — Foreign Function & Memory API</h2>
+                <p class="mini">Panama provides safe, efficient access to native libraries and off-heap memory without JNI's boilerplate and pitfalls. It includes:</p>
+                <ul class="mini">
+                    <li><strong>Foreign Function API:</strong> Bind native functions with a safer, more declarative interop.</li>
+                    <li><strong>Foreign Memory API:</strong> Allocate and access off-heap memory with explicit scopes and safer accessors.</li>
+                    <li>Better performance and fewer JNI-related bugs (no raw pointers in user code).</li>
+                </ul>
 
-// new: virtual thread (Loom)
-Thread.startVirtualThread(() -> handleRequest(req));
+                <pre class="code">// example (sketch)
+try (MemorySegment seg = MemorySegment.allocateNative(1024)) {
+  int val = seg.get(ValueLayout.JAVA_INT, 0);
+}
+
+// Call native function
+CLinker.getInstance().downcallHandle(...).invokeExact(...);
 </pre>
-                <p style="color:var(--muted)">Start hundreds of thousands of virtual threads for high concurrency without massive resource cost.</p>
+
+                <p class="mini">Panama improves safety through scopes (lifetime management) and reduces overheads for passing large data to native libraries (e.g., image processing, databases, system calls).</p>
             </section>
 
-            <section>
-                <h2>7 — Interop & pitfalls</h2>
-                <ul style="color:var(--muted)">
-                    <li><strong>Blocking native code:</strong> If native code blocks a carrier thread, it can stall virtual threads; use <code>ScopedValue</code> or offload to dedicated platform threads when necessary.</li>
-                    <li><strong>Thread-locals:</strong> ThreadLocal behaves differently — virtual threads inherit values at creation; prefer <code>ScopedValue</code> for context propagation.</li>
-                    <li><strong>Pinning:</strong> Some operations require pinning a virtual thread to a carrier (e.g., JNI calls that touch thread-local native state).</li>
-                    <li><strong>Resource management:</strong> Structured concurrency helps avoid leaking tasks; still close sockets and streams.</li>
+            <section style="margin-top:12px">
+                <h2>Project Leyden — Lightweight Java runtime images</h2>
+                <p class="mini">Leyden explores compact artifacts and faster startup without losing Java’s dynamic features. It complements tools like <code>jlink</code> and Graal native-image by focusing on:</p>
+                <ul class="mini">
+                    <li>Smaller, deployable Java artifacts</li>
+                    <li>Faster startup with retained dynamic features where possible</li>
+                    <li>Better integration with container/cloud workflows</li>
+                </ul>
+
+                <p class="mini">Leyden aims to bridge the gap between full JDK images and AOT compiled native images, offering a middle ground: smaller, modular runtime images with good startup characteristics.</p>
+            </section>
+
+            <section style="margin-top:12px">
+                <h2>How they work together</h2>
+                <p class="mini">Combined, these projects enable:</p>
+                <ul class="mini">
+                    <li>Data-efficient programs using Valhalla's flattened layouts.</li>
+                    <li>High-performance native interop via Panama for I/O-bound and system code.</li>
+                    <li>Compact deployments and improved startup via Leyden strategies.</li>
+                </ul>
+
+                <p class="mini">Example use-case: a low-latency analytics engine using value types for packed data, Panama for SIMD-accelerated native kernels, and Leyden-style runtime images for fast cold-start in serverless environments.</p>
+            </section>
+
+            <section style="margin-top:12px">
+                <h2>Practical code notes & migration tips</h2>
+                <ul class="mini">
+                    <li>Start experimenting with Valhalla preview features on Java early-access builds; watch semantics for identity and boxing.</li>
+                    <li>Use Panama for performance-critical native calls; prefer scoped memory segments and avoid raw JNI unless necessary.</li>
+                    <li>Try Leyden techniques alongside jlink/Graal to assess trade-offs for startup vs dynamic feature support.</li>
+                    <li>Benchmark real workloads — microbenchmarks can mislead when layout and GC interactions vary.</li>
                 </ul>
             </section>
 
-            <section>
-                <h2>8 — Performance characteristics</h2>
-                <p style="color:var(--muted)">Virtual threads reduce contention and context-switch overhead visible with many blocked platform threads. However, for CPU-bound, long-running tasks, platform threads (or dedicated executor pools) can still be a better fit. Measure with realistic loads.</p>
+            <section style="margin-top:12px">
+                <h2>Tools & ecosystems to watch</h2>
+                <ul class="mini">
+                    <li>JDK early-access builds (Valhalla/Panama previews)</li>
+                    <li>GraalVM for advanced AOT and polyglot needs</li>
+                    <li>Async-profiler, JFR for measuring allocation and native access patterns</li>
+                    <li>Libraries adopting value types and Panama-friendly APIs</li>
+                </ul>
             </section>
 
-            <section>
-                <h2>9 — APIs & flags</h2>
-                <pre class="code"># Create a virtual thread
-Thread v = Thread.startVirtualThread(() -> doWork());
-
-# Structured concurrency (preview API names may vary)
-new StructuredTaskScope.ShutdownOnFailure().fork(...)
-
-# Useful JVM flags for debugging
--XX:+UnlockExperimentalVMOptions -XX:+UseBiasedLocking (example; Loom flags vary)
-</pre>
-            </section>
-
-            <section>
-                <h2>10 — Migration guidance</h2>
-                <ul style="color:var(--muted)">
-                    <li>Start by using virtual threads for IO-bound request handlers.</li>
-                    <li>Audit JNI/native libraries and any code that blocks carrier threads.</li>
-                    <li>Replace ThreadLocal usage with ScopedValue where appropriate.</li>
-                    <li>Use StructuredTaskScope to control lifecycles and handle exceptions.</li>
-                    <li>Benchmark with realistic concurrency patterns.</li>
+            <section style="margin-top:12px">
+                <h2>Risks & open questions</h2>
+                <ul class="mini">
+                    <li>Backward compatibility — ensuring existing libraries behave correctly.</li>
+                    <li>Tooling support (debuggers, profilers) must evolve to understand new representations.</li>
+                    <li>Security boundaries when exposing native memory — careful API design is essential.</li>
                 </ul>
             </section>
 
         </main>
 
         <aside class="card">
-            <h3 style="margin-top:0">Quick reference</h3>
-            <p style="color:var(--muted)"><strong>Key APIs:</strong> Thread.startVirtualThread, StructuredTaskScope, ScopedValue, Continuation (internal/preview).</p>
+            <h3 style="margin-top:0">Quick summary</h3>
+            <p class="mini"><strong>Valhalla:</strong> value types, flattened memory, generics specialization.</p>
+            <p class="mini"><strong>Panama:</strong> safe foreign memory & function interop.</p>
+            <p class="mini"><strong>Leyden:</strong> compact, fast-start Java artifacts for modern deployment.</p>
 
-            <h4 style="margin-top:12px">When to prefer virtual threads</h4>
-            <ul style="color:var(--muted)">
-                <li>Handling many concurrent short-lived requests</li>
-                <li>Replacing callback-heavy async code with straightforward blocking code</li>
-                <li>Simplifying concurrency for IO-heavy servers</li>
-            </ul>
+            <h4 style="margin-top:12px">Example flags & commands</h4>
+            <pre class="code"># Try a Valhalla early build (example)
+java --enable-preview -jar myapp.jar
 
-            <h4 style="margin-top:12px">When to be careful</h4>
-            <ul style="color:var(--muted)">
-                <li>Code that relies on thread identity or native thread-local state</li>
-                <li>Long-running CPU-bound work — consider using a dedicated thread pool</li>
-                <li>Blocking inside synchronized sections that assume limited threads</li>
-            </ul>
+# Use jlink to build a runtime image
+jlink --module-path $JAVA_HOME/jmods:mods --add-modules com.example --output myimage
+</pre>
 
-            <h4 style="margin-top:12px">Want extras?</h4>
-            <p style="color:var(--muted)">I can add sequence diagrams for blocking/unblocking, a migration checklist, sample benchmarks, or a printable PDF.</p>
+            <h4 style="margin-top:12px">Want more?</h4>
+            <p class="mini">I can add a diagram showing memory layout differences, a Valhalla vs traditional object comparison, or a Leyden deployment checklist.</p>
         </aside>
     </div>
 
-    <footer>Project Loom explainer saved — tell me which deep-dive you'd like next: continuations internals, StructuredTaskScope patterns, or real-world migration case studies.</footer>
+    <footer>Explainer created — say the word if you want slides, diagrams, or an interactive demo (Valhalla memory visualizer / Panama memory inspector).</footer>
 </div>
 </body>
 </html>

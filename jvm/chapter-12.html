@@ -3,208 +3,146 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>The Birth of Java and the JVM (1995–2025)</title>
-    <meta name="description" content="A visual, readable timeline and explainer about Java and the Java Virtual Machine from 1995 to 2025." />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Java Flight Recorder & The Best Profiler You Already Own</title>
+    <meta name="description" content="Introduction to Java Flight Recorder (JFR), a powerful low-overhead profiling and event recording tool built into the JVM for monitoring and diagnosing Java applications." />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
     <style>
-        :root{
-          --bg:#0f172a; --card:#0b1220; --muted:#9aa4bf; --accent:#7c3aed; --glass: rgba(255,255,255,0.04);
-          --max-width:1100px;
+        :root {
+          --bg: #f9fafb;
+          --text: #1f2937;
+          --muted: #6b7280;
+          --accent: #3b82f6;
+          --card: #ffffff;
+          --max-width: 900px;
         }
-        *{box-sizing:border-box}
-        html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,-apple-system,"Helvetica Neue",Arial;color:#e6eef8;background:linear-gradient(180deg,var(--bg),#071026);}
-        .container{max-width:var(--max-width);margin:36px auto;padding:28px}
-        header{display:flex;align-items:center;gap:18px;margin-bottom:22px}
-        .logo{width:72px;height:72px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#3b82f6);display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:18px;box-shadow:0 8px 30px rgba(0,0,0,.6)}
-        h1{margin:0;font-size:28px}
-        p.lead{color:var(--muted);margin-top:6px}
-
-        main{display:grid;grid-template-columns:1fr 360px;gap:24px}
-        .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:20px;border-radius:12px;box-shadow:0 6px 30px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
-
-        /* timeline */
-        .timeline{padding:10px 6px}
-        .era{margin-bottom:20px}
-        .era h2{margin:6px 0 8px 0;font-size:18px}
-        .era .period{color:var(--muted);font-size:13px;margin-bottom:6px}
-        .event{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:10px;background:var(--glass);border:1px solid rgba(255,255,255,0.02)}
-        .event + .event{margin-top:10px}
-        .dot{width:12px;height:12px;border-radius:50%;background:var(--accent);flex:0 0 12px;margin-top:6px}
-        .evt-body{font-size:14px}
-        .evt-title{font-weight:600;margin:0 0 4px 0}
-        .evt-desc{color:var(--muted);margin:0}
-
-        /* side */
-        aside .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
-        .stat{background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;text-align:center}
-        .stat strong{display:block;font-size:18px}
-        .resources ul{padding-left:18px;margin:6px 0;color:var(--muted)}
-
-        footer{margin-top:20px;color:var(--muted);font-size:13px;text-align:center}
-
-        /* responsive */
-        @media (max-width:900px){main{grid-template-columns:1fr}aside{order:2}header{gap:12px}.logo{width:56px;height:56px}}
+        * {
+          box-sizing: border-box;
+        }
+        body {
+          margin: 0;
+          font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+          background: var(--bg);
+          color: var(--text);
+          line-height: 1.6;
+        }
+        .container {
+          max-width: var(--max-width);
+          margin: 40px auto;
+          padding: 20px;
+        }
+        header {
+          margin-bottom: 32px;
+          border-bottom: 2px solid var(--accent);
+          padding-bottom: 12px;
+        }
+        h1 {
+          margin: 0;
+          font-weight: 700;
+          font-size: 1.8rem;
+          color: var(--accent);
+        }
+        p.lead {
+          margin-top: 6px;
+          color: var(--muted);
+          font-size: 1.1rem;
+        }
+        section {
+          margin-bottom: 28px;
+          background: var(--card);
+          padding: 20px;
+          border-radius: 10px;
+          box-shadow: 0 8px 20px rgba(59,130,246,0.1);
+        }
+        h2 {
+          margin-top: 0;
+          color: var(--accent);
+        }
+        ul {
+          padding-left: 20px;
+          color: var(--muted);
+        }
+        pre {
+          background: #1e293b;
+          color: #d1d5db;
+          padding: 14px;
+          border-radius: 8px;
+          overflow-x: auto;
+          font-family: 'Source Code Pro', monospace, monospace;
+          font-size: 0.9rem;
+          margin-top: 12px;
+        }
+        footer {
+          text-align: center;
+          margin-top: 40px;
+          color: var(--muted);
+          font-size: 14px;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <header>
-        <div class="logo">JVM</div>
-        <div>
-            <h1>The Birth of Java and the JVM (1995–2025)</h1>
-            <p class="lead">A concise timeline tracing major language, platform, and ecosystem milestones — from Java's public debut to modern JVM innovations.</p>
-        </div>
+        <h1>Java Flight Recorder &amp; The Best Profiler You Already Own</h1>
+        <p class="lead">Built-in JVM profiling and event recording tool to monitor, diagnose, and optimize Java applications with minimal overhead.</p>
     </header>
 
-    <main>
-        <section class="card">
-            <article class="timeline">
+    <section>
+        <h2>What is Java Flight Recorder (JFR)?</h2>
+        <p>Java Flight Recorder is a powerful, low-overhead profiling and event collection framework integrated into the HotSpot JVM since Java 7 (commercial feature) and open-sourced with Java 11+. It records detailed runtime information about the JVM and Java application behavior.</p>
+        <ul>
+            <li>Records CPU usage, memory allocation, garbage collection, thread activity, locking, I/O events, and more.</li>
+            <li>Designed to have minimal impact on application performance (< 1-2% overhead).</li>
+            <li>Enables continuous monitoring and on-demand recordings.</li>
+        </ul>
+    </section>
 
-                <div class="era">
-                    <h2>Origins & Java 1.x (1991–2000)</h2>
-                    <div class="period">1991 — 2000</div>
+    <section>
+        <h2>Why use JFR?</h2>
+        <ul>
+            <li><strong>Low overhead:</strong> JFR’s design allows it to run continuously in production without significantly affecting performance.</li>
+            <li><strong>Rich insights:</strong> Provides deep visibility into JVM internals and application behavior.</li>
+            <li><strong>Integrated tools:</strong> Works seamlessly with tools like Java Mission Control (JMC) for rich visualizations.</li>
+            <li><strong>Event-based:</strong> Captures both system-level and application-level events (custom events can be defined).</li>
+        </ul>
+    </section>
 
-                    <div class="event">
-                        <div class="dot" aria-hidden></div>
-                        <div class="evt-body">
-                            <div class="evt-title">1991: Project "Oak" begins</div>
-                            <p class="evt-desc">James Gosling and team at Sun Microsystems design a platform-independent language for embedded devices — Oak eventually renamed to Java.</p>
-                        </div>
-                    </div>
+    <section>
+        <h2>How to use Java Flight Recorder</h2>
+        <p>Starting a recording from the command line:</p>
+        <pre>java -XX:StartFlightRecording=duration=60s,filename=myrecording.jfr -jar myapp.jar</pre>
+        <p>This command runs the application and records JVM events for 60 seconds, saving the recording in <code>myrecording.jfr</code>.</p>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">1995: Java 1.0 public release</div>
-                            <p class="evt-desc">Sun announces Java 1.0 and the slogan "Write Once, Run Anywhere" — the JVM becomes the portability layer between bytecode and native machines.</p>
-                        </div>
-                    </div>
+        <p>You can also control JFR dynamically via JMX or Java Mission Control (JMC) to start/stop recordings without restarting the JVM.</p>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">Late 1990s: Applets and early adoption</div>
-                            <p class="evt-desc">Java applets, server-side servlets, and the emerging ecosystem push Java into enterprise and web backends.</p>
-                        </div>
-                    </div>
-                </div>
+        <p>Opening and analyzing recordings is typically done with <a href="https://www.oracle.com/java/technologies/javase/products-java-mission-control.html" target="_blank" rel="noopener">Java Mission Control</a>, which provides visualizations and event timelines to pinpoint performance bottlenecks.</p>
+    </section>
 
-                <div class="era">
-                    <h2>Enterprise dominance & the JVM matures (2000–2010)</h2>
-                    <div class="period">2000 — 2010</div>
+    <section>
+        <h2>Key events recorded by JFR</h2>
+        <ul>
+            <li><strong>CPU sampling</strong> - stack traces sampled periodically to show hotspots.</li>
+            <li><strong>Allocation events</strong> - objects allocated on heap with size and class info.</li>
+            <li><strong>Garbage collection</strong> - pause times and GC statistics.</li>
+            <li><strong>Thread activity</strong> - thread start/stop, blocking, and contention.</li>
+            <li><strong>Lock profiling</strong> - monitor enter/exit events to detect contention.</li>
+            <li><strong>I/O events</strong> - file and network I/O with timings.</li>
+        </ul>
+    </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2004–2006: Java Community Process (JCP) and language stabilization</div>
-                            <p class="evt-desc">Community stewardship grows. Java 5 brings generics, annotations, enhanced for-loop and other major language features.</p>
-                        </div>
-                    </div>
+    <section>
+        <h2>Best practices and tips</h2>
+        <ul>
+            <li>Use JFR in production for continuous profiling to catch hard-to-reproduce issues.</li>
+            <li>Start with default event settings, then customize based on your needs.</li>
+            <li>Combine JFR with other JVM diagnostics like GC logs for comprehensive monitoring.</li>
+            <li>Analyze recordings with Java Mission Control or open-source tools like <a href="https://github.com/chrishantha/jfr-dump" target="_blank" rel="noopener">jfr-dump</a>.</li>
+            <li>Define custom events in your application code to capture domain-specific metrics.</li>
+        </ul>
+    </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">Late 2000s: JVM for other languages</div>
-                            <p class="evt-desc">Languages like Scala, Groovy, Clojure, and JRuby compile to JVM bytecode — the JVM becomes a language runtime, not just Java's VM.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="era">
-                    <h2>Open sourcing & tooling (2010–2018)</h2>
-                    <div class="period">2010 — 2018</div>
-
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2010: OpenJDK becomes the reference</div>
-                            <p class="evt-desc">Sun (then Oracle) places OpenJDK at the heart of the Java ecosystem — accelerated contributions and wide vendor builds follow.</p>
-                        </div>
-                    </div>
-
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2014–2016: Modularization discussions</div>
-                            <p class="evt-desc">Work on JVM performance, GC options (G1, CMS improvements), and the beginnings of Project Jigsaw (module system in Java 9).</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="era">
-                    <h2>Rapid release cadence & modern JVM (2018–2025)</h2>
-                    <div class="period">2018 — 2025</div>
-
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2017–2018: 6-month release cadence</div>
-                            <p class="evt-desc">Java moves to a time-driven release model. Smaller, faster feature delivery becomes the norm; long-term support (LTS) versions appear every few years.</p>
-                        </div>
-                    </div>
-
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2020s: GraalVM, native images, and polyglot runtimes</div>
-                            <p class="evt-desc">New JVM-derived runtimes like GraalVM offer ahead-of-time compilation to native images, improved polyglot interop, and better startup times for cloud-native apps.</p>
-                        </div>
-                    </div>
-
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2023–2025: Performance & productivity</div>
-                            <p class="evt-desc">Ongoing work in JVM improvements (JIT, JFR, GC), language features (records, sealed types, pattern matching) and better ergonomics for modern development.</p>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="era">
-                    <h2>Why the JVM still matters</h2>
-                    <div class="period">Platform strengths</div>
-                    <div style="margin-top:8px;display:grid;gap:8px">
-                        <div class="event"><div class="dot"></div><div class="evt-body"><div class="evt-title">Portability & compatibility</div><p class="evt-desc">Bytecode portability and strong backwards compatibility helped Java survive decades of platform change.</p></div></div>
-                        <div class="event"><div class="dot"></div><div class="evt-body"><div class="evt-title">Ecosystem & tools</div><p class="evt-desc">Rich tooling (JVM profilers, build tools, testing frameworks), mature libraries and enterprise adoption.</p></div></div>
-                        <div class="event"><div class="dot"></div><div class="evt-body"><div class="evt-title">Language diversity</div><p class="evt-desc">The JVM hosts many languages — each benefiting from GC, threading model, and mature runtime services.</p></div></div>
-                    </div>
-                </div>
-
-            </article>
-
-            <footer class="card" style="margin-top:16px;display:flex;justify-content:space-between;align-items:center">
-                <div style="font-size:13px;color:var(--muted)">Last updated: 2025</div>
-                <div style="font-size:13px;color:var(--muted)">Made with ❤️ — timeline summary</div>
-            </footer>
-        </section>
-
-        <aside class="card">
-            <div class="stats">
-                <div class="stat"><strong>1995</strong><div style="font-size:12px;color:var(--muted)">Java 1.0 released</div></div>
-                <div class="stat"><strong>2004–5</strong><div style="font-size:12px;color:var(--muted)">Generics & annotations</div></div>
-                <div class="stat"><strong>2010</strong><div style="font-size:12px;color:var(--muted)">OpenJDK</div></div>
-                <div class="stat"><strong>2018+</strong><div style="font-size:12px;color:var(--muted)">6-month cadence</div></div>
-            </div>
-
-            <div class="resources" style="margin-top:8px">
-                <h3 style="margin:0 0 8px 0">Further reading</h3>
-                <ul>
-                    <li>Java language & JVM official docs</li>
-                    <li>OpenJDK project pages</li>
-                    <li>GraalVM and native-image docs</li>
-                    <li>Books: "Java: The Complete Reference", "Programming Java Virtual Machine Internals"</li>
-                </ul>
-            </div>
-
-            <div style="margin-top:12px">
-                <h3 style="margin:0 0 8px 0">Share / Export</h3>
-                <p style="color:var(--muted);font-size:13px;margin:0">Copy this page into your site or export as a single HTML file for printing.</p>
-            </div>
-        </aside>
-
-    </main>
-
+    <footer>
+        &copy; 2025 Your Name — Powered by the JVM and Java Flight Recorder
+    </footer>
 </div>
 </body>
 </html>
