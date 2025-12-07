@@ -3,208 +3,160 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>The Birth of Java and the JVM (1995–2025)</title>
-    <meta name="description" content="A visual, readable timeline and explainer about Java and the Java Virtual Machine from 1995 to 2025." />
+    <title>Project Loom: Virtual Threads Are Not Threads</title>
+    <meta name="description" content="Explainer of Project Loom, virtual threads, continuations, and structured concurrency — why virtual threads behave differently from platform threads and how to use them." />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root{
-          --bg:#0f172a; --card:#0b1220; --muted:#9aa4bf; --accent:#7c3aed; --glass: rgba(255,255,255,0.04);
-          --max-width:1100px;
-        }
+        :root{--bg:#0b1220;--card:#071027;--muted:#9aa4bf;--accent:#f97316;--glass:rgba(255,255,255,0.02);--max:1100px}
         *{box-sizing:border-box}
-        html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,-apple-system,"Helvetica Neue",Arial;color:#e6eef8;background:linear-gradient(180deg,var(--bg),#071026);}
-        .container{max-width:var(--max-width);margin:36px auto;padding:28px}
-        header{display:flex;align-items:center;gap:18px;margin-bottom:22px}
-        .logo{width:72px;height:72px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#3b82f6);display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:18px;box-shadow:0 8px 30px rgba(0,0,0,.6)}
-        h1{margin:0;font-size:28px}
+        body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:#e6eef8;background:linear-gradient(180deg,#020617,#071026);}
+        .wrap{max-width:var(--max);margin:28px auto;padding:22px}
+        header{display:flex;gap:14px;align-items:center}
+        .logo{width:64px;height:64px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#06b6d4);display:flex;align-items:center;justify-content:center;font-weight:700}
+        h1{margin:0;font-size:22px}
         p.lead{color:var(--muted);margin-top:6px}
-
-        main{display:grid;grid-template-columns:1fr 360px;gap:24px}
-        .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:20px;border-radius:12px;box-shadow:0 6px 30px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
-
-        /* timeline */
-        .timeline{padding:10px 6px}
-        .era{margin-bottom:20px}
-        .era h2{margin:6px 0 8px 0;font-size:18px}
-        .era .period{color:var(--muted);font-size:13px;margin-bottom:6px}
-        .event{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:10px;background:var(--glass);border:1px solid rgba(255,255,255,0.02)}
-        .event + .event{margin-top:10px}
-        .dot{width:12px;height:12px;border-radius:50%;background:var(--accent);flex:0 0 12px;margin-top:6px}
-        .evt-body{font-size:14px}
-        .evt-title{font-weight:600;margin:0 0 4px 0}
-        .evt-desc{color:var(--muted);margin:0}
-
-        /* side */
-        aside .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
-        .stat{background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;text-align:center}
-        .stat strong{display:block;font-size:18px}
-        .resources ul{padding-left:18px;margin:6px 0;color:var(--muted)}
-
-        footer{margin-top:20px;color:var(--muted);font-size:13px;text-align:center}
-
-        /* responsive */
-        @media (max-width:900px){main{grid-template-columns:1fr}aside{order:2}header{gap:12px}.logo{width:56px;height:56px}}
+        .grid{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:18px}
+        .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+        pre.code{background:#071026;padding:12px;border-radius:8px;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+        table{width:100%;border-collapse:collapse;margin-top:8px}
+        th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.02);text-align:left}
+        th{color:var(--muted)}
+        .chip{display:inline-block;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.02);font-size:13px;margin-right:8px}
+        footer{margin-top:14px;color:var(--muted);font-size:13px;text-align:center}
+        @media (max-width:980px){.grid{grid-template-columns:1fr}}
     </style>
 </head>
 <body>
-<div class="container">
+<div class="wrap">
     <header>
-        <div class="logo">JVM</div>
+        <div class="logo">Loom</div>
         <div>
-            <h1>The Birth of Java and the JVM (1995–2025)</h1>
-            <p class="lead">A concise timeline tracing major language, platform, and ecosystem milestones — from Java's public debut to modern JVM innovations.</p>
+            <h1>Project Loom: Virtual Threads Are Not Threads</h1>
+            <p class="lead">A clear explanation of virtual threads, continuations, structured concurrency, and the practical changes they bring to writing concurrent Java code.</p>
         </div>
     </header>
 
-    <main>
-        <section class="card">
-            <article class="timeline">
+    <div class="grid">
+        <main class="card">
 
-                <div class="era">
-                    <h2>Origins & Java 1.x (1991–2000)</h2>
-                    <div class="period">1991 — 2000</div>
+            <section>
+                <h2>1 — The core idea</h2>
+                <p style="color:var(--muted)">Project Loom introduces <strong>virtual threads</strong> — lightweight, user-mode threads that map many logical threads onto a smaller number of platform (OS) threads. They make blocking I/O cheap again by eliminating the need for complex asynchronous APIs for many workloads.</p>
+            </section>
 
-                    <div class="event">
-                        <div class="dot" aria-hidden></div>
-                        <div class="evt-body">
-                            <div class="evt-title">1991: Project "Oak" begins</div>
-                            <p class="evt-desc">James Gosling and team at Sun Microsystems design a platform-independent language for embedded devices — Oak eventually renamed to Java.</p>
-                        </div>
-                    </div>
+            <section>
+                <h2>2 — Virtual threads vs platform threads</h2>
+                <table>
+                    <thead><tr><th></th><th>Platform thread</th><th>Virtual thread</th></tr></thead>
+                    <tbody>
+                    <tr><td>Representation</td><td>Mapped 1:1 to OS threads</td><td>User-mode, scheduled by the JVM onto carrier threads</td></tr>
+                    <tr><td>Cost</td><td>High (stack, OS resources, expensive creation)</td><td>Low (smaller default stack, cheap creation)</td></tr>
+                    <tr><td>Blocking</td><td>Blocks OS thread</td><td>Blocks virtual thread; carrier thread is freed to run others</td></tr>
+                    <tr><td>Use cases</td><td>Long-running, pinned tasks interacting with native code</td><td>High-concurrency server tasks, per-request handlers, background tasks</td></tr>
+                    </tbody>
+                </table>
+            </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">1995: Java 1.0 public release</div>
-                            <p class="evt-desc">Sun announces Java 1.0 and the slogan "Write Once, Run Anywhere" — the JVM becomes the portability layer between bytecode and native machines.</p>
-                        </div>
-                    </div>
+            <section>
+                <h2>3 — How blocking becomes cheap</h2>
+                <p style="color:var(--muted)">When a virtual thread performs a blocking call (e.g., socket read, Thread.sleep), the JVM parks the virtual thread and un-maps it from the carrier (OS) thread, which can continue running other virtual threads. This requires the JVM to manage continuations-style snapshots of execution state efficiently.</p>
+            </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">Late 1990s: Applets and early adoption</div>
-                            <p class="evt-desc">Java applets, server-side servlets, and the emerging ecosystem push Java into enterprise and web backends.</p>
-                        </div>
-                    </div>
-                </div>
+            <section>
+                <h2>4 — Continuations & scheduling</h2>
+                <p style="color:var(--muted)">Continuations capture the point of execution so the runtime can suspend and resume fiber-like units. Loom uses continuations under the hood to implement virtual threads; developers rarely interact with continuations directly but benefit from their semantics.</p>
+            </section>
 
-                <div class="era">
-                    <h2>Enterprise dominance & the JVM matures (2000–2010)</h2>
-                    <div class="period">2000 — 2010</div>
+            <section>
+                <h2>5 — Structured Concurrency</h2>
+                <p style="color:var(--muted)">Structured concurrency provides a discipline for composing concurrent tasks so lifetimes are bound to lexical scopes. Loom promotes APIs like <code>StructuredTaskScope</code> that make concurrent code easier to reason about and to handle exceptions and cancellations deterministically.</p>
+                <pre class="code">try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+  var f1 = scope.fork(() -> fetchUser());
+  var f2 = scope.fork(() -> fetchOrders());
+  scope.join();           // wait for tasks
+  scope.throwIfFailed();  // propagate first failure
+  return new Result(f1.resultNow(), f2.resultNow());
+}
+</pre>
+            </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2004–2006: Java Community Process (JCP) and language stabilization</div>
-                            <p class="evt-desc">Community stewardship grows. Java 5 brings generics, annotations, enhanced for-loop and other major language features.</p>
-                        </div>
-                    </div>
+            <section>
+                <h2>6 — Practical examples</h2>
+                <p style="color:var(--muted)"><strong>Replacing thread-per-request in servers:</strong></p>
+                <pre class="code">// old: create platform thread
+new Thread(() -> handleRequest(req)).start();
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">Late 2000s: JVM for other languages</div>
-                            <p class="evt-desc">Languages like Scala, Groovy, Clojure, and JRuby compile to JVM bytecode — the JVM becomes a language runtime, not just Java's VM.</p>
-                        </div>
-                    </div>
-                </div>
+// new: virtual thread (Loom)
+Thread.startVirtualThread(() -> handleRequest(req));
+</pre>
+                <p style="color:var(--muted)">Start hundreds of thousands of virtual threads for high concurrency without massive resource cost.</p>
+            </section>
 
-                <div class="era">
-                    <h2>Open sourcing & tooling (2010–2018)</h2>
-                    <div class="period">2010 — 2018</div>
+            <section>
+                <h2>7 — Interop & pitfalls</h2>
+                <ul style="color:var(--muted)">
+                    <li><strong>Blocking native code:</strong> If native code blocks a carrier thread, it can stall virtual threads; use <code>ScopedValue</code> or offload to dedicated platform threads when necessary.</li>
+                    <li><strong>Thread-locals:</strong> ThreadLocal behaves differently — virtual threads inherit values at creation; prefer <code>ScopedValue</code> for context propagation.</li>
+                    <li><strong>Pinning:</strong> Some operations require pinning a virtual thread to a carrier (e.g., JNI calls that touch thread-local native state).</li>
+                    <li><strong>Resource management:</strong> Structured concurrency helps avoid leaking tasks; still close sockets and streams.</li>
+                </ul>
+            </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2010: OpenJDK becomes the reference</div>
-                            <p class="evt-desc">Sun (then Oracle) places OpenJDK at the heart of the Java ecosystem — accelerated contributions and wide vendor builds follow.</p>
-                        </div>
-                    </div>
+            <section>
+                <h2>8 — Performance characteristics</h2>
+                <p style="color:var(--muted)">Virtual threads reduce contention and context-switch overhead visible with many blocked platform threads. However, for CPU-bound, long-running tasks, platform threads (or dedicated executor pools) can still be a better fit. Measure with realistic loads.</p>
+            </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2014–2016: Modularization discussions</div>
-                            <p class="evt-desc">Work on JVM performance, GC options (G1, CMS improvements), and the beginnings of Project Jigsaw (module system in Java 9).</p>
-                        </div>
-                    </div>
-                </div>
+            <section>
+                <h2>9 — APIs & flags</h2>
+                <pre class="code"># Create a virtual thread
+Thread v = Thread.startVirtualThread(() -> doWork());
 
-                <div class="era">
-                    <h2>Rapid release cadence & modern JVM (2018–2025)</h2>
-                    <div class="period">2018 — 2025</div>
+# Structured concurrency (preview API names may vary)
+new StructuredTaskScope.ShutdownOnFailure().fork(...)
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2017–2018: 6-month release cadence</div>
-                            <p class="evt-desc">Java moves to a time-driven release model. Smaller, faster feature delivery becomes the norm; long-term support (LTS) versions appear every few years.</p>
-                        </div>
-                    </div>
+# Useful JVM flags for debugging
+-XX:+UnlockExperimentalVMOptions -XX:+UseBiasedLocking (example; Loom flags vary)
+</pre>
+            </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2020s: GraalVM, native images, and polyglot runtimes</div>
-                            <p class="evt-desc">New JVM-derived runtimes like GraalVM offer ahead-of-time compilation to native images, improved polyglot interop, and better startup times for cloud-native apps.</p>
-                        </div>
-                    </div>
+            <section>
+                <h2>10 — Migration guidance</h2>
+                <ul style="color:var(--muted)">
+                    <li>Start by using virtual threads for IO-bound request handlers.</li>
+                    <li>Audit JNI/native libraries and any code that blocks carrier threads.</li>
+                    <li>Replace ThreadLocal usage with ScopedValue where appropriate.</li>
+                    <li>Use StructuredTaskScope to control lifecycles and handle exceptions.</li>
+                    <li>Benchmark with realistic concurrency patterns.</li>
+                </ul>
+            </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2023–2025: Performance & productivity</div>
-                            <p class="evt-desc">Ongoing work in JVM improvements (JIT, JFR, GC), language features (records, sealed types, pattern matching) and better ergonomics for modern development.</p>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="era">
-                    <h2>Why the JVM still matters</h2>
-                    <div class="period">Platform strengths</div>
-                    <div style="margin-top:8px;display:grid;gap:8px">
-                        <div class="event"><div class="dot"></div><div class="evt-body"><div class="evt-title">Portability & compatibility</div><p class="evt-desc">Bytecode portability and strong backwards compatibility helped Java survive decades of platform change.</p></div></div>
-                        <div class="event"><div class="dot"></div><div class="evt-body"><div class="evt-title">Ecosystem & tools</div><p class="evt-desc">Rich tooling (JVM profilers, build tools, testing frameworks), mature libraries and enterprise adoption.</p></div></div>
-                        <div class="event"><div class="dot"></div><div class="evt-body"><div class="evt-title">Language diversity</div><p class="evt-desc">The JVM hosts many languages — each benefiting from GC, threading model, and mature runtime services.</p></div></div>
-                    </div>
-                </div>
-
-            </article>
-
-            <footer class="card" style="margin-top:16px;display:flex;justify-content:space-between;align-items:center">
-                <div style="font-size:13px;color:var(--muted)">Last updated: 2025</div>
-                <div style="font-size:13px;color:var(--muted)">Made with ❤️ — timeline summary</div>
-            </footer>
-        </section>
+        </main>
 
         <aside class="card">
-            <div class="stats">
-                <div class="stat"><strong>1995</strong><div style="font-size:12px;color:var(--muted)">Java 1.0 released</div></div>
-                <div class="stat"><strong>2004–5</strong><div style="font-size:12px;color:var(--muted)">Generics & annotations</div></div>
-                <div class="stat"><strong>2010</strong><div style="font-size:12px;color:var(--muted)">OpenJDK</div></div>
-                <div class="stat"><strong>2018+</strong><div style="font-size:12px;color:var(--muted)">6-month cadence</div></div>
-            </div>
+            <h3 style="margin-top:0">Quick reference</h3>
+            <p style="color:var(--muted)"><strong>Key APIs:</strong> Thread.startVirtualThread, StructuredTaskScope, ScopedValue, Continuation (internal/preview).</p>
 
-            <div class="resources" style="margin-top:8px">
-                <h3 style="margin:0 0 8px 0">Further reading</h3>
-                <ul>
-                    <li>Java language & JVM official docs</li>
-                    <li>OpenJDK project pages</li>
-                    <li>GraalVM and native-image docs</li>
-                    <li>Books: "Java: The Complete Reference", "Programming Java Virtual Machine Internals"</li>
-                </ul>
-            </div>
+            <h4 style="margin-top:12px">When to prefer virtual threads</h4>
+            <ul style="color:var(--muted)">
+                <li>Handling many concurrent short-lived requests</li>
+                <li>Replacing callback-heavy async code with straightforward blocking code</li>
+                <li>Simplifying concurrency for IO-heavy servers</li>
+            </ul>
 
-            <div style="margin-top:12px">
-                <h3 style="margin:0 0 8px 0">Share / Export</h3>
-                <p style="color:var(--muted);font-size:13px;margin:0">Copy this page into your site or export as a single HTML file for printing.</p>
-            </div>
+            <h4 style="margin-top:12px">When to be careful</h4>
+            <ul style="color:var(--muted)">
+                <li>Code that relies on thread identity or native thread-local state</li>
+                <li>Long-running CPU-bound work — consider using a dedicated thread pool</li>
+                <li>Blocking inside synchronized sections that assume limited threads</li>
+            </ul>
+
+            <h4 style="margin-top:12px">Want extras?</h4>
+            <p style="color:var(--muted)">I can add sequence diagrams for blocking/unblocking, a migration checklist, sample benchmarks, or a printable PDF.</p>
         </aside>
+    </div>
 
-    </main>
-
+    <footer>Project Loom explainer saved — tell me which deep-dive you'd like next: continuations internals, StructuredTaskScope patterns, or real-world migration case studies.</footer>
 </div>
 </body>
 </html>
