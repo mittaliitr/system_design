@@ -3,208 +3,165 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>The Birth of Java and the JVM (1995–2025)</title>
-    <meta name="description" content="A visual, readable timeline and explainer about Java and the Java Virtual Machine from 1995 to 2025." />
+    <title>JVM Architecture — The Big Picture</title>
+    <meta name="description" content="High-level visual explainer of the Java Virtual Machine architecture: subsystems, runtime areas, GC, JIT, class loading, and tooling." />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root{
-          --bg:#0f172a; --card:#0b1220; --muted:#9aa4bf; --accent:#7c3aed; --glass: rgba(255,255,255,0.04);
-          --max-width:1100px;
-        }
+        :root{--bg:#0b1220;--card:#071027;--muted:#9aa4bf;--accent:#06b6d4;--glass:rgba(255,255,255,0.02);--max:1100px}
         *{box-sizing:border-box}
-        html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,-apple-system,"Helvetica Neue",Arial;color:#e6eef8;background:linear-gradient(180deg,var(--bg),#071026);}
-        .container{max-width:var(--max-width);margin:36px auto;padding:28px}
-        header{display:flex;align-items:center;gap:18px;margin-bottom:22px}
-        .logo{width:72px;height:72px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#3b82f6);display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:18px;box-shadow:0 8px 30px rgba(0,0,0,.6)}
-        h1{margin:0;font-size:28px}
+        body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:#e6eef8;background:linear-gradient(180deg,#020617,#071026);}
+        .wrap{max-width:var(--max);margin:28px auto;padding:22px}
+        header{display:flex;gap:14px;align-items:center}
+        .logo{width:64px;height:64px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:700}
+        h1{margin:0;font-size:22px}
         p.lead{color:var(--muted);margin-top:6px}
-
-        main{display:grid;grid-template-columns:1fr 360px;gap:24px}
-        .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:20px;border-radius:12px;box-shadow:0 6px 30px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
-
-        /* timeline */
-        .timeline{padding:10px 6px}
-        .era{margin-bottom:20px}
-        .era h2{margin:6px 0 8px 0;font-size:18px}
-        .era .period{color:var(--muted);font-size:13px;margin-bottom:6px}
-        .event{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:10px;background:var(--glass);border:1px solid rgba(255,255,255,0.02)}
-        .event + .event{margin-top:10px}
-        .dot{width:12px;height:12px;border-radius:50%;background:var(--accent);flex:0 0 12px;margin-top:6px}
-        .evt-body{font-size:14px}
-        .evt-title{font-weight:600;margin:0 0 4px 0}
-        .evt-desc{color:var(--muted);margin:0}
-
-        /* side */
-        aside .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
-        .stat{background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;text-align:center}
-        .stat strong{display:block;font-size:18px}
-        .resources ul{padding-left:18px;margin:6px 0;color:var(--muted)}
-
-        footer{margin-top:20px;color:var(--muted);font-size:13px;text-align:center}
-
-        /* responsive */
-        @media (max-width:900px){main{grid-template-columns:1fr}aside{order:2}header{gap:12px}.logo{width:56px;height:56px}}
+        .grid{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:18px}
+        .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+        .section h2{margin:8px 0}
+        .diagram{background:linear-gradient(180deg,rgba(255,255,255,0.015),transparent);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02)}
+        pre.code{background:#071026;padding:12px;border-radius:8px;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+        table{width:100%;border-collapse:collapse;margin-top:8px}
+        th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.02);text-align:left}
+        th{color:var(--muted)}
+        .chip{display:inline-block;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.02);font-size:13px;margin-right:8px}
+        footer{margin-top:14px;color:var(--muted);font-size:13px;text-align:center}
+        @media (max-width:980px){.grid{grid-template-columns:1fr}}
     </style>
 </head>
 <body>
-<div class="container">
+<div class="wrap">
     <header>
         <div class="logo">JVM</div>
         <div>
-            <h1>The Birth of Java and the JVM (1995–2025)</h1>
-            <p class="lead">A concise timeline tracing major language, platform, and ecosystem milestones — from Java's public debut to modern JVM innovations.</p>
+            <h1>JVM Architecture — The Big Picture</h1>
+            <p class="lead">A concise, visual explainer of JVM components: class loading, runtime data areas, execution engine (interpreter + JIT), garbage collection, and tooling.</p>
         </div>
     </header>
 
-    <main>
-        <section class="card">
-            <article class="timeline">
+    <div class="grid">
+        <main class="card">
 
-                <div class="era">
-                    <h2>Origins & Java 1.x (1991–2000)</h2>
-                    <div class="period">1991 — 2000</div>
+            <section class="section">
+                <h2>Overview</h2>
+                <p style="color:var(--muted)">The JVM is an abstract machine specification + concrete implementations (HotSpot, OpenJ9, GraalVM). It executes Java bytecode and provides runtime services: class loading, memory management (GC), runtime optimization (JIT), threading, and native interfacing.</p>
+            </section>
 
-                    <div class="event">
-                        <div class="dot" aria-hidden></div>
-                        <div class="evt-body">
-                            <div class="evt-title">1991: Project "Oak" begins</div>
-                            <p class="evt-desc">James Gosling and team at Sun Microsystems design a platform-independent language for embedded devices — Oak eventually renamed to Java.</p>
-                        </div>
-                    </div>
+            <section class="section">
+                <h2>High-level diagram</h2>
+                <div class="diagram" aria-hidden>
+                    <!-- Simple SVG block diagram -->
+                    <svg width="100%" height="260" viewBox="0 0 1000 260" xmlns="http://www.w3.org/2000/svg" role="img">
+                        <defs>
+                            <linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#06b6d4"/><stop offset="1" stop-color="#7c3aed"/></linearGradient>
+                        </defs>
+                        <rect x="20" y="18" width="960" height="224" rx="12" fill="#071026" stroke="rgba(255,255,255,0.03)"/>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">1995: Java 1.0 public release</div>
-                            <p class="evt-desc">Sun announces Java 1.0 and the slogan "Write Once, Run Anywhere" — the JVM becomes the portability layer between bytecode and native machines.</p>
-                        </div>
-                    </div>
+                        <rect x="40" y="34" width="420" height="90" rx="8" fill="#071a2b" stroke="rgba(255,255,255,0.02)"/>
+                        <text x="70" y="58" fill="#bfeaf5" font-size="14" font-weight="600">Class Loader Subsystem</text>
+                        <text x="70" y="76" fill="#9aa4bf" font-size="12">Bootstrap, Extension, App ClassLoaders</text>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">Late 1990s: Applets and early adoption</div>
-                            <p class="evt-desc">Java applets, server-side servlets, and the emerging ecosystem push Java into enterprise and web backends.</p>
-                        </div>
-                    </div>
+                        <rect x="40" y="132" width="420" height="100" rx="8" fill="#071a2b" stroke="rgba(255,255,255,0.02)"/>
+                        <text x="70" y="152" fill="#bfeaf5" font-size="14" font-weight="600">Runtime Data Areas</text>
+                        <text x="70" y="170" fill="#9aa4bf" font-size="12">Method Area | Heap | Java Stacks | PC Registers | Native Method Area</text>
+
+                        <rect x="490" y="34" width="480" height="198" rx="8" fill="#071a2b" stroke="#1e293b"/>
+                        <text x="540" y="58" fill="#bfeaf5" font-size="14" font-weight="600">Execution Engine & Runtime Services</text>
+                        <text x="540" y="78" fill="#9aa4bf" font-size="12">Interpreter • JIT Compiler • Garbage Collector • Thread Scheduler • JNI</text>
+
+                        <line x1="460" y1="88" x2="490" y2="88" stroke="url(#g1)" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="460" y1="172" x2="490" y2="172" stroke="url(#g1)" stroke-width="3" stroke-linecap="round"/>
+
+                        <rect x="140" y="36" width="110" height="38" rx="6" fill="#072536"/>
+                        <text x="155" y="60" fill="#bfeaf5" font-size="12">.class files</text>
+
+                        <rect x="140" y="140" width="110" height="38" rx="6" fill="#072536"/>
+                        <text x="155" y="164" fill="#bfeaf5" font-size="12">Heap (Objects)</text>
+
+                        <rect x="560" y="110" width="160" height="40" rx="6" fill="#072536"/>
+                        <text x="590" y="135" fill="#bfeaf5" font-size="12">JIT (HotSpot)</text>
+
+                    </svg>
                 </div>
+            </section>
 
-                <div class="era">
-                    <h2>Enterprise dominance & the JVM matures (2000–2010)</h2>
-                    <div class="period">2000 — 2010</div>
+            <section class="section">
+                <h2>Core components</h2>
+                <ul style="color:var(--muted)">
+                    <li><strong>Class loader subsystem:</strong> loads class files into the runtime, resolves symbolic references, and enforces visibility. Typical hierarchy: Bootstrap → Platform (Extension) → Application.</li>
+                    <li><strong>Runtime Data Areas:</strong> Method Area (class metadata, runtime constant pool), Heap (all objects, GC-managed), Java Stacks (each thread's frames), PC Registers (per-thread), Native Method Area (for JNI/native code).</li>
+                    <li><strong>Execution Engine:</strong> Interpreter converts bytecode to machine actions; JIT compiles hot methods to native code (tiered compilation). Runtime services include garbage collection, thread scheduling, and safepoints.</li>
+                    <li><strong>Native Interface (JNI):</strong> enables interaction between Java and native libraries (C/C++), important for OS integration and performance-sensitive code.</li>
+                </ul>
+            </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2004–2006: Java Community Process (JCP) and language stabilization</div>
-                            <p class="evt-desc">Community stewardship grows. Java 5 brings generics, annotations, enhanced for-loop and other major language features.</p>
-                        </div>
-                    </div>
+            <section class="section">
+                <h2>Memory model (brief)</h2>
+                <p style="color:var(--muted)">The JVM Memory Model defines visibility and ordering guarantees for threads — it specifies happens-before relationships used by `volatile`, `synchronized`, and concurrent utilities. For implementation, HotSpot separates generations (Young/Old), metaspace for class metadata, and uses per-region or per-generation GC algorithms.</p>
+            </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">Late 2000s: JVM for other languages</div>
-                            <p class="evt-desc">Languages like Scala, Groovy, Clojure, and JRuby compile to JVM bytecode — the JVM becomes a language runtime, not just Java's VM.</p>
-                        </div>
-                    </div>
-                </div>
+            <section class="section">
+                <h2>Garbage collection (GC)</h2>
+                <p style="color:var(--muted)">Multiple GC algorithms target throughput, latency, or footprint: Serial, Parallel (Throughput), CMS (deprecated), G1 (default in many versions), ZGC, Shenandoah, and region-based collectors. Modern collectors aim for low pause times and predictable latency for cloud-native apps.</p>
+            </section>
 
-                <div class="era">
-                    <h2>Open sourcing & tooling (2010–2018)</h2>
-                    <div class="period">2010 — 2018</div>
+            <section class="section">
+                <h2>JIT & Runtime optimization</h2>
+                <p style="color:var(--muted)">HotSpot uses a tiered compilation strategy: interpreter & C1 (client) for quick compilation, C2 (server) for heavy optimization. Profiling, inlining, escape analysis, and speculative optimizations improve performance over time. Graal provides an alternative JIT/AOT for polyglot runtimes and native images.</p>
+            </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2010: OpenJDK becomes the reference</div>
-                            <p class="evt-desc">Sun (then Oracle) places OpenJDK at the heart of the Java ecosystem — accelerated contributions and wide vendor builds follow.</p>
-                        </div>
-                    </div>
+            <section class="section">
+                <h2>Threading & Concurrency</h2>
+                <p style="color:var(--muted)">The JVM provides the Java Memory Model primitives (volatile, synchronized, locks, java.util.concurrent). The runtime schedules OS threads (1:1 model) and provides monitors, biased locking, and lock elision optimizations.</p>
+            </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2014–2016: Modularization discussions</div>
-                            <p class="evt-desc">Work on JVM performance, GC options (G1, CMS improvements), and the beginnings of Project Jigsaw (module system in Java 9).</p>
-                        </div>
-                    </div>
-                </div>
+            <section class="section">
+                <h2>Tooling & observability</h2>
+                <p style="color:var(--muted)">Essential tools: <span class="chip">jmap</span><span class="chip">jstack</span><span class="chip">jstat</span><span class="chip">jcmd</span><span class="chip">jinfo</span>. Flight Recorder (JFR), Java Mission Control (JMC), VisualVM for profiling and diagnostics.</p>
+            </section>
 
-                <div class="era">
-                    <h2>Rapid release cadence & modern JVM (2018–2025)</h2>
-                    <div class="period">2018 — 2025</div>
+            <section class="section">
+                <h2>Putting it together — lifecycle of a class</h2>
+                <ol style="color:var(--muted)">
+                    <li><strong>Load:</strong> Class loader locates `.class` bytes and creates a Class object in the method area.</li>
+                    <li><strong>Link:</strong> Verification, preparation (allocate static fields), and resolution of symbolic refs.</li>
+                    <li><strong>Initialize:</strong> Run static initializers and assign explicit initial values.</li>
+                    <li><strong>Execute:</strong> Methods executed by the interpreter or compiled by the JIT; objects allocated on the heap and collected by GC when unreachable.</li>
+                </ol>
+            </section>
 
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2017–2018: 6-month release cadence</div>
-                            <p class="evt-desc">Java moves to a time-driven release model. Smaller, faster feature delivery becomes the norm; long-term support (LTS) versions appear every few years.</p>
-                        </div>
-                    </div>
-
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2020s: GraalVM, native images, and polyglot runtimes</div>
-                            <p class="evt-desc">New JVM-derived runtimes like GraalVM offer ahead-of-time compilation to native images, improved polyglot interop, and better startup times for cloud-native apps.</p>
-                        </div>
-                    </div>
-
-                    <div class="event">
-                        <div class="dot"></div>
-                        <div class="evt-body">
-                            <div class="evt-title">2023–2025: Performance & productivity</div>
-                            <p class="evt-desc">Ongoing work in JVM improvements (JIT, JFR, GC), language features (records, sealed types, pattern matching) and better ergonomics for modern development.</p>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="era">
-                    <h2>Why the JVM still matters</h2>
-                    <div class="period">Platform strengths</div>
-                    <div style="margin-top:8px;display:grid;gap:8px">
-                        <div class="event"><div class="dot"></div><div class="evt-body"><div class="evt-title">Portability & compatibility</div><p class="evt-desc">Bytecode portability and strong backwards compatibility helped Java survive decades of platform change.</p></div></div>
-                        <div class="event"><div class="dot"></div><div class="evt-body"><div class="evt-title">Ecosystem & tools</div><p class="evt-desc">Rich tooling (JVM profilers, build tools, testing frameworks), mature libraries and enterprise adoption.</p></div></div>
-                        <div class="event"><div class="dot"></div><div class="evt-body"><div class="evt-title">Language diversity</div><p class="evt-desc">The JVM hosts many languages — each benefiting from GC, threading model, and mature runtime services.</p></div></div>
-                    </div>
-                </div>
-
-            </article>
-
-            <footer class="card" style="margin-top:16px;display:flex;justify-content:space-between;align-items:center">
-                <div style="font-size:13px;color:var(--muted)">Last updated: 2025</div>
-                <div style="font-size:13px;color:var(--muted)">Made with ❤️ — timeline summary</div>
-            </footer>
-        </section>
+        </main>
 
         <aside class="card">
-            <div class="stats">
-                <div class="stat"><strong>1995</strong><div style="font-size:12px;color:var(--muted)">Java 1.0 released</div></div>
-                <div class="stat"><strong>2004–5</strong><div style="font-size:12px;color:var(--muted)">Generics & annotations</div></div>
-                <div class="stat"><strong>2010</strong><div style="font-size:12px;color:var(--muted)">OpenJDK</div></div>
-                <div class="stat"><strong>2018+</strong><div style="font-size:12px;color:var(--muted)">6-month cadence</div></div>
-            </div>
+            <h3 style="margin-top:0">Quick reference</h3>
+            <table>
+                <tr><th>Area</th><th>Purpose</th></tr>
+                <tr><td>Method Area</td><td>Class metadata, static vars, runtime constant pool</td></tr>
+                <tr><td>Heap</td><td>All objects and arrays (GC-managed)</td></tr>
+                <tr><td>Java Stacks</td><td>Per-thread frames: local vars, operand stack, return addresses</td></tr>
+                <tr><td>PC Registers</td><td>Per-thread pointer to current instruction</td></tr>
+            </table>
 
-            <div class="resources" style="margin-top:8px">
-                <h3 style="margin:0 0 8px 0">Further reading</h3>
-                <ul>
-                    <li>Java language & JVM official docs</li>
-                    <li>OpenJDK project pages</li>
-                    <li>GraalVM and native-image docs</li>
-                    <li>Books: "Java: The Complete Reference", "Programming Java Virtual Machine Internals"</li>
-                </ul>
-            </div>
+            <h4 style="margin-top:12px">Common GC choices</h4>
+            <ul style="color:var(--muted)">
+                <li><strong>G1:</strong> balanced default, region-based, predictable pauses.</li>
+                <li><strong>ZGC / Shenandoah:</strong> low-pause collectors for large heaps.</li>
+                <li><strong>Parallel GC:</strong> maximize throughput in batch jobs.</li>
+            </ul>
 
-            <div style="margin-top:12px">
-                <h3 style="margin:0 0 8px 0">Share / Export</h3>
-                <p style="color:var(--muted);font-size:13px;margin:0">Copy this page into your site or export as a single HTML file for printing.</p>
-            </div>
+            <h4 style="margin-top:12px">Further reading</h4>
+            <ul style="color:var(--muted)">
+                <li>HotSpot internals (OpenJDK)</li>
+                <li>Java Virtual Machine Specification</li>
+                <li>GraalVM and native-image docs</li>
+                <li>Articles: "Inside the HotSpot JVM" and GC tuning guides</li>
+            </ul>
+
+            <h4 style="margin-top:12px">Need this as slides?</h4>
+            <p style="color:var(--muted)">I can convert this into a slide deck or printable handout, or add deeper diagrams (sequence, memory timeline).</p>
         </aside>
+    </div>
 
-    </main>
-
+    <footer>Created for clarity — tell me if you want a deeper dive into any part (GC, JIT, Class loaders, or JNI).</footer>
 </div>
 </body>
 </html>
